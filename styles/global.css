@@ -4,13 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
-
+@layer components{
+  .buttonfilter{
+    @apply p-2 border rounded-xl shadow-sm hover:shadow-lg
+    active:scale-95 active:bg-gray-100 transition transform duration-150 ease-out;
+  }
+}
 html,
 body {
   padding: 0;
   margin: 0;
   /* font-family: 'Montserrat', sans-serif; */
   /* background-color:; */
+  width: 100%;
 }
 
 a {
@@ -27,47 +33,50 @@ a {
   display: block;
 
 } */
-.imageContainer{
+/* .imageContainer{
   /* width: 100%; */
   /* display: inline-block;  */
    /* height: 30px; */
    /*  */
-}
+/* }
 .imageContainer
   > span{
     position: unset !important;
-    /* height: 100%; */
   }
 .imageContainer .image{
   object-fit: fill;
-  /* //contain */
   width:100% !important;
   position: relative !important;
   height: unset !important;
-/*  */
+
+
+
 min-width: 300px;
  min-height: 200px; 
  border-top-left-radius: 8px;
  border-top-right-radius: 8px;
-}
+} */
 /* kartice */
-h3{
+h4{
   font-size:  18px;
   font-weight: 600;
 }
-h5{
+h6{
   font-size:  16px;
   font-weight: 350;
   margin-top: 8px;
   margin-bottom: 8px;
 }
 /*  */
-
-h1{
-  font-size:  22px;
-  font-weight: 600;
+ h1{
+  font-size:  32px;
+  font-weight: 700;
 }
 h2{
-  font-size:  20px;
-  font-weight: 450;
+  font-size:  28px;
+  font-weight: 600;
 }
+h3{
+  font-size:  22px;
+  font-weight: 450;
+} 
