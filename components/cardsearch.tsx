@@ -1,7 +1,23 @@
 import Image from "next/image";
-export default function CardSearch({ name, description, price, image, stars }) {
+export default function CardSearch({
+  name,
+  description,
+  price,
+  image,
+  stars,
+}: {
+  name: string;
+  description: string;
+  price: string;
+  image: string;
+  stars: string;
+}) {
   return (
-    <div className="flex bg-gray-200 my-3 rounded-xl">
+    <div
+      className="flex my-3 border rounded-xl cursor-pointer
+    hover:opacity-80 hover:shadow-lg
+    transition duration-200 ease-out"
+    >
       <div className="relative h-24 w-40 md:h-52 md:w-80">
         {/* flex shrink 0???? */}
         <Image
@@ -21,15 +37,15 @@ export default function CardSearch({ name, description, price, image, stars }) {
           <Image src="/images/search.png" height="20" width="20" alt="" />
         </div>
         <p className="text-sm text-gray-600 flex-grow">{description}</p>
-        <p className="text-lg flex items-center">
+        <div className="text-lg flex items-center">
           {price}€/
           <p className="text-md text-gray-500 ">night</p>
-        </p>
+        </div>
         <div className="flex justify-between items-center">
-          <p className="text-sm flex items-center text-gray-500 ">
+          <div className="text-sm flex items-center text-gray-500 ">
             245€/
             <p className="text-sm text-gray-500 ">total</p>
-          </p>
+          </div>
           <div className="flex">
             <p className="text-sm font-semibold">{stars}</p>
             {/* zvezdica */}

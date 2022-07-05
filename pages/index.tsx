@@ -1,13 +1,36 @@
 import type { NextPage } from "next";
+import { delBasePath } from "next/dist/shared/lib/router/router";
 import Head from "next/head";
 import Image from "next/image";
 import Banner from "../components/banner";
-import Button from "../components/button";
 import Card from "../components/card";
 import Layout from "../components/layout";
 import styles from "../styles/Home.module.css";
+import { db, storage } from "../firebase";
+import { useSession } from "next-auth/react";
+import { addDoc, collection } from "firebase/firestore";
+import { useRouter } from "next/router";
+import Button from "../components/button";
 
 const Home: NextPage = () => {
+  // const { data: session, status } = useSession();
+
+  //prebaceno u navbar
+  // const becomeAHost = async () => {
+  //   const docRef = await addDoc(collection(db, "users"), {
+  //     // userId: session ? (session.user ? (session.user?["uid"] : 1) : 1) : 1,
+  //     userId: session?.user?.name,
+  //     host: true,
+  //   });
+  // };
+
+  // const router = useRouter();
+  // const addproperty = () => {
+  //   router.push({
+  //     pathname: "/addproperty",
+  //   });
+  // };
+
   return (
     <Layout>
       <div className="">
@@ -77,6 +100,10 @@ const Home: NextPage = () => {
               />
             </div>
           </section>
+          {/* <section>
+            <Button action={becomeAHost} text="Become a host" />
+            <Button action={addproperty} text="Add property" />
+          </section> */}
         </main>
       </div>
     </Layout>

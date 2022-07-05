@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Button from "../components/button";
+import ButtonBanner from "./buttonbanner";
 
 export default function Banner() {
   return (
@@ -21,7 +21,7 @@ export default function Banner() {
           Accomodation around the world in one place
         </div>
         <br />
-        <Button text="Find your next stay"></Button>
+        <ButtonBanner text="Find your next stay"></ButtonBanner>
       </div>
     </div>
   );

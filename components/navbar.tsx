@@ -1,6 +1,10 @@
+import { addDoc, collection } from "firebase/firestore";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
 import Image from "next/image";
 import { useState } from "react";
+import { db } from "../firebase";
+import Button from "./button";
 
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
@@ -21,31 +25,40 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
     });
   };
   const router = useRouter();
+
+  const { data: session, status } = useSession(); //ovo session je renamovano za data// const session=useSession();
+  // const { data: session } = useSession();
+
+  const [open, setOpen] = useState(false);
+  const [onSub, setOnSub] = useState(false);
+  // const [activeMenu, setActiveMenu] = useState("main");
+
+  const becomeAHost = async () => {
+    const docRef = await addDoc(collection(db, "users"), {
+      // userId: session ? (session.user ? (session.user?["uid"] : 1) : 1) : 1,
+      userId: session?.user?.name,
+      host: true,
+    });
+  };
+  const addproperty = () => {
+    router.push({
+      pathname: "/addproperty",
+    });
+  };
+
   return (
     //header tag??
     <div
       className="p-5 shadow-xl bg-header grid grid-cols-2
        w-full sticky top-0 z-[100] md:px-10"
     >
-      {/*    flex justify-between items-center  */}
-      {/* treba li padding ovde, ja ga dodala */}
       <div
         onClick={() => router.push("/")}
         className=" text-2xl text-logo font-logo font-semibold mr-2 cursor-pointer"
       >
         mybnb
       </div>
-      {/* <div className="flex items-center">
-        {/* //max wid padd i heigh border i border radious */}
-      {/* border none za input i (width) padding i outline-width!!!!!! */}
-      {/* <input type="text" placeholder="Search..." className="outline-0" />
-        <Image
-          src="/images/profile.jpg"
-          height="20"
-          width="20"
-          alt="search icon"
-        />
-      </div> */}
+
       <div className="flex items-center space-x-4 justify-self-end">
         {/* width i mr  justify-between*/}
         <div
@@ -53,9 +66,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
          rounded-full border-2 border-solid py-2
          "
         >
-          {/* md:shadow-sm */}
-          {/* //max wid  i height */}
-          {/* border none za input i (width) padding */}
           <input
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
@@ -73,12 +83,80 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             />
           </div>
         </div>
-        <div className="hidden md:inline">Register</div>
-        <div className="">Sign in</div>
+
+        {session ? (
+          <>
+            {/* ili session.user && */}
+            {/* ///////////// DROPDOWN TODO:popravi ga ////////////////////////////////////////////*/}
+            <div>
+              <div
+                className="ml-7"
+                onMouseEnter={() => setOpen(!open)} //t
+                onMouseLeave={() => {
+                  onSub ? "" : setOpen(!open); //f
+                }}
+                // onClick={() => setOpen(!open)} //
+              >
+                <Image
+                  src={session.user?.image}
+                  height="20"
+                  width="20"
+                  alt=""
+                  className="rounded-sm"
+                />
+              </div>
+              {open && (
+                <div
+                  onMouseEnter={() => setOnSub(true)} //t
+                  onMouseLeave={() => {
+                    setOpen(!open); //
+                    setOnSub(false); //f
+                  }}
+                  className="absolute w-36 bg-slate-100 -translate-x-2/4 p-1 overflow-hidden rounded-md"
+                >
+                  <div
+                    onClick={signOut}
+                    className="hover:bg-slate-50 py-1  pl-1 transition duration-200 ease-out  hover:shadow-lg"
+                  >
+                    Sign out
+                  </div>
+                  <div className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg">
+                    Profile
+                  </div>
+                  <div
+                    onClick={becomeAHost}
+                    className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+                  >
+                    Become a host
+                  </div>
+                  <div
+                    onClick={addproperty}
+                    className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+                  >
+                    Add property
+                  </div>
+                  <div className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg">
+                    Host board
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* /////////////////////////////////////////////////////////////////// */}
+          </>
+        ) : (
+          <>
+            <div className="hidden md:inline">Register</div>
+            {/* zasto se crveni onClick */}
+            <button onClick={signIn} className="">
+              Sign in
+            </button>
+          </>
+        )}
       </div>
+
       {searchInput && (
         <div className="flex flex-col mx-auto col-span-2">
-          <div className="flex items-center border-b ">
+          <div className="flex items-center border-b  my-3">
             <h3 className="flex-grow mr-10">Number of guests</h3>
             <Image src="/images/search.png" height="10" width="10" alt="" />
             <input
