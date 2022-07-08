@@ -5,13 +5,19 @@ import Image from "next/image";
 import { useState } from "react";
 import { db } from "../firebase";
 import Button from "./button";
+import Popup from "./popup";
+import SignInNEW from "./signInNEW";
 
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const [searchInput, setSearchInput] = useState("");
   const [numOfGuests, setNumOfGuests] = useState(1);
+  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   const resetSearch = () => {
     setSearchInput("");
+  };
+  const togglePopup = () => {
+    setIsPopupOpen(!isPopupOpen);
   };
   // ovaj dole nacinje oristan jer ovako mozemo da sharujemo nekom link da vidi nase reyultate
   const search = () => {
@@ -86,7 +92,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
 
         {session ? (
           <>
-            {/* ili session.user && */}
             {/* ///////////// DROPDOWN TODO:popravi ga ////////////////////////////////////////////*/}
             <div>
               <div
@@ -153,7 +158,16 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           </>
         )}
       </div>
-
+      <div>
+        <input
+          type="button"
+          value="Click to Open Popup"
+          onClick={togglePopup}
+        />
+        {isPopupOpen && (
+          <Popup content={<SignInNEW />} handleClose={togglePopup} />
+        )}
+      </div>
       {searchInput && (
         <div className="flex flex-col mx-auto col-span-2">
           <div className="flex items-center border-b  my-3">

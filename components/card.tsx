@@ -29,5 +29,3 @@ export default function Card({ name, description, price, image }) {
     </div>
   );
 }
-
-// hover:bg-gray-100 plus scale itd!!!!!!!!!!!!!!!!

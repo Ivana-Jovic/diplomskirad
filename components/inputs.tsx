@@ -1,13 +1,15 @@
 export default function Inputs({
   text,
   placeholder,
-  reff,
+  item,
   type,
+  setItem = () => {},
 }: {
   text: string;
   placeholder: string;
-  reff: any;
+  item: any;
   type: string;
+  setItem: any;
 }) {
   return (
     <div
@@ -17,7 +19,10 @@ export default function Inputs({
     >
       <div className="text-sm text-gray-600">{text}</div>
       <input
-        ref={reff}
+        value={item}
+        onChange={(e) => {
+          setItem(e.target.value);
+        }}
         type={type}
         placeholder={placeholder}
         // defaultValue={type == "number" ? "0" : ""}
