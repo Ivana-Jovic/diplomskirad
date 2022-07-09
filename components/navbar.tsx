@@ -3,22 +3,34 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
 import Image from "next/image";
 import { useState } from "react";
-import { db } from "../firebase";
-import Button from "./button";
-import Popup from "./popup";
-import SignInNEW from "./signInNEW";
+import { auth, db } from "../firebase";
+import LogoutNEW from "./logoutNEW";
+import { Dropdown, Menu, Space } from "antd";
+import SignInRegisterPopup from "./signInRegisterPopup";
+import { onAuthStateChanged } from "firebase/auth";
 
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const [searchInput, setSearchInput] = useState("");
   const [numOfGuests, setNumOfGuests] = useState(1);
-  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  // const { data: session, status } = useSession();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User is signed in
+      setIsLoggedIn(true);
+      // ...
+    } else {
+      // User is signed out
+      setIsLoggedIn(false);
+    }
+  });
+
   const resetSearch = () => {
     setSearchInput("");
   };
-  const togglePopup = () => {
-    setIsPopupOpen(!isPopupOpen);
-  };
+
   // ovaj dole nacinje oristan jer ovako mozemo da sharujemo nekom link da vidi nase reyultate
   const search = () => {
     router.push({
@@ -30,27 +42,96 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
       },
     });
   };
-  const router = useRouter();
-
-  const { data: session, status } = useSession(); //ovo session je renamovano za data// const session=useSession();
-  // const { data: session } = useSession();
-
-  const [open, setOpen] = useState(false);
-  const [onSub, setOnSub] = useState(false);
-  // const [activeMenu, setActiveMenu] = useState("main");
 
   const becomeAHost = async () => {
     const docRef = await addDoc(collection(db, "users"), {
-      // userId: session ? (session.user ? (session.user?["uid"] : 1) : 1) : 1,
-      userId: session?.user?.name,
+      // userId: session?.user?.name,<-GOOGLE
+      userId: auth?.currentUser?.uid,
       host: true,
     });
   };
-  const addproperty = () => {
+  const addProperty = () => {
     router.push({
       pathname: "/addproperty",
     });
   };
+  const hostsBoard = () => {
+    router.push({
+      pathname: "/hostsboard",
+    });
+  };
+  const profileSettings = () => {
+    router.push({
+      pathname: "/profilesettings",
+    });
+  };
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: (
+            <>
+              <div className="hover:bg-slate-50 py-1  pl-1 transition duration-200 ease-out  hover:shadow-lg">
+                <LogoutNEW setIsLoggedIn={setIsLoggedIn} />
+              </div>
+              {/* <div<-GOOGLE
+                    onClick={signOut}
+                    className="hover:bg-slate-50 py-1  pl-1 transition duration-200 ease-out  hover:shadow-lg"
+                  >
+                    Sign out
+                  </div> */}
+            </>
+          ),
+        },
+        {
+          key: "2",
+          label: (
+            <div
+              onClick={profileSettings}
+              className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+            >
+              Profile
+            </div>
+          ),
+        },
+        {
+          key: "3",
+          label: (
+            <div
+              onClick={becomeAHost}
+              className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+            >
+              Become a host
+            </div>
+          ),
+          // disabled: true,
+        },
+        {
+          key: "4",
+          label: (
+            <div
+              onClick={addProperty}
+              className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+            >
+              Add property
+            </div>
+          ),
+        },
+        {
+          key: "5",
+          label: (
+            <div
+              onClick={hostsBoard}
+              className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+            >
+              Host board
+            </div>
+          ),
+        },
+      ]}
+    />
+  );
 
   return (
     //header tag??
@@ -89,83 +170,35 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             />
           </div>
         </div>
-
-        {session ? (
+        {/* session ||  <-GOOGLE*/}
+        {isLoggedIn ? (
+          // {auth.currentUser !== null ? (
           <>
-            {/* ///////////// DROPDOWN TODO:popravi ga ////////////////////////////////////////////*/}
             <div>
-              <div
-                className="ml-7"
-                onMouseEnter={() => setOpen(!open)} //t
-                onMouseLeave={() => {
-                  onSub ? "" : setOpen(!open); //f
-                }}
-                // onClick={() => setOpen(!open)} //
-              >
-                <Image
-                  src={session.user?.image}
-                  height="20"
-                  width="20"
-                  alt=""
-                  className="rounded-sm"
-                />
-              </div>
-              {open && (
-                <div
-                  onMouseEnter={() => setOnSub(true)} //t
-                  onMouseLeave={() => {
-                    setOpen(!open); //
-                    setOnSub(false); //f
-                  }}
-                  className="absolute w-36 bg-slate-100 -translate-x-2/4 p-1 overflow-hidden rounded-md"
-                >
-                  <div
-                    onClick={signOut}
-                    className="hover:bg-slate-50 py-1  pl-1 transition duration-200 ease-out  hover:shadow-lg"
-                  >
-                    Sign out
-                  </div>
-                  <div className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg">
-                    Profile
-                  </div>
-                  <div
-                    onClick={becomeAHost}
-                    className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
-                  >
-                    Become a host
-                  </div>
-                  <div
-                    onClick={addproperty}
-                    className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
-                  >
-                    Add property
-                  </div>
-                  <div className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg">
-                    Host board
-                  </div>
-                </div>
-              )}
+              <Dropdown overlay={menu}>
+                <a onClick={(e) => e.preventDefault()}>
+                  <Space>
+                    <Image
+                      // src={session.user?.image}<-GOOGLE
+                      src="/images/app3.jpg"
+                      height="20"
+                      width="20"
+                      alt=""
+                      className="rounded-sm"
+                    />
+                    <p>+</p>
+                  </Space>
+                </a>
+              </Dropdown>
             </div>
-            {/* /////////////////////////////////////////////////////////////////// */}
           </>
         ) : (
           <>
-            <div className="hidden md:inline">Register</div>
-            {/* zasto se crveni onClick */}
-            <button onClick={signIn} className="">
-              Sign in
-            </button>
+            <SignInRegisterPopup
+              isLoggedIn={isLoggedIn}
+              setIsLoggedIn={setIsLoggedIn}
+            />
           </>
-        )}
-      </div>
-      <div>
-        <input
-          type="button"
-          value="Click to Open Popup"
-          onClick={togglePopup}
-        />
-        {isPopupOpen && (
-          <Popup content={<SignInNEW />} handleClose={togglePopup} />
         )}
       </div>
       {searchInput && (
@@ -175,7 +208,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             <Image src="/images/search.png" height="10" width="10" alt="" />
             <input
               value={numOfGuests}
-              onChange={(event) => setNumOfGuests(event.target.value)}
+              onChange={(event) => setNumOfGuests(parseInt(event.target.value))}
               min={1}
               max={15}
               type="number"

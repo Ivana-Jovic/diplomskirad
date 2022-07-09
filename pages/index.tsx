@@ -50,7 +50,8 @@ const Home: NextPage = () => {
               <h2 className="pb-4">Explore cities</h2>
               <h3>Here are some of the most popular ones</h3>
             </div>
-            <div className="flex  overflow-scroll scrollbar-hide  ">
+            <div className="flex  overflow-x-scroll sm:overflow-auto ">
+              {/* overflow-scroll scrollbar-hide  */}
               {/* space-x-3 */}
               <Card
                 // key="/images/app1.jpg"!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -79,7 +80,8 @@ const Home: NextPage = () => {
               <h2 className="pb-4">Get inspiration for your next trip </h2>
               <h3>Here are a few interesting accomodations</h3>
             </div>
-            <div className="flex space-x-3 overflow-scroll scrollbar-hide">
+            <div className="flex space-x-3 overflow-x-scroll sm:overflow-auto ">
+              {/* overflow-scroll scrollbar-hide  */}
               <Card
                 image="/images/app1.jpg"
                 name="New app"

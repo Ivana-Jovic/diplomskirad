@@ -1,8 +1,21 @@
 export default function Popup(props: any) {
   return (
-    <div className="fixed bg-slate-200 w-full h-screen border rounded-xl">
-      <div className="relative w-2/4 h-auto bg-slate-400 ">
-        <div onClick={props.handleClose}>X</div>
+    <div className="grid place-items-center fixed bg-slate-200  bg-opacity-60 w-full h-screen top-0 left-0">
+      <div
+        className="relative w-3/4 md:w-2/4 max-w-xl h-auto border rounded-xl
+        bg-header shadow-md  p-3
+      hover:shadow-xl transition duration-150
+      text-lg sm:text-2xl font-semibold 
+      flex flex-col"
+      >
+        {/*//mx-auto */}
+        <div
+          onClick={props.handleClose}
+          className="self-end cursor-pointer bg-footer text-header rounded-3xl
+           w-8 h-8 text-center mb-3"
+        >
+          X
+        </div>
         {props.content}
       </div>
     </div>

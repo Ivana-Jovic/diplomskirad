@@ -1,7 +1,7 @@
 // import { addDoc, collection } from "firebase/firestore";
 import { useState, useEffect, useRef } from "react";
 // import { db } from "../firebase";
-import Bla from "./bla";
+// import Bla from "./bla";
 
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import {
@@ -35,6 +35,7 @@ export default function FileForm({ images, setImages }: ImgProps) {
   // }, [url]);
   //TODO : dodavanje vise slika odjednom
   const changeHandler = (e: any) => {
+    //TODO nikad nisam stavila tt na nul tj prazno
     const arr: File[] = e.target.files;
     const tt: string[] = images;
     for (let index = 0; index < arr.length; index++) {
