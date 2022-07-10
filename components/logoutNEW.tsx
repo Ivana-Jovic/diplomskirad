@@ -1,11 +1,9 @@
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
-import { Dispatch, SetStateAction } from "react";
 
-export default function LogoutNEW({
-  setIsLoggedIn,
-}: {
-  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+export default function LogoutNEW({}: // setIsLoggedIn,sad
+{
+  // setIsLoggedIn: Dispatch<SetStateAction<boolean>>;sad
 }) {
   const logout = //() => {
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -14,7 +12,7 @@ export default function LogoutNEW({
       signOut(auth) //uvezeno iz druge bibl!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         .then(() => {
           console.log("the user signed out");
-          setIsLoggedIn(false);
+          // setIsLoggedIn(false);sad
         })
         .catch((err) => {
           console.log(err.message);

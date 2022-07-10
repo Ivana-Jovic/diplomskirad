@@ -1,82 +1,41 @@
 import { useRouter } from "next/router";
 import CardHostsProperty from "../components/cardhostsproperty";
-import CardSearch from "../components/cardsearch";
 import Layout from "../components/layout";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { auth, db } from "../firebase";
-import { useEffect, useRef, useState } from "react";
+import { db } from "../firebase";
+import { useContext, useEffect, useRef, useState } from "react";
+import { AuthContext } from "../firebase-authProvider";
 
-// const arrData = [
-//   {
-//     name: "MON",
-//     description: "blabla",
-//     price: "100",
-//     image: "/images/app1.jpg",
-//     stars: "5",
-//   },
-//   {
-//     name: "MON2",
-//     description: "blabla",
-//     price: "100",
-//     image: "/images/app2.jpg",
-//     stars: "5",
-//   },
-//   {
-//     name: "MON3",
-//     description: "blabla",
-//     price: "100",
-//     image: "/images/app3.jpg",
-//     stars: "5",
-//   },
-//   {
-//     name: "MON4",
-//     description: "blabla",
-//     price: "100",
-//     image: "/images/profile.jpg",
-//     stars: "5",
-//   },
-//   {
-//     name: "MON5",
-//     description: "blabla",
-//     price: "100",
-//     image: "/images/banner.jpg",
-//     stars: "5",
-//   },
-// ];
 export default function HostsBoard() {
-  const router = useRouter();
-  // const arrData: any[] = [];
-  const arrData = useRef<any[]>([]);
+  const { user, myUserr } = useContext(AuthContext);
+  // const router = useRouter();
+  // const arrData = useRef<any[]>([]);
   const [arr, setArr] = useState<any[]>([]);
   // const { location, numOfGuests } = router.query;
-  const addProperty = () => {
-    router.push({
-      pathname: "/addproperty",
+
+  const getHostProperties = async () => {
+    const arrData: any[] = [];
+    const q = query(
+      collection(db, "property"),
+      where("ownerId", "==", user?.uid)
+      //?????????????
+    );
+    const querySnapshot = await getDocs(q);
+    console.log("size", querySnapshot.size);
+    querySnapshot.forEach((doc) => {
+      if (querySnapshot.size == arr.length) {
+        setArr([]);
+      }
+      arrData.push(doc.data());
+      setArr(arrData);
+      console.log(arr.length);
     });
   };
-  const getHostProperties = async () => {
-    //   arrData.current = arrData.current.splice(0);
-    //   setArr([]);
-    //   const q = query(
-    //     collection(db, "property"),
-    //     where("ownerId", "==", auth.currentUser?.uid)
-    //     //?????????????
-    //   );
-    //   const querySnapshot = await getDocs(q);
-    //   querySnapshot.forEach((doc) => {
-    //     // doc.data() is never undefined for query doc snapshots
-    //     // console.log(doc.id, " => ", doc.data());
-    //     arrData.current.push(doc.data());
-    //     setArr(arrData.current);
-    //   });
-    //   console.log(arrData.current.length);
-  };
 
-  // useEffect(() => {
-  //   arrData.current = arrData.current.splice(0);
-  //   setArr([]);
-  //   getHostProperties();
-  // }, []);
+  useEffect(() => {
+    getHostProperties();
+  }, []);
+
   return (
     <Layout>
       THIS IS HOSTS BOARD

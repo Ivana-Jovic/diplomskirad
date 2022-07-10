@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import CardSearch from "../components/cardsearch";
 import Layout from "../components/layout";
-import Navbar from "../components/navbar";
 const arrData = [
   {
     name: "MON",

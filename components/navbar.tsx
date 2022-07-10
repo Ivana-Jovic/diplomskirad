@@ -1,31 +1,29 @@
 import { addDoc, collection } from "firebase/firestore";
-import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
 import Image from "next/image";
-import { useState } from "react";
-import { auth, db } from "../firebase";
+import { useContext, useState } from "react";
+import { db } from "../firebase";
 import LogoutNEW from "./logoutNEW";
 import { Dropdown, Menu, Space } from "antd";
 import SignInRegisterPopup from "./signInRegisterPopup";
-import { onAuthStateChanged } from "firebase/auth";
+import { AuthContext } from "../firebase-authProvider";
 
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
+  const { user, myUser } = useContext(AuthContext);
+
   const [searchInput, setSearchInput] = useState("");
   const [numOfGuests, setNumOfGuests] = useState(1);
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  // const { data: session, status } = useSession();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in
-      setIsLoggedIn(true);
-      // ...
-    } else {
-      // User is signed out
-      setIsLoggedIn(false);
-    }
-  });
+  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);sad
+
+  // useEffect(() => {sad
+  //   if (user) {
+  //     setIsLoggedIn(true);
+  //   } else {
+  //     setIsLoggedIn(false);
+  //   }
+  // }, [user]);
 
   const resetSearch = () => {
     setSearchInput("");
@@ -46,7 +44,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   const becomeAHost = async () => {
     const docRef = await addDoc(collection(db, "users"), {
       // userId: session?.user?.name,<-GOOGLE
-      userId: auth?.currentUser?.uid,
+      userId: user.uid,
       host: true,
     });
   };
@@ -73,7 +71,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           label: (
             <>
               <div className="hover:bg-slate-50 py-1  pl-1 transition duration-200 ease-out  hover:shadow-lg">
-                <LogoutNEW setIsLoggedIn={setIsLoggedIn} />
+                <LogoutNEW />
+                {/* setIsLoggedIn={setIsLoggedIn} /> sad*/}
               </div>
               {/* <div<-GOOGLE
                     onClick={signOut}
@@ -171,7 +170,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           </div>
         </div>
         {/* session ||  <-GOOGLE*/}
-        {isLoggedIn ? (
+        {user ? ( //isloggedin sad
           // {auth.currentUser !== null ? (
           <>
             <div>
@@ -195,8 +194,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         ) : (
           <>
             <SignInRegisterPopup
-              isLoggedIn={isLoggedIn}
-              setIsLoggedIn={setIsLoggedIn}
+            // isLoggedIn={isLoggedIn}sad
+            // setIsLoggedIn={setIsLoggedIn}sad
             />
           </>
         )}

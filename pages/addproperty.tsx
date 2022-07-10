@@ -1,17 +1,17 @@
 import { useSession } from "next-auth/react";
-import { useRef, useState } from "react";
+import { useContext, useState } from "react";
 import Layout from "../components/layout";
 import { collection, addDoc } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 import Button from "../components/button";
 import Inputs from "../components/inputs";
-import { Session } from "inspector";
 import FileForm from "../components/fileform";
-import { Url } from "url";
 import ErrorPage from "./errorpage";
+import { AuthContext } from "../firebase-authProvider";
 // import { FileForm } from "../components/fileform";
 
 export default function AddProperty() {
+  const { user } = useContext(AuthContext);
   const { data: session, status } = useSession();
   // const titleRef = useRef(null);
   const [title, setTitle] = useState<string>("");
@@ -24,7 +24,6 @@ export default function AddProperty() {
   const [type, setType] = useState<string>("");
   const [numRoooms, setNumRoooms] = useState<Number>(0);
   const [numPers, setNumPers] = useState<Number>(0);
-  //image i galery
   const [priceN, setPriceN] = useState<Number>(0);
   const [addPers, setAddPers] = useState<Number>(0);
   const [addCosts, setAddCosts] = useState<Number>(0);
@@ -54,7 +53,7 @@ export default function AddProperty() {
       additionalCosts: addCosts,
       garage: garage,
       // ownerId: session?.user?.name,<-GOOGLE
-      ownerId: auth.currentUser?.uid,
+      ownerId: user?.uid,
       // promeni ovo!!!!!!!!!!!!!!!!!!!!!
       images: images,
     });
@@ -63,9 +62,8 @@ export default function AddProperty() {
   };
   return (
     <>
-      {auth.currentUser ? (
+      {user ? (
         <>
-          {" "}
           <Layout>
             <div className="max-w-7xl px-5 mx-auto">
               <div className="pt-7 pb-5 text-center text-3xl font-bold">

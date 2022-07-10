@@ -7,7 +7,6 @@ export default function Banner() {
       className="relative h-[300px] sm:h-[400px] lg:h-[500px] 
     xl:h-[600px] 2xl:h-[600px]  "
     >
-      {/**/}
       {/* <div className="w-full h-[50vh] bg-[url('/images/banner.jpg')] bg-center bg-no-repeat bg-cover"> */}
       <Image
         src="/images/banner.jpg"

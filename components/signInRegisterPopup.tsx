@@ -1,22 +1,23 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { useContext, useState } from "react";
 import Popup from "./popup";
-import RegisterNEW from "./registerNEW";
-import SignInNEW from "./signInNEW";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import Button from "./button";
 import Inputs from "./inputs";
+import { doc, setDoc } from "firebase/firestore";
+import { AuthContext } from "../firebase-authProvider";
 
-export default function SignInRegisterPopup({
-  isLoggedIn,
-  setIsLoggedIn,
-}: {
-  isLoggedIn: boolean;
-  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+export default function SignInRegisterPopup({}: // isLoggedIn,//sad
+// setIsLoggedIn,sad
+{
+  // isLoggedIn: boolean;sad
+  // setIsLoggedIn: Dispatch<SetStateAction<boolean>>;sad
 }) {
+  const { user } = useContext(AuthContext); //!NOVO
+
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   const [isSignIn, setIsSignIn] = useState<boolean>(false); //SIgn in or Register popup
 
@@ -39,11 +40,15 @@ export default function SignInRegisterPopup({
   const registerForm = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Preventing the page from reloading
     createUserWithEmailAndPassword(auth, emailState, passwordState)
-      .then((cred) => {
+      .then(async (cred) => {
         console.log("User created:", cred.user);
         setEmailState("");
         setPasswordState("");
-        setIsLoggedIn(true);
+        // setIsLoggedIn(true);//sad
+        const docRef = await setDoc(doc(db, "users", cred.user.uid), {
+          userId: cred.user.uid,
+          host: false,
+        });
       })
       .catch((err) => {
         console.log(err.message);
@@ -60,7 +65,7 @@ export default function SignInRegisterPopup({
         console.log("User signedin:", cred.user);
         setEmailState2("");
         setPasswordState2("");
-        setIsLoggedIn(true);
+        // setIsLoggedIn(true);//sad
       })
       .catch((err) => {
         console.log(err.message);
@@ -91,12 +96,6 @@ export default function SignInRegisterPopup({
           content={
             <>
               {!isSignIn && (
-                // <RegisterNEW
-                //   isSignUp={isSignUp}
-                //   setIsSignUp={setIsSignUp}
-                //   handleClose={setIsPopupOpen}
-                //   setIsLoggedIn={setIsLoggedIn}
-                // />
                 <div>
                   <form onSubmit={registerForm} name="submitFormName">
                     <Inputs
@@ -124,12 +123,6 @@ export default function SignInRegisterPopup({
                 </div>
               )}
               {isSignIn && (
-                // <SignInNEW
-                //   isSignUp={isSignUp}
-                //   setIsSignUp={setIsSignUp}
-                //   setIsPopupOpen={setIsPopupOpen}
-                //   setIsLoggedIn={setIsLoggedIn}
-                // />
                 <div>
                   <form onSubmit={signin} name="signin">
                     <Inputs

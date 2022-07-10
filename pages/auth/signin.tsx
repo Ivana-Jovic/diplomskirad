@@ -9,7 +9,8 @@ import {
 import { useRef, useState } from "react";
 import { DEFAULT_MAX_VERSION } from "tls";
 
-export default function SignIn({ providers }) {
+export default function SignIn() {
+  //({ providers }) {
   // const [emailState, setEmailState] = useState<string>("");
   // const [passwordState, setPasswordState] = useState<string>("");
   // const [emailState2, setEmailState2] = useState<string>("");
