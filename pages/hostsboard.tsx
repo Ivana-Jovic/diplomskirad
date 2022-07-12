@@ -8,10 +8,7 @@ import { AuthContext } from "../firebase-authProvider";
 
 export default function HostsBoard() {
   const { user, myUserr } = useContext(AuthContext);
-  // const router = useRouter();
-  // const arrData = useRef<any[]>([]);
   const [arr, setArr] = useState<any[]>([]);
-  // const { location, numOfGuests } = router.query;
 
   const getHostProperties = async () => {
     const arrData: any[] = [];
@@ -26,20 +23,22 @@ export default function HostsBoard() {
       if (querySnapshot.size == arr.length) {
         setArr([]);
       }
-      arrData.push(doc.data());
+      arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
+      console.log(doc.id + "---" + JSON.stringify(doc.data()));
+      console.log(doc.data());
       setArr(arrData);
       console.log(arr.length);
     });
   };
 
   useEffect(() => {
-    getHostProperties();
-  }, []);
+    if (user) getHostProperties();
+  }, [user]);
 
   return (
     <Layout>
       THIS IS HOSTS BOARD
-      <div className=" flex">
+      <div className=" flex max-w-7xl mx-auto px-8 sm:px-16">
         <section className="  px-10 py-10 w-full ">
           <div className="hidden sm:inline-flex mb-5 space-x-3 text-gray-800">
             <p className="buttonfilter">filter1</p>
@@ -50,15 +49,19 @@ export default function HostsBoard() {
             <p className="buttonfilter">more</p>
           </div>
           <div className="flex flex-col ">
-            {arr.map(({ title, description, image, price, stars }) => {
+            {arr.map((item) => {
+              const property = JSON.parse(item.split("---")[1]);
+              const propertyid = item.split("---")[0];
+              // { title, description, images, pricePerNight }
               return (
                 <CardHostsProperty
-                  key={title}
-                  name={title}
-                  description={description}
-                  image={image}
-                  price={price}
-                  stars={stars}
+                  key={propertyid}
+                  propertyid={propertyid}
+                  name={property.title}
+                  description={property.description}
+                  image={property.images[0]}
+                  price={property.pricePerNight}
+                  stars="5"
                 />
               );
             })}

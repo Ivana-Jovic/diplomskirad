@@ -12,8 +12,6 @@ import { AuthContext } from "../firebase-authProvider";
 
 export default function AddProperty() {
   const { user } = useContext(AuthContext);
-  const { data: session, status } = useSession();
-  // const titleRef = useRef(null);
   const [title, setTitle] = useState<string>("");
   const [desc, setDesc] = useState<string>("");
   const [state, setState] = useState<string>("");
@@ -29,6 +27,8 @@ export default function AddProperty() {
   const [addCosts, setAddCosts] = useState<Number>(0);
   const [garage, setGarage] = useState<boolean>(false);
   const [images, setImages] = useState<string[]>([]);
+
+  //tTODO router replace umest puh sign//role
 
   // ovaj dole nacinje oristan jer ovako mozemo da sharujemo nekom link da vidi nase reyultate
   const add = async () => {
@@ -56,6 +56,8 @@ export default function AddProperty() {
       ownerId: user?.uid,
       // promeni ovo!!!!!!!!!!!!!!!!!!!!!
       images: images,
+      stars: 0,
+      isSuperhost: false,
     });
     console.log("lllll");
     // console.log(titleRef.current ? titleRef.current.value"] : "");
@@ -150,11 +152,8 @@ export default function AddProperty() {
                     }}
                   >
                     <option value=""></option>
-                    <option
-                      value="apartament"
-                      className="text-lg text-gray-400"
-                    >
-                      Apartament
+                    <option value="apartment" className="text-lg text-gray-400">
+                      Apartment
                     </option>
                     <option value="house">House</option>
                     <option value="lakehouse">Lake house</option>

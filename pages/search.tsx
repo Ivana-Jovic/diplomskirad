@@ -1,6 +1,9 @@
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import CardSearch from "../components/cardsearch";
 import Layout from "../components/layout";
+import { db } from "../firebase";
 const arrData = [
   {
     name: "MON",
@@ -41,22 +44,46 @@ const arrData = [
 //PROMENI KEY!!!
 export default function Search() {
   const router = useRouter();
-  const { location, numOfGuests } = router.query;
+  const { location, numOfGuests, rooms, from, to } = router.query;
+
+  const [arr, setArr] = useState<any[]>([]);
+
+  const getHostProperties = async () => {
+    const arrData: any[] = [];
+    const q = query(collection(db, "property"), where("city", "==", location));
+    const querySnapshot = await getDocs(q);
+    console.log("size", querySnapshot.size);
+    querySnapshot.forEach((doc) => {
+      if (querySnapshot.size == arr.length) {
+        setArr([]);
+      }
+      arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
+      setArr(arrData);
+    });
+  };
+
+  useEffect(() => {
+    if (location) getHostProperties();
+  }, [arr, location]); //TODO proveriti sve useeffect nizove
+
   return (
-    <Layout placeholder={location + " | " + numOfGuests + " guests"}>
-      {/* <div> */}
-      {/* <Navbar placeholder={location + " | " + numOfGuests + " guests"} /> */}
-      {/* | $(numOfGuests) */}
-      <div className=" flex">
+    <Layout
+      placeholder={
+        location + " | " + numOfGuests + " guests" + " | " + rooms + " rooms"
+      }
+    >
+      <div className=" flex max-w-7xl mx-auto px-8 sm:px-16">
         <section className="  px-10 py-10 w-full ">
           {/* flexgrow */}
-          <p className="text-sm">
-            Stay in {location} from to - {numOfGuests} guests
+          <p className="text-sm pb-5">
+            Stay in {location} <br />
+            from {from} to {to} <br />
+            {numOfGuests} guests - {rooms} rooms
           </p>
           <p className="text-4xl mb-6">Stays in {location}</p>
           {/* dodati burger  ya telefone */}
-          <div className="hidden sm:inline-flex mb-5 space-x-3 text-gray-800">
-            <p className="buttonfilter">filter1</p>
+          {/* hidden sm:inline-flex */}
+          <div className="flex mb-5 space-x-3 text-gray-800">
             <p className="buttonfilter">filter1</p>
             <p className="buttonfilter">filter1</p>
             <p className="buttonfilter">filter1</p>
@@ -64,15 +91,17 @@ export default function Search() {
             <p className="buttonfilter">more</p>
           </div>
           <div className="flex flex-col ">
-            {arrData.map(({ name, description, image, price, stars }) => {
+            {arr.map((item) => {
+              const property = JSON.parse(item.split("---")[1]);
+              const propertyid = item.split("---")[0];
               return (
                 <CardSearch
-                  key={image}
-                  name={name}
-                  description={description}
-                  image={image}
-                  price={price}
-                  stars={stars}
+                  key={propertyid}
+                  name={property.title}
+                  description={property.description}
+                  image={property.images[0]}
+                  price={property.pricePerNight}
+                  stars="5"
                 />
               );
             })}

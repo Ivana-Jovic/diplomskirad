@@ -136,38 +136,40 @@ export default function ProfileSettings() {
   };
   return (
     <Layout>
-      <div>hello {user?.email}</div>
-      <form onSubmit={changeProfile} name="submitFormName">
-        <Inputs
-          item={emailState}
-          setItem={setEmailState}
-          placeholder=""
-          text="email"
-          type="email"
-        />
-        <Inputs
-          item={passwordState}
-          setItem={setPasswordState}
-          placeholder="enter new password"
-          text="password"
-          type="password"
-        />
-        <Inputs
-          item={usernameState}
-          setItem={setUsernameState}
-          placeholder=""
-          text="username"
-          type="text"
-        />
-        {!file && <input type="file" onChange={changeHandler} />}
-        {file && <p>Storing image...</p>}
-        {error && <div>{error}</div>}
-        <div className="grid justify-items-center  mx-auto">
-          {url && <ImageForm url={url} />}
-        </div>
+      <div className="max-w-7xl mx-auto px-8 sm:px-16  ">
+        <div>hello {user?.email}</div>
+        <form onSubmit={changeProfile} name="submitFormName">
+          <Inputs
+            item={emailState}
+            setItem={setEmailState}
+            placeholder=""
+            text="email"
+            type="email"
+          />
+          <Inputs
+            item={passwordState}
+            setItem={setPasswordState}
+            placeholder="enter new password"
+            text="password"
+            type="password"
+          />
+          <Inputs
+            item={usernameState}
+            setItem={setUsernameState}
+            placeholder=""
+            text="username"
+            type="text"
+          />
+          {!file && <input type="file" onChange={changeHandler} />}
+          {file && <p>Storing image...</p>}
+          {error && <div>{error}</div>}
+          <div className="grid justify-items-center  mx-auto">
+            {url && <ImageForm url={url} />}
+          </div>
 
-        <Button type="submit" text="Change" action="" />
-      </form>
+          <Button type="submit" text="Change" action="" />
+        </form>
+      </div>
     </Layout>
   );
 }

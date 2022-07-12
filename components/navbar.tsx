@@ -7,6 +7,8 @@ import LogoutNEW from "./logoutNEW";
 import { Dropdown, Menu, Space } from "antd";
 import SignInRegisterPopup from "./signInRegisterPopup";
 import { AuthContext } from "../firebase-authProvider";
+import Banner from "./banner";
+import { Star } from "@mui/icons-material";
 
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
@@ -70,7 +72,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           key: "1",
           label: (
             <>
-              <div className="hover:bg-slate-50 py-1  pl-1 transition duration-200 ease-out  hover:shadow-lg">
+              <div className="hover:bg-slate-50 transition py-1 pl-1 duration-200 ease-out  hover:shadow-lg">
                 <LogoutNEW />
                 {/* setIsLoggedIn={setIsLoggedIn} /> sad*/}
               </div>
@@ -135,17 +137,18 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   return (
     //header tag??
     <div
-      className="p-5 shadow-xl bg-header grid grid-cols-2
+      className="py-5 sm:px-5 shadow-xl bg-header grid grid-cols-3
        w-full sticky top-0 z-[100] md:px-10"
     >
       <div
         onClick={() => router.push("/")}
-        className=" text-2xl text-logo font-logo font-semibold mr-2 cursor-pointer"
+        className=" text-2xl text-logo  font-logo
+         font-semibold mr-2 cursor-pointer pl-3 "
       >
         mybnb
       </div>
 
-      <div className="flex items-center space-x-4 justify-self-end">
+      <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
         {/* width i mr  justify-between*/}
         <div
           className="flex items-center
@@ -156,10 +159,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             type="text"
-            placeholder={placeholder || "Search..."}
+            placeholder={placeholder || "Where are you going?"}
             className="outline-0 pl-2 bg-transparent text-sm text-gray-600"
           />
-          <div className="hidden md:inline-flex pr-0.5  cursor-pointer">
+          <div className="hidden sm:inline-flex pr-0.5  cursor-pointer">
             {/* namesti da se i klikom na ikonicu ide u search */}
             <Image
               src="/images/search.png"
@@ -201,8 +204,9 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         )}
       </div>
       {searchInput && (
-        <div className="flex flex-col mx-auto col-span-2">
-          <div className="flex items-center border-b  my-3">
+        <div className="flex flex-col w-screen col-span-2">
+          <Banner />
+          {/* <div className="flex items-center border-b  my-3">
             <h3 className="flex-grow mr-10">Number of guests</h3>
             <Image src="/images/search.png" height="10" width="10" alt="" />
             <input
@@ -213,7 +217,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
               type="number"
               className="w-12 pl-2 text-lg outline-none"
             />
-          </div>
+          </div> */}
           <div className="flex">
             <button onClick={resetSearch} className="flex-grow cursor-pointer">
               Cancel

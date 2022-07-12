@@ -14,11 +14,12 @@ export const AuthProvider = ({ children }) => {
       if (user) {
         // User is signed in
         setUser(user);
-        console.log("!!!!!!!!!!!", user);
+        // console.log("!!!!!!!!!!!", user);
         const docSnap = await getDoc(doc(db, "users", user.uid));
 
         if (docSnap.exists()) {
-          console.log("Document data:", docSnap.data());
+          // console.log("Document data:", docSnap.data());
+
           // myUser.current = docSnap.data();
           setMyUser(docSnap.data());
         } else {

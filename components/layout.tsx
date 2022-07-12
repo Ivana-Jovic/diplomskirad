@@ -13,7 +13,10 @@ export default function Layout({
   // home?: boolean;
 }) {
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen flex flex-col">
+      {/* <> */}
+      {/* //displ flex flex dir col
+      //mt auto footer */}
       <Head>
         {/* <link rel="icon" href="/favicon.ico" />
         <meta
@@ -30,8 +33,9 @@ export default function Layout({
         <meta name="twitter:card" content="summary_large_image" /> */}
       </Head>
       <Navbar placeholder={placeholder} />
-      <main className="bg-background">{children}</main>
+      <main className="bg-background pb-7 w-full ">{children}</main>
       <Footer />
     </div>
+    // </>
   );
 }
