@@ -5,6 +5,7 @@ import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
+import Heart from "./heart";
 export default function CardHostsProperty({
   propertyid,
   name,
@@ -21,7 +22,6 @@ export default function CardHostsProperty({
   stars: string;
 }) {
   const router = useRouter();
-  const [fullHeart, setFullHeart] = useState<boolean>(false);
 
   const goToPropertyPage = () => {
     router.push({
@@ -38,7 +38,7 @@ export default function CardHostsProperty({
     hover:opacity-80 hover:shadow-lg
     transition duration-200 ease-out"
     >
-      <div className="relative h-24 w-40 md:h-52 md:w-80 ">
+      <div className="relative h-24 w-40 md:h-52 md:w-80  flex-shrink-0 ">
         {/* flex shrink 0???? */}
         <Image
           src={image}
@@ -52,21 +52,8 @@ export default function CardHostsProperty({
         {/*  */}
         <div className="flex justify-between items-center">
           <p className="text-xl font-semibold">{name}</p>
-          <div
-            onClick={() => {
-              setFullHeart(!fullHeart);
-            }}
-          >
-            {fullHeart && (
-              <FavoriteRoundedIcon
-                sx={{ color: red[700] }}
-                className="active:scale-90  transition duration-150"
-              />
-            )}
-            {!fullHeart && (
-              <FavoriteRoundedIcon className="active:scale-90 transition duration-150" />
-            )}
-          </div>
+
+          <Heart propertyid={propertyid} />
         </div>
         <p className="text-sm text-gray-600 flex-grow">{description}</p>
         <div className="text-lg flex items-center">

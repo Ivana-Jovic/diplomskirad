@@ -9,7 +9,8 @@ import SignInRegisterPopup from "./signInRegisterPopup";
 import { AuthContext } from "../firebase-authProvider";
 import Banner from "./banner";
 import { Star } from "@mui/icons-material";
-
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const { user, myUser } = useContext(AuthContext);
@@ -17,15 +18,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   const [searchInput, setSearchInput] = useState("");
   const [numOfGuests, setNumOfGuests] = useState(1);
   const router = useRouter();
-  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);sad
-
-  // useEffect(() => {sad
-  //   if (user) {
-  //     setIsLoggedIn(true);
-  //   } else {
-  //     setIsLoggedIn(false);
-  //   }
-  // }, [user]);
 
   const resetSearch = () => {
     setSearchInput("");
@@ -74,7 +66,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             <>
               <div className="hover:bg-slate-50 transition py-1 pl-1 duration-200 ease-out  hover:shadow-lg">
                 <LogoutNEW />
-                {/* setIsLoggedIn={setIsLoggedIn} /> sad*/}
               </div>
               {/* <div<-GOOGLE
                     onClick={signOut}
@@ -164,17 +155,11 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           />
           <div className="hidden sm:inline-flex pr-0.5  cursor-pointer">
             {/* namesti da se i klikom na ikonicu ide u search */}
-            <Image
-              src="/images/search.png"
-              height="20"
-              width="20"
-              alt="search icon"
-            />
+            <SearchRoundedIcon />
           </div>
         </div>
         {/* session ||  <-GOOGLE*/}
-        {user ? ( //isloggedin sad
-          // {auth.currentUser !== null ? (
+        {user ? (
           <>
             <div>
               <Dropdown overlay={menu}>
@@ -188,7 +173,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
                       alt=""
                       className="rounded-sm"
                     />
-                    <p>+</p>
+                    <ExpandMoreRoundedIcon />
                   </Space>
                 </a>
               </Dropdown>
@@ -196,28 +181,13 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           </>
         ) : (
           <>
-            <SignInRegisterPopup
-            // isLoggedIn={isLoggedIn}sad
-            // setIsLoggedIn={setIsLoggedIn}sad
-            />
+            <SignInRegisterPopup />
           </>
         )}
       </div>
       {searchInput && (
         <div className="flex flex-col w-screen col-span-2">
           <Banner />
-          {/* <div className="flex items-center border-b  my-3">
-            <h3 className="flex-grow mr-10">Number of guests</h3>
-            <Image src="/images/search.png" height="10" width="10" alt="" />
-            <input
-              value={numOfGuests}
-              onChange={(event) => setNumOfGuests(parseInt(event.target.value))}
-              min={1}
-              max={15}
-              type="number"
-              className="w-12 pl-2 text-lg outline-none"
-            />
-          </div> */}
           <div className="flex">
             <button onClick={resetSearch} className="flex-grow cursor-pointer">
               Cancel

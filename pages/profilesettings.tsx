@@ -28,7 +28,7 @@ export default function ProfileSettings() {
       setUsernameState(myUser.username);
       setUrl(myUser.photoURL);
     }
-  }, [user, myUser]);
+  }, [user, myUser]); //TODO VIDI DA LI OVOR Radi
 
   useEffect(() => {
     //MOZDA JE VSIAK

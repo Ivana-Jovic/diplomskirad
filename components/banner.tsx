@@ -15,6 +15,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { Dropdown, Menu, Space } from "antd";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 
 // const theme = createTheme({
 //   components: {
@@ -38,13 +39,6 @@ export default function Banner() {
   const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
   const [dateTo, setDateTo] = useState<Date | null>(new Date());
   const router = useRouter();
-
-  // const handleChangeFrom = (newValue: Date | null) => {
-  //   setDateFrom(newValue);
-  // };
-  // const handleChangeTo = (newValue: Date | null) => {
-  //   setDateTo(newValue);
-  // };
 
   const search = () => {
     router.push({
@@ -212,7 +206,7 @@ export default function Banner() {
                     <div> {guests} guests |&nbsp;</div>
                     <div>{rooms} rooms</div>
                   </div>
-                  <p>v</p>
+                  <ExpandMoreRoundedIcon />
                 </Space>
               </a>
             </Dropdown>

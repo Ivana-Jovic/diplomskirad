@@ -16,13 +16,14 @@ import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
 import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
+import Heart from "../components/heart";
 
 export default function PropertyPage() {
   const router = useRouter();
   const { property: propertyid } = router.query;
   const { user, myUserr } = useContext(AuthContext);
   const [property, setProperty] = useState<DocumentData>();
-  const [inFaves, setInFaves] = useState<boolean>(false);
+  // const [inFaves, setInFaves] = useState<boolean>(false);
   const getProperty = async () => {
     // const arrData: any[] = [];
 
@@ -36,43 +37,9 @@ export default function PropertyPage() {
     }
   };
 
-  const checkIfInFaves = async () => {
-    const pid: string = propertyid ? propertyid.toString() : "";
-    const docSnap = await getDoc(doc(db, "users", user?.uid));
-
-    if (docSnap.exists()) {
-      if (docSnap.data().faves.includes(pid)) {
-        setInFaves(true);
-      } else {
-        setInFaves(false);
-      }
-    } else {
-      console.log("No such document!");
-    }
-  };
-
-  const onHeart = async () => {
-    if (!inFaves) {
-      //TODO: put in faves orr delete from SVUDA GDE JE SRCE
-      await updateDoc(doc(db, "users", user?.uid), {
-        faves: arrayUnion(propertyid),
-      });
-      setInFaves(true);
-    } else {
-      await updateDoc(doc(db, "users", user?.uid), {
-        faves: arrayRemove(propertyid),
-      });
-      setInFaves(false);
-    }
-  };
-
   useEffect(() => {
     if (propertyid) getProperty();
   }, [propertyid]); //probaj i property ako ne radi
-
-  useEffect(() => {
-    if (user) checkIfInFaves();
-  }, [user]);
 
   return (
     <Layout>
@@ -107,19 +74,7 @@ export default function PropertyPage() {
               </div>
             </div>
 
-            {user && (
-              <div onClick={onHeart} className="mr-10">
-                {inFaves && (
-                  <FavoriteRoundedIcon
-                    sx={{ color: red[700] }}
-                    className="active:scale-90  transition duration-150"
-                  />
-                )}
-                {!inFaves && (
-                  <FavoriteRoundedIcon className="active:scale-90 transition duration-150" />
-                )}
-              </div>
-            )}
+            <Heart propertyid={propertyid} />
           </div>
 
           <div

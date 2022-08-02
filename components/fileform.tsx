@@ -22,6 +22,7 @@ export default function FileForm({ images, setImages }: ImgProps) {
       setFile(null);
       console.log("klll");
     }
+    console.log("in fileform useEffect");
   }, [url]);
 
   const changeHandler = (e: any) => {

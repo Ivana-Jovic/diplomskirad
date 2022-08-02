@@ -18,16 +18,16 @@ export default function HostsBoard() {
       //?????????????
     );
     const querySnapshot = await getDocs(q);
-    console.log("size", querySnapshot.size);
+    // console.log("size", querySnapshot.size);
     querySnapshot.forEach((doc) => {
-      if (querySnapshot.size == arr.length) {
-        setArr([]);
-      }
+      // if (querySnapshot.size == arr.length) {
+      //   setArr([]);
+      // }
       arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
       console.log(doc.id + "---" + JSON.stringify(doc.data()));
       console.log(doc.data());
       setArr(arrData);
-      console.log(arr.length);
+      // console.log(arr.length);
     });
   };
 

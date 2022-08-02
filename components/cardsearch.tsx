@@ -4,23 +4,24 @@ import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
 import { useState } from "react";
+import Heart from "./heart";
 
 //TODO vidi svuda za srce klik u fav
 export default function CardSearch({
+  propertyid,
   name,
   description,
   price,
   image,
   stars,
 }: {
+  propertyid: string;
   name: string;
   description: string;
   price: string;
   image: string;
   stars: string;
 }) {
-  const [fullHeart, setFullHeart] = useState<boolean>(false);
-
   return (
     <div
       className="flex my-3 border rounded-xl cursor-pointer
@@ -41,21 +42,7 @@ export default function CardSearch({
       <div className="flex flex-col flex-grow p-7">
         <div className="flex justify-between items-center">
           <p className="text-xl font-semibold">{name}</p>
-          <div
-            onClick={() => {
-              setFullHeart(!fullHeart);
-            }}
-          >
-            {fullHeart && (
-              <FavoriteRoundedIcon
-                sx={{ color: red[700] }}
-                className="active:scale-90  transition duration-150"
-              />
-            )}
-            {!fullHeart && (
-              <FavoriteRoundedIcon className="active:scale-90 transition duration-150" />
-            )}
-          </div>
+          <Heart propertyid={propertyid} />
         </div>
         <p className="text-sm text-gray-600 flex-grow">{description}</p>
         <div className="text-lg flex items-center">
