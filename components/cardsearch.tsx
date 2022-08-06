@@ -3,8 +3,9 @@ import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
-import { useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Heart from "./heart";
+import { AuthContext } from "../firebase-authProvider";
 
 //TODO vidi svuda za srce klik u fav
 export default function CardSearch({

@@ -17,11 +17,21 @@ import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
 import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
 import Heart from "../components/heart";
+import Banner from "../components/banner";
+import TextField from "@mui/material/TextField";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { Dropdown, Menu, Space } from "antd";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
+import Wierder from "../components/wierder";
+import Extrawierd from "../components/extrawierd";
 
 export default function PropertyPage() {
   const router = useRouter();
   const { property: propertyid } = router.query;
-  const { user, myUserr } = useContext(AuthContext);
+  // const { user, myUser } = useContext(AuthContext);
   const [property, setProperty] = useState<DocumentData>();
   // const [inFaves, setInFaves] = useState<boolean>(false);
   const getProperty = async () => {
@@ -40,6 +50,13 @@ export default function PropertyPage() {
   useEffect(() => {
     if (propertyid) getProperty();
   }, [propertyid]); //probaj i property ako ne radi
+  ////reservacije
+  const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
+  const [dateTo, setDateTo] = useState<Date | null>(new Date());
+  const [guests, setGuests] = useState<number>(1);
+  const [rooms, setRooms] = useState<number>(1);
+
+  const [visible, setVisible] = useState(false);
 
   return (
     <Layout>
@@ -74,7 +91,7 @@ export default function PropertyPage() {
               </div>
             </div>
 
-            <Heart propertyid={propertyid} />
+            <Heart propertyid={propertyid ? propertyid[0] : ""} />
           </div>
 
           <div
@@ -126,6 +143,10 @@ export default function PropertyPage() {
           <div className="mb-10">REVIEWS</div>
           <div className="mb-10">MAP</div>
           <div className="mb-10">CALENDAR- RESERVE</div>
+          <div className="bg-slate-100">
+            <Extrawierd rese={true} property={property} />
+            {/* //TODO: ograniciti dokle ide broj gostiju ili skloniti */}
+          </div>
         </div>
       )}
     </Layout>

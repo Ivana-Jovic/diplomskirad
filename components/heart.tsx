@@ -5,33 +5,39 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { db } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
 
-export default function Heart({ propertyid }: { propertyid: string }) {
-  const { user, myUserr } = useContext(AuthContext);
+export default function Heart({
+  propertyid,
+}: // inFavess,
+{
+  propertyid: string;
+  // inFavess: boolean;
+}) {
+  const { user, myUser } = useContext(AuthContext);
   const [inFaves, setInFaves] = useState<boolean>(false);
 
-  // const checkIfInFaves = () => {
-  //   console.log("in heart checkifinfaves");
-  //   //PROMENA POSLE PREKORACENJA FIREBASA//TODO PROVERI
-  //   const pid: string = propertyid ? propertyid.toString() : "";
-  //   // const docSnap = await getDoc(doc(db, "users", user?.uid)); //PROMENA POSLE PREKORACENJA FIREBASA
+  const checkIfInFaves = useCallback(() => {
+    console.log("in heart checkifinfaves");
+    //PROMENA POSLE PREKORACENJA FIREBASA//TODO PROVERI
+    const pid: string = propertyid ? propertyid.toString() : "";
+    // const docSnap = await getDoc(doc(db, "users", user?.uid)); //PROMENA POSLE PREKORACENJA FIREBASA
 
-  //   if (myUserr) {
-  //     //PROMENA POSLE PREKORACENJA FIREBASA
-  //     if (myUserr.faves.includes(pid)) {
-  //       setInFaves(true);
-  //     } else {
-  //       setInFaves(false);
-  //     }
-  //   } else {
-  //     console.log("No such document!");
-  //   }
-  // };
+    if (myUser) {
+      //PROMENA POSLE PREKORACENJA FIREBASA
+      if (myUser.faves.includes(pid)) {
+        setInFaves(true);
+      } else {
+        setInFaves(false);
+      }
+    } else {
+      console.log("No such document!");
+    }
+  }, [myUser, propertyid]);
 
   const onHeart = async () => {
     console.log("in heart onHeart");
@@ -50,8 +56,10 @@ export default function Heart({ propertyid }: { propertyid: string }) {
   };
 
   useEffect(() => {
-    // if (user) checkIfInFaves();
-  }, [user]); //myUserr probaj zbog  //PROMENA POSLE PREKORACENJA FIREBASA//TODO PROVERI
+    //TODO proveri uslove
+    console.log("useEffect in heart");
+    if (user && myUser != undefined) checkIfInFaves();
+  }, [user, myUser, checkIfInFaves]); //myUser probaj zbog  //PROMENA POSLE PREKORACENJA FIREBASA//TODO PROVERI
 
   return (
     <>

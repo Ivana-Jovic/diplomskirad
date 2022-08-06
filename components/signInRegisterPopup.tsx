@@ -9,6 +9,7 @@ import Button from "./button";
 import Inputs from "./inputs";
 import { doc, setDoc } from "firebase/firestore";
 import { AuthContext } from "../firebase-authProvider";
+import { useRouter } from "next/router";
 
 export default function SignInRegisterPopup({}: // isLoggedIn,//sad
 // setIsLoggedIn,sad
@@ -17,6 +18,7 @@ export default function SignInRegisterPopup({}: // isLoggedIn,//sad
   // setIsLoggedIn: Dispatch<SetStateAction<boolean>>;sad
 }) {
   const { user } = useContext(AuthContext); //!NOVO
+  const router = useRouter();
 
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   const [isSignIn, setIsSignIn] = useState<boolean>(false); //SIgn in or Register popup
@@ -49,6 +51,12 @@ export default function SignInRegisterPopup({}: // isLoggedIn,//sad
           userId: cred.user.uid,
           host: false,
         });
+        router.push({
+          pathname: "/profilesettings",
+          // query: {
+
+          // },
+        });
       })
       .catch((err) => {
         console.log(err.message);
@@ -71,7 +79,7 @@ export default function SignInRegisterPopup({}: // isLoggedIn,//sad
         console.log(err.message);
       });
   };
-
+  //TODO: on x delecte polja
   return (
     <div className="">
       <button

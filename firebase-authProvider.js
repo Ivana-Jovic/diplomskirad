@@ -18,12 +18,12 @@ export const AuthProvider = ({ children }) => {
         const docSnap = await getDoc(doc(db, "users", user.uid));
 
         if (docSnap.exists()) {
-          console.log("Document data:", docSnap.data());
+          console.log("firebase - Document data:", docSnap.data());
 
           // myUser.current = docSnap.data();
           setMyUser(docSnap.data());
         } else {
-          console.log("No such document!");
+          console.log("firebase - No such document!", user.uid);
         }
       } else {
         // User is signed out

@@ -128,63 +128,66 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   return (
     //header tag??
     <div
-      className="py-5 sm:px-5 shadow-xl bg-header grid grid-cols-3
-       w-full sticky top-0 z-[100] md:px-10"
+      className="py-5  shadow-xl bg-header flex flex-col
+       w-full sticky top-0 z-[100]"
     >
-      <div
-        onClick={() => router.push("/")}
-        className=" text-2xl text-logo  font-logo
-         font-semibold mr-2 cursor-pointer pl-3 "
-      >
-        mybnb
-      </div>
-
-      <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
-        {/* width i mr  justify-between*/}
+      <div className="sm:px-5  md:px-10 grid grid-cols-3">
         <div
-          className="flex items-center
+          onClick={() => router.push("/")}
+          className=" text-2xl text-logo  font-logo
+         font-semibold mr-2 cursor-pointer pl-3 "
+        >
+          mybnb
+        </div>
+
+        <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
+          {/* width i mr  justify-between*/}
+          <div
+            className="flex items-center
          rounded-full border-2 border-solid py-2
          "
-        >
-          <input
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            type="text"
-            placeholder={placeholder || "Where are you going?"}
-            className="outline-0 pl-2 bg-transparent text-sm text-gray-600"
-          />
-          <div className="hidden sm:inline-flex pr-0.5  cursor-pointer">
-            {/* namesti da se i klikom na ikonicu ide u search */}
-            <SearchRoundedIcon />
-          </div>
-        </div>
-        {/* session ||  <-GOOGLE*/}
-        {user ? (
-          <>
-            <div>
-              <Dropdown overlay={menu}>
-                <a onClick={(e) => e.preventDefault()}>
-                  <Space>
-                    <Image
-                      // src={session.user?.image}<-GOOGLE
-                      src="/images/app3.jpg"
-                      height="20"
-                      width="20"
-                      alt=""
-                      className="rounded-sm"
-                    />
-                    <ExpandMoreRoundedIcon />
-                  </Space>
-                </a>
-              </Dropdown>
+          >
+            <input
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              type="text"
+              placeholder={placeholder || "Where are you going?"}
+              className="outline-0 pl-2 bg-transparent text-sm text-gray-600"
+            />
+            <div className="hidden sm:inline-flex pr-0.5  cursor-pointer">
+              {/* namesti da se i klikom na ikonicu ide u search */}
+              <SearchRoundedIcon />
             </div>
-          </>
-        ) : (
-          <>
-            <SignInRegisterPopup />
-          </>
-        )}
+          </div>
+          {/* session ||  <-GOOGLE*/}
+          {user ? (
+            <>
+              <div>
+                <Dropdown overlay={menu}>
+                  <a onClick={(e) => e.preventDefault()}>
+                    <Space>
+                      <Image
+                        // src={session.user?.image}<-GOOGLE
+                        src="/images/app3.jpg"
+                        height="20"
+                        width="20"
+                        alt=""
+                        className="rounded-sm"
+                      />
+                      <ExpandMoreRoundedIcon />
+                    </Space>
+                  </a>
+                </Dropdown>
+              </div>
+            </>
+          ) : (
+            <>
+              <SignInRegisterPopup />
+            </>
+          )}
+        </div>
       </div>
+
       {searchInput && (
         <div className="flex flex-col w-screen col-span-2">
           <Banner />

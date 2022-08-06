@@ -1,13 +1,20 @@
 import { useRouter } from "next/router";
 import CardHostsProperty from "../components/cardhostsproperty";
 import Layout from "../components/layout";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
+import ReservationCard from "../components/reservationcard";
 
 export default function HostsBoard() {
-  const { user, myUserr } = useContext(AuthContext);
+  const { user, myUser } = useContext(AuthContext);
   const [arr, setArr] = useState<any[]>([]);
 
   const getHostProperties = async () => {
@@ -34,11 +41,35 @@ export default function HostsBoard() {
   useEffect(() => {
     if (user) getHostProperties();
   }, [user]);
+  /////////////////// reservations
+  // const [reserv, setReserv] = useState<any[]>([]);
+  const reserv = useRef<any[]>([]);
+  const q = query(
+    collection(db, "reservations"),
+    where("hostId", "==", "x18ohaIjc6ZDHW54IBqcwRERR4X2")
+    // user ? user.uid : ""
+  );
+  //TODO: OVO TREBA SREDITI DA SE NE POZIVA ZILION PUTA!!!!!!!!!!!
+  // MOZDA DA SE STALNO DOHVATAJU REZERVACIJE IZ BAZE, ALI KAKO ONDA REFRESH???
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const res: any[] = [];
+    querySnapshot.forEach((doc) => {
+      res.push(doc);
 
+      console.log(
+        "NEW RESRVATION",
+        doc.data().propertyId,
+        doc.data().from,
+        doc.data().to
+      );
+    });
+    reserv.current = res;
+    // setReserv(res);// sa ovim poludi
+  });
   return (
     <Layout>
       THIS IS HOSTS BOARD
-      <div className=" flex max-w-7xl mx-auto px-8 sm:px-16">
+      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
         <section className="  px-10 py-10 w-full ">
           <div className="hidden sm:inline-flex mb-5 space-x-3 text-gray-800">
             <p className="buttonfilter">filter1</p>
@@ -67,6 +98,17 @@ export default function HostsBoard() {
             })}
           </div>
         </section>
+        <div>
+          <div className="flex flex-col ">
+            {reserv.current.map((item) => {
+              return (
+                <div key={item.id}>
+                  <ReservationCard item={item} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </Layout>
   );

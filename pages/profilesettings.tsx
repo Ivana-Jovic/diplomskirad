@@ -7,14 +7,19 @@ import Inputs from "../components/inputs";
 import Layout from "../components/layout";
 import { db, storage } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
+import { useRouter } from "next/router";
 
 //TODO proveri svuda za  auth.currentUser da li ostaje ili na neki drugi nacin
 export default function ProfileSettings() {
   const { user, myUser } = useContext(AuthContext);
+  const router = useRouter();
 
   const [emailState, setEmailState] = useState<string>("");
   const [passwordState, setPasswordState] = useState<string>("");
   const [usernameState, setUsernameState] = useState<string>("");
+
+  const [firstName, setFirstName] = useState<string>("");
+  const [secondName, setSecondName] = useState<string>("");
   const [error, setError] = useState<any>("");
   const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState<string>("");
@@ -25,8 +30,13 @@ export default function ProfileSettings() {
       setEmailState(user.email);
     }
     if (myUser) {
-      setUsernameState(myUser.username);
-      setUrl(myUser.photoURL);
+      if (myUser.username) setUsernameState(myUser.username);
+      if (myUser.passwordState) setPasswordState(myUser.passwordState);
+      //TOD: vidi za pass, posto se ne cuva u users colekciji pravi problem ya dugme plus trebalo bi da se ispisuje stari ili sta vec
+      if (myUser.firstName) setFirstName(myUser.firstName);
+      if (myUser.secondName) setSecondName(myUser.secondName);
+      if (myUser.photoURL) setUrl(myUser.photoURL);
+      console.log("{{{{{{{{{{{{{{", myUser.username);
     }
   }, [user, myUser]); //TODO VIDI DA LI OVOR Radi
 
@@ -133,12 +143,44 @@ export default function ProfileSettings() {
         console.log("ERROR ", error.message);
       });
     }
+
+    // update first name
+    if (user && myUser.firstName != firstName) {
+      const docRef = await updateDoc(doc(db, "users", user.uid), {
+        firstName: firstName,
+      }).catch((err) => {
+        console.log("ERROR ", error.message);
+      });
+    }
+
+    // update second name
+    if (user && myUser.secondName != secondName) {
+      const docRef = await updateDoc(doc(db, "users", user.uid), {
+        secondName: secondName,
+      }).catch((err) => {
+        console.log("ERROR ", error.message);
+      });
+    }
   };
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-8 sm:px-16  ">
         <div>hello {user?.email}</div>
         <form onSubmit={changeProfile} name="submitFormName">
+          <Inputs
+            item={firstName}
+            setItem={setFirstName}
+            placeholder=""
+            text="first name"
+            type="text"
+          />
+          <Inputs
+            item={secondName}
+            setItem={setSecondName}
+            placeholder=""
+            text="second name"
+            type="text"
+          />
           <Inputs
             item={emailState}
             setItem={setEmailState}
@@ -160,14 +202,45 @@ export default function ProfileSettings() {
             text="username"
             type="text"
           />
+
           {!file && <input type="file" onChange={changeHandler} />}
           {file && <p>Storing image...</p>}
           {error && <div>{error}</div>}
           <div className="grid justify-items-center  mx-auto">
             {url && <ImageForm url={url} />}
           </div>
-
-          <Button type="submit" text="Change" action="" />
+          <div>
+            {(!emailState ||
+              !passwordState ||
+              !usernameState ||
+              !url ||
+              !firstName ||
+              !secondName) && ( // hover:shadow-xl
+              <div
+                className="my-5 mx-auto  text-center shadow-md  p-3
+          
+              text-lg sm:text-2xl font-semibold rounded-lg "
+              >
+                Please fillout every field.
+              </div>
+            )}
+            {emailState &&
+              passwordState &&
+              usernameState &&
+              url &&
+              firstName &&
+              secondName && (
+                <Button
+                  type="submit"
+                  text="Update info"
+                  action={() => {
+                    router.push({
+                      pathname: "/",
+                    });
+                  }}
+                />
+              )}
+          </div>
         </form>
       </div>
     </Layout>
