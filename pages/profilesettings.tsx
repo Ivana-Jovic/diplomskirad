@@ -19,7 +19,7 @@ export default function ProfileSettings() {
   const [usernameState, setUsernameState] = useState<string>("");
 
   const [firstName, setFirstName] = useState<string>("");
-  const [secondName, setSecondName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [error, setError] = useState<any>("");
   const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState<string>("");
@@ -34,7 +34,7 @@ export default function ProfileSettings() {
       if (myUser.passwordState) setPasswordState(myUser.passwordState);
       //TOD: vidi za pass, posto se ne cuva u users colekciji pravi problem ya dugme plus trebalo bi da se ispisuje stari ili sta vec
       if (myUser.firstName) setFirstName(myUser.firstName);
-      if (myUser.secondName) setSecondName(myUser.secondName);
+      if (myUser.lastName) setLastName(myUser.lastName);
       if (myUser.photoURL) setUrl(myUser.photoURL);
       console.log("{{{{{{{{{{{{{{", myUser.username);
     }
@@ -153,10 +153,10 @@ export default function ProfileSettings() {
       });
     }
 
-    // update second name
-    if (user && myUser.secondName != secondName) {
+    // update last name
+    if (user && myUser.lastName != lastName) {
       const docRef = await updateDoc(doc(db, "users", user.uid), {
-        secondName: secondName,
+        lastName: lastName,
       }).catch((err) => {
         console.log("ERROR ", error.message);
       });
@@ -175,10 +175,10 @@ export default function ProfileSettings() {
             type="text"
           />
           <Inputs
-            item={secondName}
-            setItem={setSecondName}
+            item={lastName}
+            setItem={setLastName}
             placeholder=""
-            text="second name"
+            text="last name"
             type="text"
           />
           <Inputs
@@ -215,7 +215,7 @@ export default function ProfileSettings() {
               !usernameState ||
               !url ||
               !firstName ||
-              !secondName) && ( // hover:shadow-xl
+              !lastName) && ( // hover:shadow-xl
               <div
                 className="my-5 mx-auto  text-center shadow-md  p-3
           
@@ -229,7 +229,7 @@ export default function ProfileSettings() {
               usernameState &&
               url &&
               firstName &&
-              secondName && (
+              lastName && (
                 <Button
                   type="submit"
                   text="Update info"

@@ -92,7 +92,9 @@ export default function HostsBoard() {
                   description={property.description}
                   image={property.images[0]}
                   price={property.pricePerNight}
-                  stars="5"
+                  // stars="5"/
+                  totalStars={property.totalStars}
+                  numberOfReviews={property.numberOfReviews}
                 />
               );
             })}

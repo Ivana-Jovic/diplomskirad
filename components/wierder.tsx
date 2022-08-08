@@ -82,6 +82,8 @@ export default function Wierder({
       title: title,
       total: total,
       userId: user.uid,
+      firstName: myUser.firstName,
+      lastName: myUser.lastName,
       user: myUser.username,
       hostId: property.ownerId,
       from: dateFrom?.toDateString(),
@@ -91,6 +93,7 @@ export default function Wierder({
       timeCheckIn: 17,
       timeCheckOut: 10,
       specialReq: "crib",
+      leftFeedback: false,
       // timestamp
     });
   };

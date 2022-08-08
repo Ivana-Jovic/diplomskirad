@@ -56,7 +56,9 @@ export default function AddProperty() {
       ownerId: user?.uid,
       // promeni ovo!!!!!!!!!!!!!!!!!!!!!
       images: images,
-      stars: 0,
+      // stars: 0,
+      totalStars: 0,
+      numberOfReview: 0,
       isSuperhost: false,
     });
     console.log("lllll");

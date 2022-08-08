@@ -1,28 +1,98 @@
 import { NestCamWiredStandTwoTone } from "@mui/icons-material";
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  DocumentData,
+  getDoc,
+  getDocs,
+  increment,
+  query,
+  QueryDocumentSnapshot,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { useState } from "react";
 import Popup from "./popup";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import Button from "./button";
+import { db } from "../firebase";
 
 //TODO vidi svuda za srce klik u fav
 export default function ReservationCard({
-  item,
+  item: reservation, //reservation
 }: {
   item: QueryDocumentSnapshot<DocumentData>;
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
+  const [leftFB, setLeftFB] = useState<boolean>(
+    reservation.data().leftFeedback
+  );
   const [comment, setComment] = useState<string>("");
   const [stars, setStars] = useState<number>(1);
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
   };
 
-  const leaveFeedback = () => {
-    // updatecomm and stars in database
-    //TODO: trigger functions like update avg stars on property
-    // and zabraniti da isti korisnik komentarise ponovo
+  const leaveFeedback = async () => {
+    //TODO:
+    //racunanje za superhosta
+
+    const propertiesRef = collection(db, "property");
+    const docRef = await addDoc(
+      collection(propertiesRef, reservation.data().propertyId, "comments"),
+      {
+        comment: comment,
+        stars: stars,
+        userId: reservation.data().userId,
+        firstName: reservation.data().firstName,
+        lastName: reservation.data().lastName,
+        date: reservation.data().to,
+      }
+    );
+
+    await updateDoc(doc(db, "property", reservation.data().propertyId), {
+      numberOfReviews: increment(1),
+      totalStars: increment(stars),
+
+      //TODO timestamp
+      //TODO: when I need avg just divide
+      // delete field stars in property
+    });
+    await updateDoc(doc(db, "reservations", reservation.id), {
+      leftFeedback: true,
+    });
+
+    const docSnap = await getDoc(
+      doc(db, "property", reservation.data().propertyId)
+    );
+
+    if (docSnap.exists()) {
+      if (
+        docSnap.data().numberOfReviews >= 5 &&
+        docSnap.data().totalStars / docSnap.data().numberOfReviews > 4.8
+      ) {
+        await updateDoc(doc(db, "users", reservation.data().hostId), {
+          isSuperhost: true,
+        });
+        //update every property- held by superhost
+        const q = query(
+          collection(db, "property"),
+          where("ownerId", "==", reservation.data().hostId)
+        );
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (property) => {
+          await updateDoc(doc(db, "property", property.id), {
+            isSuperhost: true,
+          });
+        });
+      }
+    }
+    setLeftFB(true);
+    setIsPopupOpen(false);
+    setComment("");
+    setStars(1);
   };
   return (
     // hover:opacity-80
@@ -33,46 +103,51 @@ transition duration-200 ease-out"
     >
       <div
         className={`${
-          new Date(item.data().to) <= new Date() ? " bg-red-50" : "bg-green-50"
+          new Date(reservation.data().to) <= new Date()
+            ? " bg-red-50"
+            : "bg-green-50"
         }`}
       >
         <div>
-          {new Date(item.data().to) <= new Date() ? "" : "**UPCOMING**"}
+          {new Date(reservation.data().to) <= new Date() ? "" : "**UPCOMING**"}
         </div>
-        <div className="text-xl font-semibold">{item.data().title}</div>
+        <div className="text-xl font-semibold">{reservation.data().title}</div>
         {/* <div>{item.data().propertyId}</div> */}
         <div className="text-lg font-semibold">
-          {item.data().user}-{item.data().userId}
+          {reservation.data().user}-{reservation.data().userId}
         </div>
         <div className="text-lg font-semibold">
-          {item.data().from} - {item.data().to}
+          {reservation.data().from} - {reservation.data().to}
         </div>
-        <div>Total: {item.data().total}e</div>
-        <div>Guests: {item.data().guests}</div>
-        <div>Garage: {item.data().garage ? "YES" : "NO"}</div>
+        <div>Total: {reservation.data().total}e</div>
+        <div>Guests: {reservation.data().guests}</div>
+        <div>Garage: {reservation.data().garage ? "YES" : "NO"}</div>
         {/* TODO */}
         <div>
-          Time of check in/out: {item.data().timeCheckIn}:00 /{" "}
-          {item.data().timeCheckOut}:00
+          Time of check in/out: {reservation.data().timeCheckIn}:00 /{" "}
+          {reservation.data().timeCheckOut}:00
         </div>
         {/* TODO */}
         <div>
           Special request:
-          {item.data().specialReq ? item.data().specialReq : "none"}
+          {reservation.data().specialReq
+            ? reservation.data().specialReq
+            : "none"}
         </div>
         {/* TODO */}
 
         <div>
-          {/* //TODO: i uslov ako vec nije dat komentar */}
-          {new Date(item.data().to) <= new Date() && (
+          {new Date(reservation.data().to) <= new Date() && (
             <div>
-              <button
-                onClick={() => {
-                  togglePopup();
-                }}
-              >
-                Leave feedback
-              </button>
+              {!leftFB && (
+                <button
+                  onClick={() => {
+                    togglePopup();
+                  }}
+                >
+                  Leave feedback
+                </button>
+              )}
               {isPopupOpen && (
                 <Popup
                   content={
@@ -100,7 +175,7 @@ transition duration-200 ease-out"
                         <StarOutlineRoundedIcon />
                       </div>
                       <Button
-                        action={leaveFeedback()}
+                        action={leaveFeedback} //TODO: zasto ako je lambda ovde se poyove vise puta
                         text="Leave feedback"
                         type=""
                       />

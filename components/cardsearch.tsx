@@ -14,14 +14,18 @@ export default function CardSearch({
   description,
   price,
   image,
-  stars,
+  // stars,
+  totalStars,
+  numberOfReviews,
 }: {
   propertyid: string;
   name: string;
   description: string;
   price: string;
   image: string;
-  stars: string;
+  // stars: string;
+  totalStars: number;
+  numberOfReviews: number;
 }) {
   return (
     <div
@@ -56,7 +60,10 @@ export default function CardSearch({
             <p className="text-sm text-gray-500 ">total</p>
           </div>
           <div className="flex">
-            <p className="text-sm font-semibold">{stars}</p>
+            <p className="text-sm font-semibold">
+              {" "}
+              {(totalStars / numberOfReviews).toFixed(1)}
+            </p>
             <StarOutlineRoundedIcon sx={{ color: yellow[700] }} />
           </div>
         </div>

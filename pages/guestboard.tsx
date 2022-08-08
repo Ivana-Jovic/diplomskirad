@@ -7,15 +7,19 @@ import {
   where,
   getDocs,
   onSnapshot,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import ReservationCard from "../components/reservationcard";
+import CardSearch from "../components/cardsearch";
 
 export default function GuestBoard() {
   const { user, myUser } = useContext(AuthContext);
   const [arr, setArr] = useState<any[]>([]);
+  const [faves, setFaves] = useState<any[]>([]);
 
   const getGuestReservations = async () => {
     const arrData: any[] = [];
@@ -31,10 +35,24 @@ export default function GuestBoard() {
       setArr(arrData);
     });
   };
+  const getFaves = async () => {
+    //TODO potencijalnbo da postoji subkolekcija fave poperty
+    const arrData: any[] = [];
+    myUser.faves.forEach(async (item: any) => {
+      const docSnap = await getDoc(doc(db, "property", item));
 
+      if (docSnap.exists()) {
+        arrData.push(docSnap);
+      }
+      setFaves(arrData);
+    });
+  };
   useEffect(() => {
-    if (user) getGuestReservations();
-  }, [user]);
+    if (user) {
+      getGuestReservations();
+    }
+    if (myUser) getFaves();
+  }, [user, myUser]);
 
   return (
     <Layout>
@@ -46,6 +64,26 @@ export default function GuestBoard() {
               return (
                 <div key={item.id}>
                   <ReservationCard item={item} />
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex flex-col mt-10 ">
+            <div className="text-center font-semibold text-xl">WISHLIST</div>
+            {faves.map((property: any) => {
+              return (
+                <div key={property.id}>
+                  <CardSearch
+                    key={property.id}
+                    propertyid={property.id}
+                    name={property.data().title}
+                    description={property.data().description}
+                    image={property.data().images[0]}
+                    price={property.data().pricePerNight}
+                    // stars="5"
+                    totalStars={property.data().totalStars}
+                    numberOfReviews={property.data().numberOfReviews}
+                  />
                 </div>
               );
             })}

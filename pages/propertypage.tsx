@@ -2,13 +2,15 @@ import Image from "next/image";
 import {
   arrayRemove,
   arrayUnion,
+  collection,
   doc,
   DocumentData,
   getDoc,
+  getDocs,
   updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Layout from "../components/layout";
 import { db } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
@@ -29,19 +31,44 @@ import Wierder from "../components/wierder";
 import Extrawierd from "../components/extrawierd";
 
 export default function PropertyPage() {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // const arrr = [1, 2, 3];
   const router = useRouter();
   const { property: propertyid } = router.query;
-  // const { user, myUser } = useContext(AuthContext);
   const [property, setProperty] = useState<DocumentData>();
-  // const [inFaves, setInFaves] = useState<boolean>(false);
+  const [comments, setComments] = useState<DocumentData[]>();
+  const pid: string = propertyid ? propertyid.toString() : "";
   const getProperty = async () => {
-    // const arrData: any[] = [];
+    const comm: any[] = [];
 
-    const pid: string = propertyid ? propertyid.toString() : "";
+    // const pid: string = propertyid ? propertyid.toString() : "";
     const docSnap = await getDoc(doc(db, "property", pid));
 
     if (docSnap.exists()) {
       setProperty(docSnap.data());
+
+      const subColl = collection(db, "property", pid, "comments");
+      const subDocSnap = await getDocs(subColl);
+      subDocSnap.forEach((doc) => {
+        comm.push(doc);
+        // console.log(" such document!", doc.data());
+      });
+      setComments(comm);
+      // console.log(" such !", comm);
     } else {
       console.log("No such document!");
     }
@@ -50,13 +77,6 @@ export default function PropertyPage() {
   useEffect(() => {
     if (propertyid) getProperty();
   }, [propertyid]); //probaj i property ako ne radi
-  ////reservacije
-  const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
-  const [dateTo, setDateTo] = useState<Date | null>(new Date());
-  const [guests, setGuests] = useState<number>(1);
-  const [rooms, setRooms] = useState<number>(1);
-
-  const [visible, setVisible] = useState(false);
 
   return (
     <Layout>
@@ -72,10 +92,11 @@ export default function PropertyPage() {
           <div className="flex justify-between font-semibold ">
             <div className="flex space-x-4">
               <div>
-                {property.stars}
+                {/* {property.stars} */}
+                {(property.totalStars / property.numberOfReviews).toFixed(1)}
                 <StarOutlineRoundedIcon sx={{ fontSize: 18 }} />
               </div>
-              <div>10 reviews</div>
+              <div>{property.numberOfReviews}reviews</div>
               <div>
                 {property.isSuperhost ? (
                   <>
@@ -140,7 +161,32 @@ export default function PropertyPage() {
             {/* {property.street}-{property.streetNum} */}
           </div>
           <div className="mb-10">Amenities</div>
-          <div className="mb-10">REVIEWS</div>
+          <div className="mb-10">
+            REVIEWS{" "}
+            {comments?.map((item: DocumentData) => {
+              return (
+                <div key={item.id} className="my-5 p-2 border">
+                  {/* <div>{item.data().userId}</div> */}
+                  <div>
+                    {item.data().firstName}-{item.data().lastName}
+                  </div>
+                  <div className="text-xs">
+                    {/* jun 2022. */}
+                    {months[new Date(item.data().date).getMonth()]}
+                    &nbsp;
+                    {new Date(item.data().date).getFullYear()}
+                    {/* // .toLocaleString("default", { style: "long" })} */}
+                  </div>
+                  {/* //TODO: timestamp */}
+                  <div>
+                    {item.data().stars}
+                    <StarOutlineRoundedIcon />
+                  </div>
+                  <div className="font-normal">{item.data().comment}</div>
+                </div>
+              );
+            })}
+          </div>
           <div className="mb-10">MAP</div>
           <div className="mb-10">CALENDAR- RESERVE</div>
           <div className="bg-slate-100">

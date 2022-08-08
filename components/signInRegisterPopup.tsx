@@ -50,6 +50,7 @@ export default function SignInRegisterPopup({}: // isLoggedIn,//sad
         const docRef = await setDoc(doc(db, "users", cred.user.uid), {
           userId: cred.user.uid,
           host: false,
+          isSuperhost: false,
         });
         router.push({
           pathname: "/profilesettings",

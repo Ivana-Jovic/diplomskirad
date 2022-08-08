@@ -7,7 +7,7 @@
 export default function AddUserInfo() {
   //   const { user } = useContext(AuthContext);
   //   const [firstName, setFirstName] = useState<string>("");
-  //   const [secondName, setSecondName] = useState<string>("");
+  //   const [secondName, setSecondName] = useState<string>("");last
   //   const [username, setUsername] = useState<string>("");
   //   const [images, setImages] = useState<string[]>([]);
   //   return (
@@ -22,7 +22,7 @@ export default function AddUserInfo() {
   //           type="text"
   //         />
   //         <Inputs
-  //           item={secondName}
+  //           item={secondName}//lastname
   //           setItem={setSecondName}
   //           placeholder=""
   //           text="Second name"

@@ -52,6 +52,11 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
       pathname: "/hostsboard",
     });
   };
+  const guestBoard = () => {
+    router.push({
+      pathname: "/guestboard",
+    });
+  };
   const profileSettings = () => {
     router.push({
       pathname: "/profilesettings",
@@ -118,6 +123,17 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
               className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
             >
               Host board
+            </div>
+          ),
+        },
+        {
+          key: "6",
+          label: (
+            <div
+              onClick={guestBoard}
+              className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+            >
+              Guest board
             </div>
           ),
         },
