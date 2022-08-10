@@ -1,5 +1,3 @@
-import { useRouter } from "next/router";
-import CardHostsProperty from "../components/cardhostsproperty";
 import Layout from "../components/layout";
 import {
   collection,
@@ -37,6 +35,7 @@ export default function GuestBoard() {
   };
   const getFaves = async () => {
     //TODO potencijalnbo da postoji subkolekcija fave poperty
+    console.log("\\\\\\\\\\\\\\\n");
     const arrData: any[] = [];
     myUser.faves.forEach(async (item: any) => {
       const docSnap = await getDoc(doc(db, "property", item));

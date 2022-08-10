@@ -1,25 +1,7 @@
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { useContext, useState } from "react";
-import Button from "./button";
-import ButtonBanner from "./buttonbanner";
-
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import type {} from "@mui/x-date-pickers/themeAugmentation";
 
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
-import { Dropdown, Menu, Space } from "antd";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import Wierder from "./wierder";
-import { addDoc, collection, DocumentData } from "firebase/firestore";
-import { db } from "../firebase";
-import { AuthContext } from "../firebase-authProvider";
+import { DocumentData } from "firebase/firestore";
 
 export default function Extrawierd({
   rese,
@@ -28,30 +10,6 @@ export default function Extrawierd({
   rese: boolean;
   property: DocumentData;
 }) {
-  //   const [location, setLocation] = useState<string>("");
-  //   const [guests, setGuests] = useState<number>(1);
-  //   const [rooms, setRooms] = useState<number>(1);
-  //   const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
-  //   const [dateTo, setDateTo] = useState<Date | null>(new Date());
-  //   const router = useRouter();
-
-  //   const [total, setTotal] = useState<number>(0);
-  //   //   const router = useRouter();
-  //   const { property: propertyid } = router.query;
-
-  //   const { user, myUser } = useContext(AuthContext);
-  //   const reserve = async () => {
-  //     const docRef = await addDoc(collection(db, "reservations"), {
-  //       idProperty: propertyid,
-  //       total: total,
-  //       idUser: user.uid,
-  //       from: dateFrom,
-  //       to: dateTo,
-  //       guests: guests,
-  //       // timestamp
-  //     });
-  //   };
-
   return (
     <>
       {/* h-[300px] sm:h-[400px] lg:h-[500px] 

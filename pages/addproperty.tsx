@@ -1,4 +1,3 @@
-import { useSession } from "next-auth/react";
 import { useContext, useState } from "react";
 import Layout from "../components/layout";
 import { collection, addDoc } from "firebase/firestore";

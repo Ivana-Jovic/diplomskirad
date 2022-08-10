@@ -1,7 +1,5 @@
 import Image from "next/image";
 import {
-  arrayRemove,
-  arrayUnion,
   collection,
   doc,
   DocumentData,
@@ -19,15 +17,6 @@ import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
 import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
 import Heart from "../components/heart";
-import Banner from "../components/banner";
-import TextField from "@mui/material/TextField";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
-import { Dropdown, Menu, Space } from "antd";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
-import Wierder from "../components/wierder";
 import Extrawierd from "../components/extrawierd";
 
 export default function PropertyPage() {

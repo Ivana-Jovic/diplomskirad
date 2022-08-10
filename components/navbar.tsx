@@ -8,7 +8,6 @@ import { Dropdown, Menu, Space } from "antd";
 import SignInRegisterPopup from "./signInRegisterPopup";
 import { AuthContext } from "../firebase-authProvider";
 import Banner from "./banner";
-import { Star } from "@mui/icons-material";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 //proveri upitnik kod placeholder

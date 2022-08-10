@@ -13,6 +13,51 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import ReservationCard from "../components/reservationcard";
 
+import * as React from "react";
+import { styled } from "@mui/material/styles";
+import TextField from "@mui/material/TextField";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
+import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
+import endOfWeek from "date-fns/endOfWeek";
+import isSameDay from "date-fns/isSameDay";
+import isWithinInterval from "date-fns/isWithinInterval";
+import startOfWeek from "date-fns/startOfWeek";
+// import Kal from "../components/kal";
+// import Kk from "../components/kk";
+import dynamic from "next/dynamic";
+const Kk = dynamic(() => import("../components/kk"), {
+  ssr: false,
+});
+// type CustomPickerDayProps = PickersDayProps<Date> & {
+//   dayIsBetween: boolean;
+//   isFirstDay: boolean;
+//   isLastDay: boolean;
+// };
+
+// const CustomPickersDay = styled(PickersDay, {
+//   shouldForwardProp: (prop) =>
+//     prop !== "dayIsBetween" && prop !== "isFirstDay" && prop !== "isLastDay",
+// })<CustomPickerDayProps>(({ theme, dayIsBetween, isFirstDay, isLastDay }) => ({
+//   ...(dayIsBetween && {
+//     borderRadius: 0,
+//     backgroundColor: theme.palette.primary.main,
+//     color: theme.palette.common.white,
+//     "&:hover, &:focus": {
+//       backgroundColor: theme.palette.primary.dark,
+//     },
+//   }),
+//   ...(isFirstDay && {
+//     borderTopLeftRadius: "50%",
+//     borderBottomLeftRadius: "50%",
+//   }),
+//   ...(isLastDay && {
+//     borderTopRightRadius: "50%",
+//     borderBottomRightRadius: "50%",
+//   }),
+// })) as React.ComponentType<CustomPickerDayProps>;
+
 export default function HostsBoard() {
   const { user, myUser } = useContext(AuthContext);
   const [arr, setArr] = useState<any[]>([]);
@@ -51,26 +96,28 @@ export default function HostsBoard() {
   );
   //TODO: OVO TREBA SREDITI DA SE NE POZIVA ZILION PUTA!!!!!!!!!!!
   // MOZDA DA SE STALNO DOHVATAJU REZERVACIJE IZ BAZE, ALI KAKO ONDA REFRESH???
-  const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    const res: any[] = [];
-    querySnapshot.forEach((doc) => {
-      res.push(doc);
+  //   const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  //     const res: any[] = [];
+  //     querySnapshot.forEach((doc) => {
+  //       res.push(doc);
 
-      console.log(
-        "NEW RESRVATION",
-        doc.data().propertyId,
-        doc.data().from,
-        doc.data().to
-      );
-    });
-    reserv.current = res;
-    // setReserv(res);// sa ovim poludi
-  });
+  //       console.log(
+  //         "NEW RESRVATION",
+  //         doc.data().propertyId,
+  //         doc.data().from,
+  //         doc.data().to
+  //       );
+  //     });
+  //     reserv.current = res;
+  //     // setReserv(res);// sa ovim poludi
+  //   });
+  // ;
+
   return (
     <Layout>
       THIS IS HOSTS BOARD
-      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
-        <section className="  px-10 py-10 w-full ">
+      {/* <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16"> */}
+      {/* <section className="  px-10 py-10 w-full ">
           <div className="hidden sm:inline-flex mb-5 space-x-3 text-gray-800">
             <p className="buttonfilter">filter1</p>
             <p className="buttonfilter">filter1</p>
@@ -99,8 +146,8 @@ export default function HostsBoard() {
               );
             })}
           </div>
-        </section>
-        <div>
+        </section> */}
+      {/* <div>
           <div className="flex flex-col ">
             {reserv.current.map((item) => {
               return (
@@ -110,8 +157,29 @@ export default function HostsBoard() {
               );
             })}
           </div>
-        </div>
+        </div> */}
+      {/* <div> */}
+      {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <StaticDatePicker
+          displayStaticWrapperAs="desktop"
+          label="Week picker"
+          value={value}
+          onChange={(newValue) => {
+            setValue(newValue);
+          }}
+          renderDay={renderWeekPickerDay}
+          renderInput={(params) => <TextField {...params} />}
+          inputFormat="'Week of' MMM d"
+        />
+      </LocalizationProvider> */}
+      {/* </div> */}
+      {/* <Kal />
+       */}
+      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
+        {" "}
+        <Kk />{" "}
       </div>
+      {/* </div> */}
     </Layout>
   );
 }

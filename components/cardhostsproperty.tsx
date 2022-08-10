@@ -1,9 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { Key, useState } from "react";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
-import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
-import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
 import Heart from "./heart";
 export default function CardHostsProperty({
