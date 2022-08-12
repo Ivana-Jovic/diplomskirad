@@ -10,6 +10,7 @@ import { AuthContext } from "../firebase-authProvider";
 import Banner from "./banner";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import LocationCityIcon from "@mui/icons-material/LocationCity";
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const { user, myUser } = useContext(AuthContext);
@@ -152,7 +153,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           className=" text-2xl text-logo  font-logo
          font-semibold mr-2 cursor-pointer pl-3 "
         >
-          mybnb
+          {/* mybnb */}
+          <LocationCityIcon fontSize="large" />
         </div>
 
         <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">

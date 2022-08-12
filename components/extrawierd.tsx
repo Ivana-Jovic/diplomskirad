@@ -2,6 +2,8 @@ import type {} from "@mui/x-date-pickers/themeAugmentation";
 
 import Wierder from "./wierder";
 import { DocumentData } from "firebase/firestore";
+import { Rating } from "@mui/material";
+import { useState } from "react";
 
 export default function Extrawierd({
   rese,
@@ -10,6 +12,10 @@ export default function Extrawierd({
   rese: boolean;
   property: DocumentData;
 }) {
+  const [guests, setGuests] = useState<number>(1); //this is sent to component wierder
+  const [rooms, setRooms] = useState<number>(1);
+  const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
+  const [dateTo, setDateTo] = useState<Date | null>(new Date());
   return (
     <>
       {/* h-[300px] sm:h-[400px] lg:h-[500px] 
@@ -35,25 +41,76 @@ export default function Extrawierd({
         >
           {rese && (
             <div className="w-full flex justify-between px-10 py-2 mb-7 text-sm">
-              <div>34e night</div>
-              <div> 4.45 * - 14 reviews</div>
+              <div>{property.pricePerNight}e night</div>
+              <div className="flex  items-center">
+                {(property.totalStars / property.numberOfReviews).toFixed(1)}
+                <Rating
+                  name="read-only"
+                  value={1}
+                  readOnly
+                  size="small"
+                  max={1}
+                />{" "}
+                - {property.numberOfReviews} reviews
+              </div>
             </div>
           )}
-          <Wierder rese={rese} totall={rese ? 230 : 0} property={property} />
+          <Wierder
+            rese={rese}
+            totall={rese ? 230 : 0}
+            property={property}
+            setGuests={setGuests}
+            setRooms={setRooms}
+            setDateFrom={setDateFrom}
+            setDateTo={setDateTo}
+            dateTo={dateTo}
+            dateFrom={dateFrom}
+            rooms={rooms}
+            guests={guests}
+          />
           {rese && (
             <div className="w-full mt-10 text-sm">
               <div className="flex justify-between px-10 my-2">
-                <div>34e x 5 nights</div>
-                <div>total 180e</div>
+                <div>
+                  {property.pricePerNight}e x
+                  {dateTo && dateFrom
+                    ? Math.round(
+                        (dateTo?.getTime() - dateFrom?.getTime()) /
+                          (1000 * 60 * 60 * 24)
+                      )
+                    : 0}
+                  nights
+                </div>
+
+                <div>
+                  {dateTo && dateFrom
+                    ? property.pricePerNight *
+                      Math.round(
+                        (dateTo?.getTime() - dateFrom?.getTime()) /
+                          (1000 * 60 * 60 * 24)
+                      )
+                    : 0}
+                  e
+                </div>
               </div>
               <div className="flex justify-between px-10 my-2">
                 <div>Service fee</div>
-                <div>50e</div>
+                <div>{property.additionalCosts}e</div>
               </div>
               <hr />
               <div className="flex justify-between px-10 my-3">
                 <div>Total</div>
-                <div> 230e</div>
+                <div>
+                  {dateTo && dateFrom
+                    ? property.pricePerNight *
+                        Math.round(
+                          (dateTo?.getTime() - dateFrom?.getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        ) +
+                      property.additionalCosts
+                    : 0}
+                  e
+                </div>
               </div>
               <hr />
               <hr />

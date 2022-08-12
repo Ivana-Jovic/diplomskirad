@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import { yellow, red } from "@mui/material/colors";
 import Heart from "./heart";
+import { Rating } from "@mui/material";
 export default function CardHostsProperty({
   propertyid,
   name,
@@ -35,7 +36,7 @@ export default function CardHostsProperty({
   return (
     <div
       onClick={goToPropertyPage}
-      className="flex my-3 border rounded-xl cursor-pointer
+      className="flex my-3 border rounded-md cursor-pointer
     hover:opacity-80 hover:shadow-lg
     transition duration-200 ease-out"
     >
@@ -46,7 +47,7 @@ export default function CardHostsProperty({
           alt={name}
           layout="fill"
           objectFit="cover"
-          className="rounded-xl"
+          className="rounded-l-md"
         />
       </div>
       <div className="flex flex-col flex-grow p-7">
@@ -71,7 +72,15 @@ export default function CardHostsProperty({
               {" "}
               {(totalStars / numberOfReviews).toFixed(1)}
             </p>
-            <StarOutlineRoundedIcon sx={{ color: yellow[700] }} />
+            {/* <StarOutlineRoundedIcon sx={{ color: yellow[700] }} />
+             */}
+            <Rating
+              name="read-only"
+              value={totalStars / numberOfReviews}
+              readOnly
+              size="small"
+              precision={0.1}
+            />
           </div>
         </div>
       </div>

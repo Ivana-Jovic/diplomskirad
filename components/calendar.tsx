@@ -15,27 +15,44 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { LegacyRef, useEffect, useRef, useState } from "react";
+import {
+  LegacyRef,
+  RefObject,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import Popup from "./popup";
 import { EventInput } from "@fullcalendar/react";
+const arrColour = ["#f7cbc8", "#c9eef0", "#d0e8c8", "#e8dcc1"];
+const arrColour3 = ["bg-[#f7cbc8]", "bg-[#c9eef0]"];
+const arrColour2 = ["logo", "logo"];
+//TDOD: add colours
 
-export default function Kk() {
+export default function Calendar({
+  propertyId,
+}: // reff,
+{
+  propertyId: string[];
+  // reff: RefObject<FullCalendar>;
+}) {
   const calendarRef = useRef<FullCalendar>(null);
   //   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   //   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [eventInfo, setEventInfo] = useState<any>(null);
 
   //   const niz = useRef<Date[]>([]);
-  const getRes = async () => {
+  const getRes = useCallback(async () => {
     console.log("]]]]]");
     const q = query(
       collection(db, "reservations"),
-      where("propertyId", "==", "0GTCREHu5UT8FCN9Un78")
+      where("propertyId", "in", propertyId)
     );
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
-      //   console.log("AAAAAAAAAAAAAA", new Date(doc.data().to).getHours());
+      console.log("AAAAAAAAAAAAAA", "bg-[" + arrColour[0] + "]");
       calendarRef.current
         ?.getApi()
         .getEventById(
@@ -62,12 +79,15 @@ export default function Kk() {
             total: doc.data().total,
             timeCheckIn: doc.data().timeCheckIn,
             timeCheckOut: doc.data().timeCheckOut,
+            propertyId: doc.data().propertyId,
           },
+          color: arrColour[propertyId.indexOf(doc.data().propertyId)],
         });
     });
-  };
+  }, [propertyId]);
+
   useEffect(() => {
-    console.log("JEDAN", calendarRef.current?.getApi().getEvents());
+    console.log("JEDAN", propertyId, calendarRef.current?.getApi().getEvents());
     calendarRef.current
       ?.getApi()
       .getEvents()
@@ -87,21 +107,21 @@ export default function Kk() {
         item.remove();
         console.log("Tri");
       });
-    // // var eventSources = calendarRef.current.getApi().getEventSources();
-    // // var len = eventSources.length;
-    // // for (var i = 0; i < len; i++) {
-    // //   eventSources[i].remove();
-    // // }
     // // setEventInfo(null);
-    const proba = async () => {
-      await getRes();
-    };
-    proba();
-  }, []);
+    // const proba = async () => {
+    //   if (propertyId) await getRes();
+    // };
+    // proba();
+    if (propertyId && propertyId.length > 0) getRes();
+  }, [getRes, propertyId, propertyId.length]);
+  // ,propertyId[0], propertyId[1]
+  // [JSON.stringify(propertyId)] https://stackoverflow.com/questions/59467758/passing-array-to-useeffect-dependency-list
 
   return (
     <>
       <FullCalendar
+        // key={propertyId}
+
         ref={calendarRef}
         plugins={[dayGridPlugin]}
         showNonCurrentDates={false}
@@ -128,8 +148,18 @@ export default function Kk() {
         }}
       />
       {eventInfo && (
-        <div>
-          <div>aaaaa {eventInfo?.event.title}</div>
+        <div className="mt-10">
+          <div
+            className={
+              // "bg-[" + arrColour2[1] + "]"
+              // "bg-" + arrColour2[1]
+              arrColour3[
+                propertyId.indexOf(eventInfo?.event.extendedProps.propertyId)
+              ]
+            }
+          >
+            aaaaa {eventInfo?.event.title}
+          </div>
           <div> From:{eventInfo?.event.start.toDateString()}</div>
           <div> To:{eventInfo?.event.end.toDateString()}</div>
           <div>Total:{eventInfo?.event.extendedProps.total}</div>

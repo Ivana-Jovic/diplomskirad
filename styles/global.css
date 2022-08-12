@@ -10,7 +10,7 @@
   }
   .roundButton {
     @apply flex rounded-full w-10 h-10 border
-    p-3 place-content-center place-items-center
+    p-3 place-content-center place-items-center items-center justify-items-center
     
    shadow-md 
 hover:shadow-xl active:scale-90 transition duration-150
@@ -66,6 +66,26 @@ a {
 
 .fc .fc-daygrid-day.fc-day-today {
   background: rgb(222, 220, 220) !important;
+}
+.fc .fc-prev-button, .fc-next-button, .fc-today-button {
+  background-color: #161616 !important;
+  border-color:#f8fafc !important;
+}
+.fc .fc-today-button{
+  background: #161616 !important;
+  border-color:#f8fafc !important;
+ }
+
+ .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline ,
+  /* .MuiOutlinedInput-input .MuiInputBase-input{
+     */
+     /* .MuiFormControl-root-focused .MuiTextField-root { */
+      .MuiInputLabel-root  
+        ,.MuiOutlinedInput-input{
+          /* .label.Mui-focused{ */
+     /* m-3 .css-1u3bzj6-MuiFormControl-root-MuiTextField-root{ */
+  color: #161616;
+  border-color: #161616;
 }
 /* img {
   max-width: 100%;

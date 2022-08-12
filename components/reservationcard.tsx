@@ -16,6 +16,7 @@ import Popup from "./popup";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import Button from "./button";
 import { db } from "../firebase";
+import Rating from "@mui/material/Rating";
 
 //TODO vidi svuda za srce klik u fav
 export default function ReservationCard({
@@ -29,7 +30,7 @@ export default function ReservationCard({
     reservation.data().leftFeedback
   );
   const [comment, setComment] = useState<string>("");
-  const [stars, setStars] = useState<number>(1);
+  const [stars, setStars] = useState<number | null>(1);
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
   };
@@ -43,7 +44,7 @@ export default function ReservationCard({
       collection(propertiesRef, reservation.data().propertyId, "comments"),
       {
         comment: comment,
-        stars: stars,
+        stars: stars ? stars : 1,
         userId: reservation.data().userId,
         firstName: reservation.data().firstName,
         lastName: reservation.data().lastName,
@@ -53,7 +54,7 @@ export default function ReservationCard({
 
     await updateDoc(doc(db, "property", reservation.data().propertyId), {
       numberOfReviews: increment(1),
-      totalStars: increment(stars),
+      totalStars: increment(stars ? stars : 1),
 
       //TODO timestamp
       //TODO: when I need avg just divide
@@ -96,7 +97,7 @@ export default function ReservationCard({
   return (
     // hover:opacity-80
     <div
-      className="flex my-3 border rounded-xl cursor-pointer
+      className="flex my-3 border rounded-md cursor-pointer
 hover:shadow-lg
 transition duration-200 ease-out"
     >
@@ -152,15 +153,8 @@ transition duration-200 ease-out"
                   content={
                     <>
                       Leave feedback:
-                      <textarea
-                        value={comment}
-                        onChange={(e) => {
-                          setComment(e.target.value);
-                        }}
-                        className="outline-0 border bg-transparent text-lg text-gray-600"
-                      />
                       <div className="flex">
-                        <input
+                        {/* <input
                           value={stars}
                           onChange={(e) => {
                             setStars(parseInt(e.target.value));
@@ -171,8 +165,22 @@ transition duration-200 ease-out"
                           max={5}
                           className="outline-0  bg-transparent text-lg text-gray-600"
                         />
-                        <StarOutlineRoundedIcon />
+                        <StarOutlineRoundedIcon /> */}
+                        <Rating
+                          name="simple-controlled"
+                          value={stars}
+                          onChange={(event, newValue) => {
+                            setStars(newValue);
+                          }}
+                        />
                       </div>
+                      <textarea
+                        value={comment}
+                        onChange={(e) => {
+                          setComment(e.target.value);
+                        }}
+                        className="outline-0 border bg-transparent text-lg text-gray-600"
+                      />
                       <Button
                         action={leaveFeedback} //TODO: zasto ako je lambda ovde se poyove vise puta
                         text="Leave feedback"

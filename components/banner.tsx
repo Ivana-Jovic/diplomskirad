@@ -12,7 +12,8 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { Dropdown, Menu, Space } from "antd";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
-
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 // const theme = createTheme({
 //   components: {
 //     MuiDatePicker: {
@@ -34,24 +35,29 @@ export default function Banner() {
   const [rooms, setRooms] = useState<number>(1);
   const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
   const [dateTo, setDateTo] = useState<Date | null>(new Date());
+  const [error, setError] = useState<string>("");
   const router = useRouter();
 
   const search = () => {
-    router.push({
-      pathname: "/search",
-      query: {
-        location: location,
-        // startdate i end... 1;31 day3
-        from: dateFrom?.toDateString(),
-        to: dateTo?.toDateString(),
-        //  `${dateTo?.getDate()}-${
-        //   dateTo?.getMonth() ? dateTo?.getMonth() : 0 + 1
-        // }-${dateTo?.getFullYear()}`,
-        numOfGuests: guests,
-        rooms: rooms,
-        //TODO add other
-      },
-    });
+    if (dateFrom && dateTo && dateFrom >= dateTo) {
+      setError("Check out date must be after check in date");
+    } else {
+      router.push({
+        pathname: "/search",
+        query: {
+          location: location,
+          // startdate i end... 1;31 day3
+          from: dateFrom?.toDateString(),
+          to: dateTo?.toDateString(),
+          //  `${dateTo?.getDate()}-${
+          //   dateTo?.getMonth() ? dateTo?.getMonth() : 0 + 1
+          // }-${dateTo?.getFullYear()}`,
+          numOfGuests: guests,
+          rooms: rooms,
+          //TODO add other
+        },
+      });
+    }
   };
   const menu = (
     <Menu
@@ -61,7 +67,7 @@ export default function Banner() {
           key: "1",
           label: (
             <>
-              <div className="flex mb-2 lg:mb-0">
+              <div className="flex mb-2 lg:mb-0  items-center">
                 <label className="mx-5">guests</label>
                 <button
                   className="roundButton"
@@ -69,7 +75,7 @@ export default function Banner() {
                     if (guests - 1 > 0) setGuests(guests - 1);
                   }}
                 >
-                  -
+                  <RemoveIcon fontSize="small" />
                 </button>
                 <div className="mx-3">{guests}</div>
                 <button
@@ -80,7 +86,7 @@ export default function Banner() {
                       setGuests(guests + 1);
                   }}
                 >
-                  +
+                  <AddIcon fontSize="small" />
                 </button>
               </div>
             </>
@@ -90,7 +96,7 @@ export default function Banner() {
           key: "2",
           label: (
             <>
-              <div className="flex lg:mr-7">
+              <div className="flex lg:mr-7  items-center">
                 <label className="mx-5">rooms</label>
                 <button
                   className="roundButton"
@@ -98,7 +104,7 @@ export default function Banner() {
                     if (rooms - 1 > 0) setRooms(rooms - 1);
                   }}
                 >
-                  -
+                  <RemoveIcon fontSize="small" />
                 </button>
                 <div className="mx-3">{rooms}</div>
                 <button
@@ -109,7 +115,7 @@ export default function Banner() {
                       setRooms(rooms + 1);
                   }}
                 >
-                  +
+                  <AddIcon fontSize="small" />
                 </button>
               </div>
             </>
@@ -161,10 +167,16 @@ export default function Banner() {
               type="text"
               placeholder="Where do you want to go?"
               className="outline-0  bg-transparent 
-              placeholder:text-text p-3
-              w-80  text-center mb-3 lg:mb-0"
+              placeholder:text-text p-3 items-center text-center
+              w-80   mb-3 lg:mb-0"
             />
-
+            {/* <TextField
+              id="standard-search"
+              // label="Search field"
+              placeholder="Where do you want to go?"
+              type="search"
+              variant="standard"
+            /> */}
             <div className="flex mb-3 lg:mb-0 lg:mr-7 mr-2">
               <div className="mr-3">
                 <DatePicker
@@ -175,6 +187,9 @@ export default function Banner() {
                   value={dateFrom}
                   onChange={(newValue) => {
                     setDateFrom(newValue);
+                    if (newValue && dateTo && newValue < dateTo) {
+                      setError("");
+                    }
                   }}
                   renderInput={(params) => <TextField {...params} />}
                 />
@@ -182,11 +197,19 @@ export default function Banner() {
 
               <DatePicker
                 disablePast
+                shouldDisableDate={(date: Date) => {
+                  if (dateTo && dateFrom && date <= dateFrom) {
+                    return true;
+                  } else return false;
+                }}
                 label="Check out"
                 inputFormat="dd/MM/yyyy"
                 value={dateTo}
                 onChange={(newValue) => {
                   setDateTo(newValue);
+                  if (dateFrom && newValue && dateFrom < newValue) {
+                    setError("");
+                  }
                 }}
                 renderInput={(params) => <TextField {...params} />}
               />
@@ -209,6 +232,7 @@ export default function Banner() {
             <div className="-mt-3 -mb-5 lg:-mt-0 lg:mb-3 ml-3">
               <Button action={search} text="search" type="" />
             </div>
+            {error}
           </div>
         </div>
       </LocalizationProvider>

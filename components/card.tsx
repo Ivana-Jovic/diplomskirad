@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function Card({ name, description, price, image }) {
   return (
     <div
-      className="my-5 mr-5 rounded-lg shadow-md cursor-pointer 
+      className="my-5 mr-5 rounded-md shadow-md cursor-pointer 
       transition transform duration-300 ease-out hover:scale-105 "
     >
       {/* relative//???? */}
@@ -15,7 +15,7 @@ export default function Card({ name, description, price, image }) {
           src={image}
           alt={name}
           layout="fill"
-          className="rounded-xl"
+          className="rounded-t-md"
           objectFit="cover"
           // image
           // objectFit="contain" // pazi na ovo za slike moze i object position left

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useContext, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
 import Button from "./button";
 
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -27,16 +27,33 @@ export default function Wierder({
   rese,
   totall,
   property,
+  setGuests,
+  setRooms,
+  setDateFrom,
+  setDateTo,
+  guests,
+  rooms,
+  dateFrom,
+  dateTo,
 }: {
   rese: boolean;
   totall: number;
   property: DocumentData;
+  setGuests: Dispatch<SetStateAction<number>>;
+  setRooms: Dispatch<SetStateAction<number>>;
+  setDateFrom: Dispatch<SetStateAction<Date | null>>;
+  setDateTo: Dispatch<SetStateAction<Date | null>>;
+  guests: number;
+  rooms: number;
+  dateFrom: Date | null;
+  dateTo: Date | null;
 }) {
   const [location, setLocation] = useState<string>("");
-  const [guests, setGuests] = useState<number>(1);
-  const [rooms, setRooms] = useState<number>(1);
-  const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
-  const [dateTo, setDateTo] = useState<Date | null>(new Date());
+  const [error, setError] = useState<string>("");
+  // const [guests, setGuests] = useState<number>(1);
+  // const [rooms, setRooms] = useState<number>(1);
+  // const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
+  // const [dateTo, setDateTo] = useState<Date | null>(new Date());
   const router = useRouter();
 
   const search = () => {
@@ -63,36 +80,40 @@ export default function Wierder({
   //TODO: na dosta mesta u ostalim je bilo na slican fazon - popravi!
   const { user, myUser } = useContext(AuthContext);
   const reserve = async () => {
-    // const querySnapshot = await getDocs(query(collection(db, "property"), where("propertyid", "==", true)));
-    const docSnap = await getDoc(doc(db, "property", prId)); //TODO: da li je moguce ovo uraditi kod deklaracije propId
-    let title = ""; //TODO: ispravi svuda gde je let
-    console.log("++++++++++++++++++", prId);
-    if (docSnap.exists()) {
-      title = docSnap.data().title;
-      console.log("--------------------!");
+    if (dateFrom && dateTo && dateFrom >= dateTo) {
+      setError("Check out date must be after check in date");
     } else {
-      console.log("-------------No such document!");
-    }
+      // const querySnapshot = await getDocs(query(collection(db, "property"), where("propertyid", "==", true)));
+      const docSnap = await getDoc(doc(db, "property", prId)); //TODO: da li je moguce ovo uraditi kod deklaracije propId
+      let title = ""; //TODO: ispravi svuda gde je let
+      console.log("++++++++++++++++++", prId);
+      if (docSnap.exists()) {
+        title = docSnap.data().title;
+        console.log("--------------------!");
+      } else {
+        console.log("-------------No such document!");
+      }
 
-    const docRef = await addDoc(collection(db, "reservations"), {
-      propertyId: propertyid,
-      title: title,
-      total: total,
-      userId: user.uid,
-      firstName: myUser.firstName,
-      lastName: myUser.lastName,
-      user: myUser.username,
-      hostId: property.ownerId,
-      from: dateFrom?.toDateString(),
-      to: dateTo?.toDateString(),
-      guests: guests,
-      garage: true,
-      timeCheckIn: 17,
-      timeCheckOut: 10,
-      specialReq: "crib",
-      leftFeedback: false,
-      // timestamp
-    });
+      const docRef = await addDoc(collection(db, "reservations"), {
+        propertyId: propertyid,
+        title: title,
+        total: total,
+        userId: user.uid,
+        firstName: myUser.firstName,
+        lastName: myUser.lastName,
+        user: myUser.username,
+        hostId: property.ownerId,
+        from: dateFrom?.toDateString(),
+        to: dateTo?.toDateString(),
+        guests: guests,
+        garage: true,
+        timeCheckIn: 17,
+        timeCheckOut: 10,
+        specialReq: "crib",
+        leftFeedback: false,
+        // timestamp
+      });
+    }
   };
 
   // const khm=()=>{
@@ -205,6 +226,9 @@ export default function Wierder({
                   value={dateFrom}
                   onChange={(newValue) => {
                     setDateFrom(newValue);
+                    if (newValue && dateTo && newValue < dateTo) {
+                      setError("");
+                    }
                   }}
                   renderInput={(params) => <TextField {...params} />}
                 />
@@ -212,11 +236,19 @@ export default function Wierder({
 
               <DatePicker
                 disablePast
+                shouldDisableDate={(date: Date) => {
+                  if (dateTo && dateFrom && date <= dateFrom) {
+                    return true;
+                  } else return false;
+                }}
                 label="Check out"
                 inputFormat="dd/MM/yyyy"
                 value={dateTo}
                 onChange={(newValue) => {
                   setDateTo(newValue);
+                  if (dateFrom && newValue && dateFrom < newValue) {
+                    setError("");
+                  }
                 }}
                 renderInput={(params) => <TextField {...params} />}
               />
@@ -242,6 +274,7 @@ export default function Wierder({
               {!rese && <Button action={search} text="search" type="" />}
               {rese && <Button action={reserve} text="Reserve" type="" />}
             </div>
+            {error}
           </div>
         </div>
       </LocalizationProvider>

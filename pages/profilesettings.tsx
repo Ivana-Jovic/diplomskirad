@@ -8,6 +8,7 @@ import Layout from "../components/layout";
 import { db, storage } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
 import { useRouter } from "next/router";
+import { TextField } from "@mui/material";
 
 //TODO proveri svuda za  auth.currentUser da li ostaje ili na neki drugi nacin
 export default function ProfileSettings() {
@@ -167,7 +168,7 @@ export default function ProfileSettings() {
       <div className="max-w-7xl mx-auto px-8 sm:px-16  ">
         <div>hello {user?.email}</div>
         <form onSubmit={changeProfile} name="submitFormName">
-          <Inputs
+          {/* <Inputs
             item={firstName}
             setItem={setFirstName}
             placeholder=""
@@ -201,7 +202,73 @@ export default function ProfileSettings() {
             placeholder=""
             text="username"
             type="text"
-          />
+          /> */}
+          <div className="flex flex-col">
+            <TextField
+              className="m-3"
+              required
+              id="outlined-required"
+              label="first name"
+              value={firstName}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+              }}
+            />
+            <TextField
+              className="m-3"
+              required
+              id="outlined-required"
+              label="last name"
+              value={lastName}
+              onChange={(e) => {
+                setLastName(e.target.value);
+              }}
+            />
+            {/* <TextField
+              className="m-3"
+              required
+              id="outlined-required"
+              label="email"
+              type="email"
+              value={emailState}
+              onChange={(e) => {
+                if(isEmail(e)) {
+                  setIsValid(true);              
+               } else {
+                  setIsValid(false);              
+               }
+                setEmailState(e.target.value);
+              }}
+            /> */}
+            <Inputs
+              item={emailState}
+              setItem={setEmailState}
+              placeholder=""
+              text="email"
+              type="email"
+            />
+            <TextField
+              className="m-3"
+              required
+              id="outlined-required"
+              label="enter new password"
+              type="password"
+              value={passwordState}
+              onChange={(e) => {
+                setPasswordState(e.target.value);
+              }}
+            />
+            <TextField
+              className="m-3"
+              required
+              id="outlined-required"
+              label="username"
+              value={usernameState}
+              onChange={(e) => {
+                setUsernameState(e.target.value);
+              }}
+            />
+          </div>
 
           {!file && <input type="file" onChange={changeHandler} />}
           {file && <p>Storing image...</p>}

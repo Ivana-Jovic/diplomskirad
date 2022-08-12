@@ -18,6 +18,7 @@ import { yellow, red } from "@mui/material/colors";
 import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
 import Heart from "../components/heart";
 import Extrawierd from "../components/extrawierd";
+import { Rating } from "@mui/material";
 
 export default function PropertyPage() {
   const months = [
@@ -80,10 +81,24 @@ export default function PropertyPage() {
 
           <div className="flex justify-between font-semibold ">
             <div className="flex space-x-4">
-              <div>
+              <div className="flex  items-center">
                 {/* {property.stars} */}
                 {(property.totalStars / property.numberOfReviews).toFixed(1)}
-                <StarOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                {/* <StarOutlineRoundedIcon sx={{ fontSize: 18 }} /> */}
+                {/* <Rating
+                  name="read-only"
+                  value={property.totalStars / property.numberOfReviews}
+                  readOnly
+                  size="small"
+                  precision={0.1}
+                /> */}
+                <Rating
+                  name="read-only"
+                  value={1}
+                  readOnly
+                  size="small"
+                  max={1}
+                />
               </div>
               <div>{property.numberOfReviews}reviews</div>
               <div>
@@ -168,8 +183,12 @@ export default function PropertyPage() {
                   </div>
                   {/* //TODO: timestamp */}
                   <div>
-                    {item.data().stars}
-                    <StarOutlineRoundedIcon />
+                    <Rating
+                      name="read-only"
+                      value={item.data().stars}
+                      readOnly
+                      size="small"
+                    />
                   </div>
                   <div className="font-normal">{item.data().comment}</div>
                 </div>
