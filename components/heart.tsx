@@ -69,7 +69,7 @@ export default function Heart({
             e.stopPropagation();
             onHeart();
           }}
-          className="mr-10"
+          // className="mr-10"
         >
           {inFaves && (
             <FavoriteRoundedIcon

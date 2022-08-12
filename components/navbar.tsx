@@ -150,7 +150,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
       <div className="sm:px-5  md:px-10 grid grid-cols-3">
         <div
           onClick={() => router.push("/")}
-          className=" text-2xl text-logo  font-logo
+          className=" text-2xl text-darkGreen  font-logo
          font-semibold mr-2 cursor-pointer pl-3 "
         >
           {/* mybnb */}

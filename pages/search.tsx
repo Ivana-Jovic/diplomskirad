@@ -1,32 +1,16 @@
-// Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
-// at Search (webpack-internal:///./pages/search.tsx:126:72)
-// at AuthProvider (webpack-internal:///./firebase-authProvider.js:54:26)
-// at MyApp (webpack-internal:///./pages/_app.tsx:76:28)
-// at ErrorBoundary (webpack-internal:///./node_modules/next/dist/compiled/@next/react-dev-overlay/client.js:8:20746)
-// at ReactDevOverlay (webpack-internal:///./node_modules/next/dist/compiled/@next/react-dev-overlay/client.js:8:23395)
-// at Container (webpack-internal:///./node_modules/next/dist/client/index.js:323:9)
-// at AppContainer (webpack-internal:///./node_modules/next/dist/client/index.js:825:26)
-// at Root (webpack-internal:///./node_modules/next/dist/client/index.js:949:27)
-// window.console.error @ next-dev.js?3515:25
-// printWarning @ react-dom.development.js?ac89:86
-// error @ react-dom.development.js?ac89:60
-// checkForNestedUpdates @ react-dom.development.js?ac89:27300
-// scheduleUpdateOnFiber @ react-dom.development.js?ac89:25475
-// dispatchSetState @ react-dom.development.js?ac89:17527
-// eval @ search.tsx?c3ba:183
-// commitHookEffectListMount @ react-dom.development.js?ac89:23150
-// commitPassiveMountOnFiber @ react-dom.development.js?ac89:24926
-// commitPassiveMountEffects_complete @ react-dom.development.js?ac89:24891
-// commitPassiveMountEffects_begin @ react-dom.development.js?ac89:24878
-// commitPassiveMountEffects @ react-dom.development.js?ac89:24866
-// flushPassiveEffectsImpl @ react-dom.development.js?ac89:27039
-// flushPassiveEffects @ react-dom.development.js?ac89:26984
-// eval @ react-dom.development.js?ac89:26769
-// workLoop @ scheduler.development.js?bcd2:266
-// flushWork @ scheduler.development.js?bcd2:239
-// performWorkUntilDeadline @ scheduler.development.js?bcd2:533
-import { Chip, Rating } from "@mui/material";
+import {
+  Box,
+  Chip,
+  Popover,
+  Rating,
+  Slider,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
+import * as React from "react";
 import { Console } from "console";
+import { previousDay } from "date-fns";
 import {
   collection,
   DocumentData,
@@ -36,13 +20,62 @@ import {
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, MouseEvent } from "react";
 import CardSearch from "../components/cardsearch";
 import Layout from "../components/layout";
 import { db } from "../firebase";
-
+import { styled } from "@mui/material/styles";
+const AirbnbSlider = styled(Slider)(({ theme }) => ({
+  color: "#3a8589",
+  height: 3,
+  padding: "13px 0",
+  "& .MuiSlider-thumb": {
+    height: 27,
+    width: 27,
+    backgroundColor: "#fff",
+    border: "1px solid currentColor",
+    "&:hover": {
+      boxShadow: "0 0 0 8px rgba(58, 133, 137, 0.16)",
+    },
+    "& .airbnb-bar": {
+      height: 9,
+      width: 1,
+      backgroundColor: "currentColor",
+      marginLeft: 1,
+      marginRight: 1,
+    },
+  },
+  "& .MuiSlider-track": {
+    height: 3,
+  },
+  "& .MuiSlider-mark": {
+    color: "#f8fafc",
+  },
+  "& .MuiSlider-rail": {
+    color: theme.palette.mode === "dark" ? "#bfbfbf" : "#d8d8d8",
+    opacity: theme.palette.mode === "dark" ? undefined : 1,
+    height: 3,
+  },
+}));
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  "& .MuiToggleButtonGroup-grouped": {
+    margin: theme.spacing(0.5),
+    border: 0,
+    "&.Mui-disabled": {
+      border: 0,
+    },
+    "&:not(:first-of-type)": {
+      borderRadius: theme.shape.borderRadius,
+    },
+    "&:first-of-type": {
+      borderRadius: theme.shape.borderRadius,
+    },
+  },
+}));
 //TODO: dodati datume u search i ostale
-
+function valuetext(value: number) {
+  return `${value}°C`;
+}
 //PROMENI KEY!!!
 async function isAvailable(from: Date, to: Date, propertyId: string) {
   const querySnapshot6 = await getDocs(
@@ -75,38 +108,18 @@ async function isAvailable(from: Date, to: Date, propertyId: string) {
     }
   }
   return true;
-  // querySnapshot6.docs.forEach((doc) => {
-  //   //oni koji se potencijalno poklapaju
-  //   if (new Date(doc.data().from) >= to) {
-  //     //ne poklapaju se
-  //   } else {
-  //     //poklapaju se kako god
-  //     //ako je doc.to izmedju to i from poklapaju se sigurno
-  //     //ako doc.to vece od to poklapaju se  ako je from iymedju ili pre from
-  //     //
-  //     return false;
-  //   }
-  //   return true;
-  // });
 }
 export default function Search() {
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [numPropertiesLocation, setNumPropertiesLocation] = useState<number>(0);
+  const [sumPricesPropertiesLocation, setSumPricesPropertiesLocation] =
+    useState<number>(0);
   const router = useRouter();
   const { location, from, to } = router.query; //,rooms,numOfGuests, from, to
   const fromDate = new Date(router.query.from as string);
   fromDate.setHours(0, 0, 0, 0);
-  // (router.query.from as string).toDateString() ?? (router.query.from as string)
-  // );
-  // (router.query.from as string);
-  // router.query.from
-  //   ? new Date(router.query.from as string)
-  //   : undefined;
   const toDate = new Date(router.query.to as string);
   toDate.setHours(0, 0, 0, 0);
-  //   router.query.to?.toDateString() ?? (router.query.to as string)
-  // );
-  //  router.query.to
-  //   ? new Date(router.query.to as string)
-  //   : undefined;
 
   const rooms = (router.query.rooms ?? 0) as number;
   // router.query.rooms ? +router.query.rooms : undefined;
@@ -114,13 +127,17 @@ export default function Search() {
   // ? +router.query.numOfGuests
   // : undefined;
   const [arr, setArr] = useState<any[]>([]);
+  const [filteredArr, setFilteredArr] = useState<any[]>([]);
 
   const [selectedSuperhost, setSelectedSuperhost] = useState<boolean>(false);
   const [selectedRatingFourAndUp, setSelectedRatingFourAndUp] =
     useState<boolean>(false);
-    const [selectedGarage, setSelectedGarage] = useState<boolean>(false);
-  
-  const getSearchProperties = useCallback(async () => {
+  const [selectedGarage, setSelectedGarage] = useState<boolean>(false);
+  const [selectedPrice, setSelectedPrice] = useState<boolean>(false);
+  const [sortPrice, setSortPrice] = useState<string | null>(null);
+  const [priceRange, setPriceRange] = useState<number[]>([1, 100]); //put max when adding property
+  const factorPrice = 10;
+  const getSearchProperties = async () => {
     console.log("in search gethostproperty");
     const qs44: string[] = [];
     const qs33: string[] = [];
@@ -157,29 +174,32 @@ export default function Search() {
       querySnapshot2.docs
     );
     //UNIJA
-
+    setNumPropertiesLocation(0);
+    setSumPricesPropertiesLocation(0);
     r.forEach(async (doc) => {
+      // console.log()
+      setNumPropertiesLocation((prev) => prev + 1);
+      setSumPricesPropertiesLocation((prev) => prev + doc.data().pricePerNight);
       if (
         rooms &&
         numOfGuests &&
         doc.data().numOfPersons >= numOfGuests &&
         doc.data().numOfRooms >= rooms
       ) {
-        // console.log("MAIN", doc.data().from, doc.data().to);
         console.log("MAIN", fromDate, toDate);
-        // const isAv = await isAvailable(fromDate, toDate, doc.id);
-        // if (isAv) {
-        arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
-        setArr(arrData);
-        console.log(
-          "MAIN2",
-          fromDate,
-          toDate,
-          doc.id,
-          arrData.length,
-          arr.length
-        );
-        // }
+        isAvailable(fromDate, toDate, doc.id).then((isAv) => {
+          if (isAv) {
+            arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
+            // setArr(arrData);
+            setArr((prev) => {
+              return [...prev, doc.id + "---" + JSON.stringify(doc.data())];
+            });
+            setFilteredArr((prev) => {
+              return [...prev, doc.id + "---" + JSON.stringify(doc.data())];
+            });
+            console.log("MAIN2", fromDate, toDate, doc.id, arrData.length, arr);
+          }
+        });
       }
 
       //PRESEK
@@ -201,22 +221,8 @@ export default function Search() {
       // setArr(arrData);
       // }
     });
-  }, [location, numOfGuests, rooms]);
-
-  // useEffect(() => {
-  //   //TODO: proveri uslove
-  //   if (
-  //     location != undefined &&
-  //     rooms != undefined &&
-  //     numOfGuests != undefined &&
-  //     rooms &&
-  //     location &&
-  //     numOfGuests &&
-  //     fromDate &&
-  //     toDate
-  //   )
-  //     getSearchProperties();
-  // }, [location, rooms, numOfGuests, getSearchProperties]); //TODO proveriti sve useeffect nizove
+  };
+  //, [location, numOfGuests, rooms]);
 
   const shouldBeShown = (selected: boolean, is: boolean) => {
     if ((selected && is) || !selected) {
@@ -232,72 +238,107 @@ export default function Search() {
     const propertyid = item.split("---")[0];
     //if selectedSuperhost and isSuperhost
     // or !selectedSuperhost   -> SHOULD BE SHOWN
+    console.log(
+      "PRICE",
+      property.pricePerNight,
+      priceRange[0] * factorPrice,
+      priceRange[1] * factorPrice
+    );
     if (
       shouldBeShown(selectedSuperhost, property.isSuperhost) &&
       shouldBeShown(
         selectedRatingFourAndUp,
         property.totalStars / property.numberOfReviews >= 4
-      )&&
-      shouldBeShown(selectedGarage, property.garage) 
+      ) &&
+      shouldBeShown(selectedGarage, property.garage) &&
+      //TODO: namestiti da je 2000 max za noc u bazi
+      shouldBeShown(
+        true,
+        priceRange[0] * factorPrice <= property.pricePerNight &&
+          priceRange[1] * factorPrice >= property.pricePerNight
+      )
     ) {
-      console.log("TRUE");
+      console.log("TRUE", sortPrice);
       return true;
     }
 
     console.log("FALSE", selectedSuperhost, property.isSuperhost);
     return false;
   };
-  // const filterProperties = useCallback(() => {
-  // const arrData2: any[] = [];
-  // const arrData3: any[] = arr;
-  // arrData3.forEach((item) => {
-  //   console.log("in arrdata3");
-  //   const property = JSON.parse(item.split("---")[1]);
-  //   const propertyid = item.split("---")[0];
-  //   if (selectedSuperhost && property.isSuperhost) {
-  //     arrData2.push(item);
-  //     console.log("in arrdata2", arrData2.length);
-  //     setArr(arrData2);
-  //   }
-  // });
-  // }, []);
-  // const bljuc = () => {
-  //   // arr.filter(filterProperties);
-  //   setArr(arr.filter(filterProperties));
-  // };
 
   useEffect(() => {
-    if (selectedSuperhost || selectedRatingFourAndUp||selectedGarage) {
-      // filterProperties();
-      // bljuc()
-      const arrData5: any[] = arr.filter(filterProperties);
-      setArr(arrData5);
-    } else {
-      if (
-        location != undefined &&
-        rooms != undefined &&
-        numOfGuests != undefined &&
-        fromDate != undefined &&
-        toDate != undefined &&
-        rooms &&
-        location &&
-        numOfGuests &&
-        fromDate &&
-        toDate
-      ) {
-        getSearchProperties();
+    if (
+      selectedSuperhost ||
+      selectedRatingFourAndUp ||
+      selectedGarage ||
+      selectedPrice ||
+      sortPrice ||
+      sortPrice == null
+    ) {
+      setFilteredArr([]);
+      setFilteredArr(arr);
+      // getSearchProperties().then(() => {
+      // const arrData5: any[] = filteredArr.filter(filterProperties);
+      setFilteredArr((prev) => [...prev].filter(filterProperties));
+      if (sortPrice == "asc") {
+        console.log("ASC");
+        setFilteredArr((prev) =>
+          [...prev]
+            .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
+            .sort(
+              (a: any, b: any) =>
+                JSON.parse(a.split("---")[1]).pricePerNight -
+                JSON.parse(b.split("---")[1]).pricePerNight
+            )
+        );
+      } else if (sortPrice == "desc") {
+        console.log("DESC");
+        setFilteredArr((prev) =>
+          [...prev]
+            .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
+            .sort(
+              (a: any, b: any) =>
+                JSON.parse(b.split("---")[1]).pricePerNight -
+                JSON.parse(a.split("---")[1]).pricePerNight
+            )
+        );
+      } else {
+        console.log("NIJE NI RASTUCE NI OP");
       }
+    } else {
+      setFilteredArr([]);
+      setFilteredArr(() => {
+        return arr;
+      });
     }
   }, [
-    location,
-    rooms,
-    numOfGuests,
-    getSearchProperties,
     selectedSuperhost,
     selectedRatingFourAndUp,
-    selectedGarage
+    selectedGarage,
+    selectedPrice,
+    priceRange[0],
+    priceRange[1],
+    sortPrice,
   ]); //TODO proveriti sve useeffect nizove
 
+  useEffect(() => {
+    if (
+      location != undefined &&
+      rooms != undefined &&
+      numOfGuests != undefined &&
+      fromDate != undefined &&
+      toDate != undefined &&
+      rooms &&
+      location &&
+      numOfGuests &&
+      fromDate &&
+      toDate
+    ) {
+      setArr([]);
+      setFilteredArr([]);
+      getSearchProperties();
+    }
+  }, [location, rooms, numOfGuests]);
   return (
     <Layout
       placeholder={
@@ -310,7 +351,9 @@ export default function Search() {
           <p className="text-sm pb-5">
             Stay in {location} <br />
             from {from} to {to} <br />
-            {numOfGuests} guests - {rooms} rooms
+            {numOfGuests} guests - {rooms} rooms <br />
+            Average price per night in {location} is{" "}
+            {sumPricesPropertiesLocation / numPropertiesLocation}e
           </p>
           <p className="text-4xl mb-6">Stays in {location}</p>
           {/* dodati burger  ya telefone */}
@@ -327,8 +370,86 @@ export default function Search() {
                 setSelectedRatingFourAndUp(!selectedRatingFourAndUp);
               }}
             />
-            <p className="buttonfilter">Price</p>
-            <p className="buttonfilter">Garage</p>
+            {/* <p className="buttonfilter">Price</p> */}
+            <Chip
+              label="Price"
+              variant={selectedPrice ? "filled" : "outlined"}
+              onClick={(event: any) => {
+                // setSelectedPrice(!selectedPrice);
+                setAnchorEl(event.currentTarget);
+              }}
+            />
+            {
+              <Popover
+                id={Boolean(anchorEl) ? "simple-popover" : undefined}
+                open={Boolean(anchorEl)}
+                anchorEl={anchorEl}
+                onClose={() => {
+                  setAnchorEl(null);
+                }}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "center",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "center",
+                }}
+              >
+                <div className="m-7 mt-10 flex flex-col items-center">
+                  <Box sx={{ width: 300 }}>
+                    <AirbnbSlider
+                      getAriaLabel={() => "Price range"}
+                      value={priceRange}
+                      onChange={(e: Event, newValue: number | number[]) => {
+                        setPriceRange(newValue as number[]);
+                        setSelectedPrice(true);
+                      }}
+                      getAriaValueText={valuetext}
+                      marks={[
+                        {
+                          value: 0,
+                          label: "0e",
+                        },
+                        {
+                          value: 100,
+                          label: "1000e",
+                        },
+                      ]}
+                    />
+                  </Box>
+                  <div className="mb-4  flex">
+                    Price from&nbsp;
+                    <p className="font-medium">
+                      {priceRange[0] * factorPrice}e
+                    </p>
+                    &nbsp;to&nbsp;
+                    <p className="font-medium">
+                      {priceRange[1] * factorPrice}e
+                    </p>
+                  </div>
+                  <StyledToggleButtonGroup
+                    value={sortPrice}
+                    exclusive
+                    onChange={(e: MouseEvent, val: string | null) => {
+                      setSortPrice(val);
+                      setSelectedPrice(true);
+                    }}
+                    aria-label="sortPrice"
+                  >
+                    <ToggleButton value="asc" aria-label="asc">
+                      {/* TODO: sta su aria label */}
+                      Sort ascending
+                    </ToggleButton>
+                    <ToggleButton value="desc" aria-label="desc">
+                      Sort descending
+                    </ToggleButton>
+                  </StyledToggleButtonGroup>
+                  {/* sortPrice:{sortPrice ?? "none"} */}
+                </div>
+              </Popover>
+            }
+            {/* <p className="buttonfilter">Garage</p> */}
             <Chip
               label="Garage"
               variant={selectedGarage ? "filled" : "outlined"}
@@ -348,7 +469,7 @@ export default function Search() {
             {/* <p className="buttonfilter">more</p> */}
           </div>
           <div className="flex flex-col ">
-            {arr.map((item) => {
+            {filteredArr.map((item) => {
               const property = JSON.parse(item.split("---")[1]);
               const propertyid = item.split("---")[0];
               return (
@@ -362,6 +483,14 @@ export default function Search() {
                   // stars="5"
                   totalStars={property.totalStars}
                   numberOfReviews={property.numberOfReviews}
+                  numberOfNights={
+                    fromDate && toDate
+                      ? Math.round(
+                          (toDate.getTime() - fromDate.getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        )
+                      : 0
+                  }
                 />
               );
             })}

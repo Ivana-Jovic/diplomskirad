@@ -34,7 +34,9 @@ export default function Banner() {
   const [guests, setGuests] = useState<number>(1);
   const [rooms, setRooms] = useState<number>(1);
   const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
-  const [dateTo, setDateTo] = useState<Date | null>(new Date());
+  const [dateTo, setDateTo] = useState<Date | null>(
+    new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+  );
   const [error, setError] = useState<string>("");
   const router = useRouter();
 
@@ -138,11 +140,12 @@ export default function Banner() {
         >
           {/* <div className="w-full h-[50vh] bg-[url('/images/banner.jpg')] bg-center bg-no-repeat bg-cover"> */}
           <Image
-            src="/images/banner.jpg"
+            src="/images/banner3.jpg"
             alt=""
             layout="fill"
             objectFit="cover"
-          ></Image>
+            className="opacity-80"
+          />
           {/* <div className="absolute text-textFooter pl-7 top-1/4 w-fit">
           {/* <div className="absolute text-textFooter h-[50vh] bg-footer pt-[20vh] p-12 w-2/5"> */}
           {/* <div className="bg-footer text-xl sm:text-3xl font-bold ">

@@ -11,14 +11,14 @@ export default function Button({
     console.log("em");
   };
   return (
-    <div className=" text-center ">
+    <div className=" text-center  ">
       <button
         type={type == "submit" ? "submit" : "button"}
         onClick={action ? action : emptyFunc}
         // {action && onClick={action }}
         className="my-5 mx-auto  shadow-md  p-3
-         hover:shadow-xl active:scale-90 transition duration-150
-         text-lg sm:text-2xl font-semibold rounded-lg "
+         hover:shadow-lg active:scale-90 transition duration-150
+         text-lg sm:text-2xl font-semibold rounded-lg bg-background border"
       >
         {/* bg-grey-100  */}
         <h2>{text}</h2>

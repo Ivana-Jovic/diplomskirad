@@ -25,6 +25,7 @@ import {
 } from "react";
 import Popup from "./popup";
 import { EventInput } from "@fullcalendar/react";
+import ReservationCard from "./reservationcard";
 const arrColour = ["#f7cbc8", "#c9eef0", "#d0e8c8", "#e8dcc1"];
 const arrColour3 = ["bg-[#f7cbc8]", "bg-[#c9eef0]"];
 const arrColour2 = ["logo", "logo"];
@@ -52,7 +53,7 @@ export default function Calendar({
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
-      console.log("AAAAAAAAAAAAAA", "bg-[" + arrColour[0] + "]");
+      // console.log("AAAAAAAAAAAAAA", "bg-[" + arrColour[0] + "]");
       calendarRef.current
         ?.getApi()
         .getEventById(
@@ -80,6 +81,16 @@ export default function Calendar({
             timeCheckIn: doc.data().timeCheckIn,
             timeCheckOut: doc.data().timeCheckOut,
             propertyId: doc.data().propertyId,
+            hostId: doc.data().hostId,
+            garage: doc.data().garage,
+            guests: doc.data().guests,
+            specialReq: doc.data().specialReq,
+            userId: doc.data().userId,
+            firstName: doc.data().firstName,
+            lastName: doc.data().lastName,
+            user: doc.data().user,
+            leftFeedback: doc.data().leftFeedback,
+            reservationId: doc.data().reservationId,
           },
           color: arrColour[propertyId.indexOf(doc.data().propertyId)],
         });
@@ -148,8 +159,38 @@ export default function Calendar({
         }}
       />
       {eventInfo && (
-        <div className="mt-10">
-          <div
+        <div className="mt-10 ">
+          <div className="grid place-items-center ">
+            <div
+              className={
+                arrColour3[
+                  propertyId.indexOf(eventInfo?.event.extendedProps.propertyId)
+                ]
+              }
+            >
+              <ReservationCard
+                userId={eventInfo?.event.extendedProps.userId}
+                firstName={eventInfo?.event.extendedProps.firstName}
+                lastName={eventInfo?.event.extendedProps.lastName}
+                to={eventInfo?.event.end.toDateString()}
+                from={eventInfo?.event.start.toDateString()}
+                propertyId={eventInfo?.event.extendedProps.propertyId}
+                hostId={eventInfo?.event.extendedProps.hostId}
+                garage={eventInfo?.event.extendedProps.garage}
+                guests={eventInfo?.event.extendedProps.guests}
+                specialReq={eventInfo?.event.extendedProps.specialReq}
+                timeCheckIn={eventInfo?.event.extendedProps.timeCheckIn}
+                timeCheckOut={eventInfo?.event.extendedProps.timeCheckOut}
+                title={eventInfo?.event.title}
+                total={eventInfo?.event.extendedProps.total}
+                user={eventInfo?.event.extendedProps.user}
+                leftFeedback={eventInfo?.event.extendedProps.leftFeedback}
+                reservationId={eventInfo?.event.extendedProps.reservationId}
+              />
+            </div>
+          </div>
+
+          {/* <div
             className={
               // "bg-[" + arrColour2[1] + "]"
               // "bg-" + arrColour2[1]
@@ -167,7 +208,7 @@ export default function Calendar({
 
           <div>
             Time check out:{eventInfo?.event.extendedProps.timeCheckOut}
-          </div>
+          </div>*/}
         </div>
       )}
     </>

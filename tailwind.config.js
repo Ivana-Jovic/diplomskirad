@@ -16,6 +16,7 @@ module.exports = {
         header: "#f8fafc",
         textHover: "#a1a1aa",
         logo: "#FF5A5F",
+        darkGreen: "#134e4a",
       },
       height: {
         "50vh": "50vh",
@@ -43,5 +44,5 @@ module.exports = {
     //   "7xl": "5rem",
     // },
   },
-  plugins: [require("tailwind-scrollbar-hide")],
+  plugins: [require("tailwind-scrollbar-hide"), require("daisyui")],
 };

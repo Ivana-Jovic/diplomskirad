@@ -29,6 +29,7 @@ export default function HostsBoard() {
 
   const bljuc = useRef<string[]>([]);
   const getHostProperties = useCallback(async () => {
+    bljuc.current = [];
     const arrData: any[] = [];
     const q = query(
       collection(db, "property"),
@@ -80,18 +81,21 @@ export default function HostsBoard() {
   });
   return (
     <Layout>
-      THIS IS HOSTS BOARD
-      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
-        <section className="  px-10 py-10 w-full ">
-          <div className="hidden sm:inline-flex mb-5 space-x-3 text-gray-800">
+      {/* THIS IS HOSTS BOARD */}
+      <div className="pt-7 pb-5 text-center text-3xl font-bold">
+        My properties
+      </div>
+      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16 ">
+        <section className=" w-full ">
+          {/* <div className="hidden sm:inline-flex mb-5 space-x-3 text-gray-800">
             <p className="buttonfilter">filter1</p>
             <p className="buttonfilter">filter1</p>
             <p className="buttonfilter">filter1</p>
             <p className="buttonfilter">filter1</p>
             <p className="buttonfilter">filter1</p>
             <p className="buttonfilter">more</p>
-          </div>
-          <div className="flex flex-col ">
+          </div> */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {arr.map((item) => {
               const property = JSON.parse(item.split("---")[1]);
               const propertyid = item.split("---")[0];
@@ -112,12 +116,15 @@ export default function HostsBoard() {
             })}
           </div>
         </section>
+        <div className="pt-7 pb-5 text-center text-3xl font-bold">
+          Reservations
+        </div>
         <div>
-          <div className="flex flex-col ">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {reserv.current.map((item) => {
               return (
                 <div key={item.id}>
-                  <ReservationCard item={item} />
+                  <ReservationCard {...item.data()} reservationId={item.id} />
                 </div>
               );
             })}
