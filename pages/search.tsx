@@ -25,6 +25,7 @@ import CardSearch from "../components/cardsearch";
 import Layout from "../components/layout";
 import { db } from "../firebase";
 import { styled } from "@mui/material/styles";
+import { Dropdown, Menu, Space } from "antd";
 const AirbnbSlider = styled(Slider)(({ theme }) => ({
   color: "#3a8589",
   height: 3,
@@ -339,6 +340,7 @@ export default function Search() {
       getSearchProperties();
     }
   }, [location, rooms, numOfGuests]);
+
   return (
     <Layout
       placeholder={
@@ -371,15 +373,86 @@ export default function Search() {
               }}
             />
             {/* <p className="buttonfilter">Price</p> */}
-            <Chip
+            {/* <Chip
               label="Price"
               variant={selectedPrice ? "filled" : "outlined"}
               onClick={(event: any) => {
                 // setSelectedPrice(!selectedPrice);
                 setAnchorEl(event.currentTarget);
               }}
-            />
-            {
+            /> */}
+            <div className="dropdown">
+              <div tabIndex={0} className=" ">
+                <Chip
+                  label="Price"
+                  variant={selectedPrice ? "filled" : "outlined"}
+                  onClick={(event: any) => {
+                    // setSelectedPrice(!selectedPrice);
+                    setAnchorEl(event.currentTarget);
+                  }}
+                />
+              </div>
+              <ul
+                tabIndex={0}
+                className="border dropdown-content menu p-2 shadow bg-base-100 rounded-box w-96 "
+              >
+                <li>
+                  <div className="mt-10 flex flex-col ">
+                    <Box sx={{ width: 300 }}>
+                      <AirbnbSlider
+                        getAriaLabel={() => "Price range"}
+                        value={priceRange}
+                        onChange={(e: Event, newValue: number | number[]) => {
+                          setPriceRange(newValue as number[]);
+                          setSelectedPrice(true);
+                        }}
+                        getAriaValueText={valuetext}
+                        marks={[
+                          {
+                            value: 0,
+                            label: "0e",
+                          },
+                          {
+                            value: 100,
+                            label: "1000e",
+                          },
+                        ]}
+                      />
+                    </Box>
+                    <div className="mb-4  flex">
+                      Price from&nbsp;
+                      <p className="font-medium">
+                        {priceRange[0] * factorPrice}e
+                      </p>
+                      &nbsp;to&nbsp;
+                      <p className="font-medium">
+                        {priceRange[1] * factorPrice}e
+                      </p>
+                    </div>
+                    <StyledToggleButtonGroup
+                      value={sortPrice}
+                      exclusive
+                      onChange={(e: MouseEvent, val: string | null) => {
+                        setSortPrice(val);
+                        setSelectedPrice(true);
+                      }}
+                      aria-label="sortPrice"
+                    >
+                      <ToggleButton value="asc" aria-label="asc">
+                        {/* TODO: sta su aria label */}
+                        Sort ascending
+                      </ToggleButton>
+                      <ToggleButton value="desc" aria-label="desc">
+                        Sort descending
+                      </ToggleButton>
+                    </StyledToggleButtonGroup>
+                    {/* sortPrice:{sortPrice ?? "none"} */}
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* {
               <Popover
                 id={Boolean(anchorEl) ? "simple-popover" : undefined}
                 open={Boolean(anchorEl)}
@@ -439,16 +512,16 @@ export default function Search() {
                   >
                     <ToggleButton value="asc" aria-label="asc">
                       {/* TODO: sta su aria label */}
-                      Sort ascending
+            {/*   Sort ascending
                     </ToggleButton>
                     <ToggleButton value="desc" aria-label="desc">
                       Sort descending
                     </ToggleButton>
                   </StyledToggleButtonGroup>
                   {/* sortPrice:{sortPrice ?? "none"} */}
-                </div>
-              </Popover>
-            }
+            {/* </div>
+              </Popover> */}
+            {/*  }
             {/* <p className="buttonfilter">Garage</p> */}
             <Chip
               label="Garage"

@@ -53,7 +53,7 @@ export default function Calendar({
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
-      // console.log("AAAAAAAAAAAAAA", "bg-[" + arrColour[0] + "]");
+      console.log("AAAAAAAAAAAAAA", propertyId.length);
       calendarRef.current
         ?.getApi()
         .getEventById(
@@ -186,6 +186,7 @@ export default function Calendar({
                 user={eventInfo?.event.extendedProps.user}
                 leftFeedback={eventInfo?.event.extendedProps.leftFeedback}
                 reservationId={eventInfo?.event.extendedProps.reservationId}
+                isHost={true}
               />
             </div>
           </div>

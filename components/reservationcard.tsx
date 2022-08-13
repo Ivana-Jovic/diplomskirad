@@ -17,6 +17,37 @@ import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import Button from "./button";
 import { db } from "../firebase";
 import Rating from "@mui/material/Rating";
+import {
+  createTheme,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+} from "@mui/material";
+
+// const theme = createTheme({
+//   components: {
+//     MuiDatePicker: {
+//       styleOverrides: {
+//         root: {
+//           backgroundColor: "red",
+//         },
+//       },
+//     },
+//   },
+// });
+
+// const theme = createTheme({
+//   components: {
+//     Radio: {
+//       '&$checked': {
+//         color: '#4B8DF8'
+//       }
+//     },
+//     checked: {}
+//   },
+// });
 
 //TODO vidi svuda za srce klik u fav
 export default function ReservationCard({
@@ -40,6 +71,7 @@ export default function ReservationCard({
   user,
   leftFeedback,
   reservationId,
+  isHost,
 }: {
   // item: QueryDocumentSnapshot<DocumentData>;
 
@@ -61,15 +93,18 @@ export default function ReservationCard({
   user: string;
   leftFeedback: boolean;
   reservationId: string;
+  isHost: boolean;
 }) {
-  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+  // const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
   const [leftFB, setLeftFB] = useState<boolean>(leftFeedback);
   const [comment, setComment] = useState<string>("");
   const [stars, setStars] = useState<number | null>(1);
-  const togglePopup = () => {
-    setIsPopupOpen(!isPopupOpen);
-  };
+  const [reportOpen, setReportOpen] = useState<boolean>(isHost ? true : false);
+  const [reportReason, setReportReason] = useState<string>("");
+  // const togglePopup = () => {
+  //   setIsPopupOpen(!isPopupOpen);
+  // };
 
   const leaveFeedback = async () => {
     //TODO:
@@ -123,10 +158,31 @@ export default function ReservationCard({
         });
       }
     }
+
+    if (reportOpen) {
+      report();
+    }
     setLeftFB(true);
-    setIsPopupOpen(false);
+    // setIsPopupOpen(false);
     setComment("");
     setStars(1);
+    setReportReason("");
+  };
+
+  const report = async () => {
+    const docRef = await addDoc(collection(db, "reports"), {
+      guestId: userId,
+      guestFirstName: firstName,
+      guestLastName: lastName,
+      reservationId: reservationId,
+      hostId: hostId, //TODO maybe put username
+      // reportedFirstName: myUser.firstName,//TODO Put in db in reserv and in rep
+      // reportedLastName: myUser.lastName,
+      guestIsReporting: true,
+      reportText: reportReason,
+      processed: false,
+      // timestamp
+    });
   };
   return (
     //     <div
@@ -308,15 +364,116 @@ export default function ReservationCard({
           </div>
           <div>
             {new Date(to) <= new Date() && (
-              <div>
+              <div className="text-center mt-5">
                 {!leftFB && (
-                  <Button
-                    action={togglePopup} //TODO: zasto ako je lambda ovde se poyove vise puta
-                    text="Leave feedback"
-                    type=""
-                  />
+                  <>
+                    {/* // <Button
+                  //   action={togglePopup} //TODO: zasto ako je lambda ovde se poyove vise puta
+                  //   text="Leave feedback"
+                  //   type=""
+                  // /> */}
+                    <label
+                      htmlFor="my-modal-3"
+                      className="btn btn-active bg-background hover:bg-background text-text border-none
+                      
+                      shadow-md 
+                      hover:shadow-lg active:scale-90 transition duration-150"
+                    >
+                      {isHost ? "Report" : "Leave feedback"}
+                    </label>
+                    <input
+                      type="checkbox"
+                      id="my-modal-3"
+                      className="modal-toggle"
+                    />
+                    <label htmlFor="my-modal-3" className="modal cursor-pointe">
+                      <label className="modal-box relative">
+                        <label
+                          htmlFor="my-modal-3"
+                          className="btn btn-sm btn-circle absolute right-2 top-2"
+                        >
+                          ✕
+                        </label>
+                        <h3 className="text-lg font-bold mb-3">
+                          {isHost ? "Report" : "Leave feedback"}
+                        </h3>
+                        <div className="w-full">
+                          {!isHost && (
+                            <>
+                              <div className="flex">
+                                <Rating
+                                  name="simple-controlled"
+                                  value={stars}
+                                  onChange={(event, newValue) => {
+                                    setStars(newValue);
+                                  }}
+                                />
+                              </div>
+                              <textarea
+                                value={comment}
+                                onChange={(e) => {
+                                  setComment(e.target.value);
+                                }}
+                                className="outline-0 border bg-transparent text-lg text-gray-600 w-full"
+                              />
+                            </>
+                          )}
+                          {!isHost && (
+                            <Button
+                              action={() => setReportOpen(!reportOpen)} //TODO: zasto ako je lambda ovde se poyove vise puta
+                              text="Do you want to report?"
+                              type=""
+                            />
+                          )}
+                          {reportOpen && (
+                            <div>
+                              <FormControl>
+                                <FormLabel
+                                  id="demo-radio-buttons-group-label"
+                                  className="text-text "
+                                >
+                                  Please tell us the reason for filing a report
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-labelledby="demo-radio-buttons-group-label"
+                                  defaultValue="behavior"
+                                  name="radio-buttons-group"
+                                  onChange={(e) => {
+                                    setReportReason(e.target.value);
+                                  }}
+                                >
+                                  <FormControlLabel
+                                    value="behavior"
+                                    control={<Radio />}
+                                    label="Inappropriate behavior"
+                                    // checked
+                                  />
+                                  <FormControlLabel
+                                    value="description"
+                                    control={<Radio />}
+                                    label="Property does not match description"
+                                  />
+                                  <FormControlLabel
+                                    value="other"
+                                    control={<Radio />}
+                                    label="Other"
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+                              {/* <Button action={report} text="Report" type="" /> */}
+                            </div>
+                          )}
+                          <Button //ako je vlasnik onda ne ostavlja feedback vec samo reportuje
+                            action={leaveFeedback} //TODO: zasto ako je lambda ovde se poyove vise puta
+                            text={isHost ? "Report" : "Leave feedback"}
+                            type=""
+                          />
+                        </div>
+                      </label>
+                    </label>{" "}
+                  </>
                 )}
-                {isPopupOpen && (
+                {/* {isPopupOpen && (
                   <Popup
                     content={
                       <>
@@ -334,7 +491,7 @@ export default function ReservationCard({
                           className="outline-0  bg-transparent text-lg text-gray-600"
                         />
                         <StarOutlineRoundedIcon /> */}
-                          <Rating
+                {/*   <Rating
                             name="simple-controlled"
                             value={stars}
                             onChange={(event, newValue) => {
@@ -349,16 +506,21 @@ export default function ReservationCard({
                           }}
                           className="outline-0 border bg-transparent text-lg text-gray-600"
                         />
-                        <Button
+                        <Button //ako je vlasnik onda ne ostavlja feedback vec samo reportuje
                           action={leaveFeedback} //TODO: zasto ako je lambda ovde se poyove vise puta
                           text="Leave feedback"
+                          type=""
+                        />
+                        <Button
+                          action={report} //TODO: zasto ako je lambda ovde se poyove vise puta
+                          text="Report"
                           type=""
                         />
                       </>
                     }
                     handleClose={togglePopup}
                   />
-                )}
+                )} */}
               </div>
             )}
           </div>

@@ -69,7 +69,11 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           key: "1",
           label: (
             <>
-              <div className="hover:bg-slate-50 transition py-1 pl-1 duration-200 ease-out  hover:shadow-lg">
+              <div
+                className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+
+                // className="hover:bg-slate-50 transition py-1 pl-1 duration-200 ease-out  hover:shadow-lg"
+              >
                 <LogoutNEW />
               </div>
               {/* <div<-GOOGLE
@@ -86,7 +90,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           label: (
             <div
               onClick={profileSettings}
-              className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+              // className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
             >
               Profile
             </div>
@@ -97,7 +102,9 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           label: (
             <div
               onClick={becomeAHost}
-              className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+
+              // className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
             >
               Become a host
             </div>
@@ -109,7 +116,9 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           label: (
             <div
               onClick={addProperty}
-              className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+
+              // className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
             >
               Add property
             </div>
@@ -120,7 +129,9 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           label: (
             <div
               onClick={hostsBoard}
-              className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+
+              // className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
             >
               Host board
             </div>
@@ -131,7 +142,9 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           label: (
             <div
               onClick={guestBoard}
-              className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
+              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+
+              // className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
             >
               Guest board
             </div>

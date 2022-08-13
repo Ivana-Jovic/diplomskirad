@@ -33,21 +33,21 @@ export default function HostsBoard() {
     const arrData: any[] = [];
     const q = query(
       collection(db, "property"),
-      where("ownerId", "==", user?.uid)
+      where("ownerId", "==", user.uid)
       //?????????????
     );
+    console.log("--------------");
     const querySnapshot = await getDocs(q);
-    // console.log("size", querySnapshot.size);
+    setArr([]);
     querySnapshot.forEach((doc) => {
-      // if (querySnapshot.size == arr.length) {
-      //   setArr([]);
-      // }
-      arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
+      // console.log("\\\\\\\\\\\\]", doc.id);
+      // arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
       bljuc.current.push(doc.id);
-      console.log(doc.id + "---" + JSON.stringify(doc.data()));
-      console.log(doc.data());
-      setArr(arrData);
-      // console.log(arr.length);
+      // console.log(doc.id + "---" + JSON.stringify(doc.data()));
+      console.log("WWWWWWWWWWWW", bljuc.current.length);
+      // setArr(arrData);
+
+      setArr((prev) => [...prev, doc.id + "---" + JSON.stringify(doc.data())]);
     });
   }, [user?.uid]);
 
@@ -62,7 +62,7 @@ export default function HostsBoard() {
     where("hostId", "==", "x18ohaIjc6ZDHW54IBqcwRERR4X2")
     // user ? user.uid : ""
   );
-  //TODO: OVO TREBA SREDITI DA SE NE POZIVA ZILION PUTA!!!!!!!!!!!
+  // TODO: OVO TREBA SREDITI DA SE NE POZIVA ZILION PUTA!!!!!!!!!!!
   // MOZDA DA SE STALNO DOHVATAJU REZERVACIJE IZ BAZE, ALI KAKO ONDA REFRESH???
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
     const res: any[] = [];
@@ -124,7 +124,11 @@ export default function HostsBoard() {
             {reserv.current.map((item) => {
               return (
                 <div key={item.id}>
-                  <ReservationCard {...item.data()} reservationId={item.id} />
+                  <ReservationCard
+                    {...item.data()}
+                    reservationId={item.id}
+                    isHost={myUser.host}
+                  />
                 </div>
               );
             })}

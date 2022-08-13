@@ -55,20 +55,29 @@ export default function GuestBoard() {
 
   return (
     <Layout>
-      THIS IS Guest BOARD
+      {/* THIS IS Guest BOARD */}
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
         <div>
+          <div className="pt-7 pb-5 text-center text-3xl font-bold">
+            My reservations
+          </div>
           <div className="flex flex-col ">
             {arr.map((item) => {
               return (
                 <div key={item.id}>
-                  <ReservationCard item={item} />
+                  <ReservationCard
+                    {...item.data()}
+                    reservationId={item.id}
+                    isHost={myUser.host}
+                  />
                 </div>
               );
             })}
           </div>
           <div className="flex flex-col mt-10 ">
-            <div className="text-center font-semibold text-xl">WISHLIST</div>
+            <div className="pt-7 pb-5 text-center text-3xl font-bold">
+              Wishlist
+            </div>
             {faves.map((property: any) => {
               return (
                 <div key={property.id}>
@@ -82,6 +91,7 @@ export default function GuestBoard() {
                     // stars="5"
                     totalStars={property.data().totalStars}
                     numberOfReviews={property.data().numberOfReviews}
+                    numberOfNights={0}
                   />
                 </div>
               );

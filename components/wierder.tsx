@@ -79,6 +79,7 @@ export default function Wierder({
   const prId: string = propertyid?.toString() ? propertyid?.toString() : ""; //TODO: da li ima elegantniji  nacin
   //TODO: na dosta mesta u ostalim je bilo na slican fazon - popravi!
   const { user, myUser } = useContext(AuthContext);
+
   const reserve = async () => {
     if (dateFrom && dateTo && dateFrom >= dateTo) {
       setError("Check out date must be after check in date");
