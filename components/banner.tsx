@@ -72,7 +72,9 @@ export default function Banner() {
               <div className="flex mb-2 lg:mb-0  items-center">
                 <label className="mx-5">guests</label>
                 <button
-                  className="roundButton"
+                  className={
+                    `roundButton ` + `${guests == 1 ? "  bg-red-600" : ""}`
+                  }
                   onClick={() => {
                     if (guests - 1 > 0) setGuests(guests - 1);
                   }}
@@ -81,7 +83,9 @@ export default function Banner() {
                 </button>
                 <div className="mx-3">{guests}</div>
                 <button
-                  className="roundButton"
+                  className={
+                    `roundButton ` + `${guests == 20 ? "  bg-red-600" : ""}`
+                  }
                   onClick={() => {
                     if (guests + 1 <= 20)
                       //TODO check if this matches other min and maxs
@@ -158,7 +162,7 @@ export default function Banner() {
           {/* //TODO nije u istoj liniji nekako */}
           <div
             className="absolute flex  flex-col lg:flex-row items-center
-         rounded-3xl lg:rounded-full border-2 border-solid py-5  text-xl
+         rounded-xl lg:rounded-full border-2 border-solid py-5  text-xl
          justify-around bg-background opacity-95 pr-5 mx-5 pl-5 lg:pl-0
        "
           >

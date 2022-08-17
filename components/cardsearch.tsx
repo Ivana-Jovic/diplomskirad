@@ -30,12 +30,24 @@ export default function CardSearch({
   const router = useRouter();
 
   const goToPropertyPage = () => {
-    router.push({
-      pathname: "/propertypage",
-      query: {
-        property: propertyid,
-      },
-    });
+    if ((router.pathname = "/search")) {
+      router.push({
+        pathname: "/propertypage",
+        query: {
+          property: propertyid,
+          from: router.query.from,
+          numOfGuests: router.query.numOfGuests,
+          to: router.query.to,
+        },
+      });
+    } else {
+      router.push({
+        pathname: "/propertypage",
+        query: {
+          property: propertyid,
+        },
+      });
+    }
   };
   return (
     // <div
@@ -90,8 +102,9 @@ export default function CardSearch({
 
     <div
       onClick={goToPropertyPage}
-      className="card lg:card-side bg-base-100 shadow-lg my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
-      // transition duration-200 ease-out"
+      className="card rounded-md lg:card-side bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
+transition duration-200 ease-out
+cursor-pointer" //TODO dodaj ostalima
     >
       <figure className="relative h-48 lg:h-auto lg:w-1/3 flex-shrink-0">
         {/* className="relative h-48 lg:h-fit lg:w-1/3" */}

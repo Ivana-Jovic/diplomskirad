@@ -87,11 +87,13 @@ export default function CardHostsProperty({
     // </div>
     <div
       onClick={goToPropertyPage}
-      className="card  bg-base-100 shadow-lg my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
+      className="card rounded-md bg-base-100 shadow-lg my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
       transition duration-200 ease-out"
     >
       <figure className="relative h-48 flex-shrink-0">
-        <Image src={image} alt={name} layout="fill" objectFit="cover" />
+        {image && (
+          <Image src={image} alt={name} layout="fill" objectFit="cover" />
+        )}
       </figure>
       <div className="card-body">
         <div>

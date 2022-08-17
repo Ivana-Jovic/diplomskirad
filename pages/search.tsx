@@ -118,9 +118,9 @@ export default function Search() {
   const router = useRouter();
   const { location, from, to } = router.query; //,rooms,numOfGuests, from, to
   const fromDate = new Date(router.query.from as string);
-  fromDate.setHours(0, 0, 0, 0);
+  // fromDate.setHours(0, 0, 0, 0);
   const toDate = new Date(router.query.to as string);
-  toDate.setHours(0, 0, 0, 0);
+  // toDate.setHours(0, 0, 0, 0);
 
   const rooms = (router.query.rooms ?? 0) as number;
   // router.query.rooms ? +router.query.rooms : undefined;

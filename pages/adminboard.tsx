@@ -56,7 +56,7 @@ export default function AdminBoard() {
                   key={item.id}
                   className="my-3 grid grid-cols-1 lg:grid-cols-2"
                 >
-                  <ReportCard item={item} />
+                  <ReportCard report={item} />
                 </div>
               );
             })}

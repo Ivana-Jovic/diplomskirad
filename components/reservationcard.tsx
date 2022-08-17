@@ -8,6 +8,7 @@ import {
   increment,
   query,
   QueryDocumentSnapshot,
+  Timestamp,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -25,6 +26,7 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
+//TODO mmaxdozvoljeni broj propertija je 10
 
 // const theme = createTheme({
 //   components: {
@@ -86,8 +88,8 @@ export default function ReservationCard({
   garage: boolean;
   guests: number;
   specialReq: string;
-  timeCheckIn: number;
-  timeCheckOut: number;
+  timeCheckIn: string;
+  timeCheckOut: string;
   title: string;
   total: number;
   user: string;
@@ -117,9 +119,10 @@ export default function ReservationCard({
         comment: comment,
         stars: stars ? stars : 1,
         userId: userId,
-        firstName: firstName,
-        lastName: lastName,
+        firstName: firstName ?? "dummy", //TODO makni ovo
+        lastName: lastName ?? "dummy",
         date: to,
+        reservationId: reservationId ?? "dummy",
       }
     );
 
@@ -178,7 +181,7 @@ export default function ReservationCard({
       hostId: hostId, //TODO maybe put username
       // reportedFirstName: myUser.firstName,//TODO Put in db in reserv and in rep
       // reportedLastName: myUser.lastName,
-      guestIsReporting: true,
+      guestIsReporting: true, //TODO change to !isHost
       reportText: reportReason,
       processed: false,
       // timestamp
@@ -288,7 +291,7 @@ export default function ReservationCard({
 
     <div
       className={
-        `card shadow-lg my-3  max-w-5xl h-96 ` +
+        `card rounded-md shadow-lg my-3  max-w-5xl h-96 ` +
         `${new Date(to) <= new Date() ? " bg-[#f1efef]" : " bg-[#eff5ef]"}`
       }
     >
@@ -352,7 +355,7 @@ export default function ReservationCard({
                 <tr>
                   <td> Time of check in/out:</td>
                   <td>
-                    {timeCheckIn}:00 / {timeCheckOut}:00
+                    {timeCheckIn}-{timeCheckOut}
                   </td>
                 </tr>
                 <tr>
@@ -448,11 +451,20 @@ export default function ReservationCard({
                                     label="Inappropriate behavior"
                                     // checked
                                   />
-                                  <FormControlLabel
-                                    value="description"
-                                    control={<Radio />}
-                                    label="Property does not match description"
-                                  />
+                                  {isHost && (
+                                    <FormControlLabel
+                                      value="destruction"
+                                      control={<Radio />}
+                                      label="Destruction of property"
+                                    />
+                                  )}
+                                  {!isHost && (
+                                    <FormControlLabel
+                                      value="description"
+                                      control={<Radio />}
+                                      label="Property does not match description"
+                                    />
+                                  )}
                                   <FormControlLabel
                                     value="other"
                                     control={<Radio />}

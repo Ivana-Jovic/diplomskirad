@@ -1,16 +1,25 @@
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import React, { useEffect, useRef, useState } from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
 import { auth, db } from "./firebase";
 
-export const AuthContext = React.createContext();
+type ContextType = {
+  user: User | null | undefined;
+  myUser: any;
+};
+type AuthProviderProps = {
+  children?: React.ReactNode;
+};
+export const AuthContext = createContext<ContextType>({
+  user: null,
+  myUser: null,
+});
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  // const myUser = useRef < any > null;
-  const [myUser, setMyUser] = useState(null);
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<User | null | undefined>(null);
+  const [myUser, setMyUser] = useState<any>(null);
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // User is signed in
         setUser(user);
@@ -31,12 +40,9 @@ export const AuthProvider = ({ children }) => {
         setMyUser(null);
       }
     });
+
+    return unsubscribe;
   }, []);
-  // useEffect(() => {
-  //   console.log("!!first", user);
-  //   auth.onAuthStateChanged(setUser);
-  //   console.log("!!sec", user);
-  // }, []);
   return (
     <AuthContext.Provider value={{ user, myUser }}>
       {children}

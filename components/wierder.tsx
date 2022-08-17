@@ -55,7 +55,7 @@ export default function Wierder({
   // const [dateFrom, setDateFrom] = useState<Date | null>(new Date());
   // const [dateTo, setDateTo] = useState<Date | null>(new Date());
   const router = useRouter();
-
+  const { property: propertyid } = router.query;
   const search = () => {
     router.push({
       pathname: "/search",
@@ -74,8 +74,6 @@ export default function Wierder({
     });
   };
   const [total, setTotal] = useState<number>(totall ? totall : 0);
-  //   const router = useRouter();
-  const { property: propertyid } = router.query;
   const prId: string = propertyid?.toString() ? propertyid?.toString() : ""; //TODO: da li ima elegantniji  nacin
   //TODO: na dosta mesta u ostalim je bilo na slican fazon - popravi!
   const { user, myUser } = useContext(AuthContext);
@@ -199,7 +197,7 @@ export default function Wierder({
           {/* //TODO nije u istoj liniji nekako */}
           <div
             className={
-              `flex  flex-col items-center text-xl justify-around bg-background opacity-95 pr-5 mx-5 pl-5 ` +
+              `flex  flex-col items-center text-xl justify-around bg-background opacity-95   ` +
               `${rese === false ? " lg:flex-row lg:pl-0" : ""}`
             }
           >
@@ -217,23 +215,23 @@ export default function Wierder({
               />
             )}
 
-            <div className="flex mb-3 lg:mb-0 lg:mr-7 mr-2">
-              <div className="mr-3">
-                <DatePicker
-                  disablePast
-                  label="Check in"
-                  inputFormat="dd/MM/yyyy"
-                  // views={["year", "month", "day"]}
-                  value={dateFrom}
-                  onChange={(newValue) => {
-                    setDateFrom(newValue);
-                    if (newValue && dateTo && newValue < dateTo) {
-                      setError("");
-                    }
-                  }}
-                  renderInput={(params) => <TextField {...params} />}
-                />
-              </div>
+            <div className="flex justify-between gap-3 mb-3 lg:mb-0 lg:mx-7 ">
+              {/* <div className="mr-3"> */}
+              <DatePicker
+                disablePast
+                label="Check in"
+                inputFormat="dd/MM/yyyy"
+                // views={["year", "month", "day"]}
+                value={dateFrom}
+                onChange={(newValue) => {
+                  setDateFrom(newValue);
+                  if (newValue && dateTo && newValue < dateTo) {
+                    setError("");
+                  }
+                }}
+                renderInput={(params) => <TextField {...params} />}
+              />
+              {/* </div> */}
 
               <DatePicker
                 disablePast

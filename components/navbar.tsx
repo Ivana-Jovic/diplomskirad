@@ -14,9 +14,9 @@ import LocationCityIcon from "@mui/icons-material/LocationCity";
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const { user, myUser } = useContext(AuthContext);
-
-  const [searchInput, setSearchInput] = useState("");
-  const [numOfGuests, setNumOfGuests] = useState(1);
+  const [openSearch, setOpenSearch] = useState<boolean>(false);
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [numOfGuests, setNumOfGuests] = useState<number>(1);
   const router = useRouter();
 
   const resetSearch = () => {
@@ -38,7 +38,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   const becomeAHost = async () => {
     const docRef = await addDoc(collection(db, "users"), {
       // userId: session?.user?.name,<-GOOGLE
-      userId: user.uid,
+      userId: user?.uid,
       host: true,
     });
   };
@@ -60,6 +60,21 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   const profileSettings = () => {
     router.push({
       pathname: "/profilesettings",
+    });
+  };
+  const adminBoard = () => {
+    router.push({
+      pathname: "/adminboard",
+    });
+  };
+  const faq = () => {
+    router.push({
+      pathname: "/faq",
+    });
+  };
+  const wishlist = () => {
+    router.push({
+      pathname: "/wishlist",
     });
   };
   const menu = (
@@ -143,10 +158,42 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             <div
               onClick={guestBoard}
               className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-
-              // className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
             >
               Guest board
+            </div>
+          ),
+        },
+
+        {
+          key: "7",
+          label: (
+            <div
+              onClick={adminBoard}
+              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+            >
+              Admin board
+            </div>
+          ),
+        },
+        {
+          key: "8",
+          label: (
+            <div
+              onClick={faq}
+              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+            >
+              FAQ
+            </div>
+          ),
+        },
+        {
+          key: "9",
+          label: (
+            <div
+              onClick={wishlist}
+              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
+            >
+              Wishlist
             </div>
           ),
         },
@@ -172,7 +219,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
 
         <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
           {/* width i mr  justify-between*/}
-          <div
+          {/* <div
             className="flex items-center
          rounded-full border-2 border-solid py-2
          "
@@ -186,9 +233,16 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             />
             <div className="hidden sm:inline-flex pr-0.5  cursor-pointer">
               {/* namesti da se i klikom na ikonicu ide u search */}
-              <SearchRoundedIcon />
-            </div>
-          </div>
+          {/* <SearchRoundedIcon /> */}
+          {/* </div>*/}
+          <button
+            onClick={() => {
+              setOpenSearch(!openSearch);
+            }}
+          >
+            <SearchRoundedIcon />
+          </button>
+          {/*</div> */}
           {/* session ||  <-GOOGLE*/}
           {user ? (
             <>
@@ -218,17 +272,18 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         </div>
       </div>
 
-      {searchInput && (
+      {openSearch && router.pathname != "/" && (
+        // {searchInput && (
         <div className="flex flex-col w-screen col-span-2">
           <Banner />
-          <div className="flex">
+          {/* <div className="flex">
             <button onClick={resetSearch} className="flex-grow cursor-pointer">
               Cancel
             </button>
             <button onClick={search} className="flex-grow cursor-pointer">
               Search
             </button>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

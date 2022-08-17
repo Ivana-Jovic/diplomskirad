@@ -1,10 +1,12 @@
 import Image from "next/image";
 import {
+  addDoc,
   collection,
   doc,
   DocumentData,
   getDoc,
   getDocs,
+  QueryDocumentSnapshot,
   updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
@@ -19,6 +21,8 @@ import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRou
 import Heart from "../components/heart";
 import Extrawierd from "../components/extrawierd";
 import { Rating } from "@mui/material";
+import Button from "../components/button";
+import Map2 from "../components/map2";
 
 export default function PropertyPage() {
   const months = [
@@ -37,20 +41,25 @@ export default function PropertyPage() {
   ];
 
   // const arrr = [1, 2, 3];
+
+  const { user, myUser } = useContext(AuthContext);
   const router = useRouter();
-  const { property: propertyid } = router.query;
+  const { property: propertyid, from, to, numOfGuests } = router.query;
   const [property, setProperty] = useState<DocumentData>();
   const [comments, setComments] = useState<DocumentData[]>();
   const pid: string = propertyid ? propertyid.toString() : "";
+  const [arrLocation, setArrLocation] = useState<
+    QueryDocumentSnapshot<DocumentData>[]
+  >([]);
   const getProperty = async () => {
     const comm: any[] = [];
 
     // const pid: string = propertyid ? propertyid.toString() : "";
     const docSnap = await getDoc(doc(db, "property", pid));
-
+    setArrLocation([]);
     if (docSnap.exists()) {
       setProperty(docSnap.data());
-
+      setArrLocation((prev) => [...prev, docSnap]);
       const subColl = collection(db, "property", pid, "comments");
       const subDocSnap = await getDocs(subColl);
       subDocSnap.forEach((doc) => {
@@ -68,6 +77,23 @@ export default function PropertyPage() {
     if (propertyid) getProperty();
   }, [propertyid]); //probaj i property ako ne radi
 
+  const report = async (comment: DocumentData) => {
+    //report comment
+    const docRef = await addDoc(collection(db, "reports"), {
+      guestId: comment.data().userId, //ko je komentarisao
+      guestFirstName: comment.data().firstName,
+      guestLastName: comment.data().lastName,
+      reservationId: comment.data().reservationId,
+      hostId: user?.uid ?? "", //TODO maybe put username
+      // reportedFirstName: myUser.firstName,//TODO Put in db in reserv and in rep
+      // reportedLastName: myUser.lastName,
+      guestIsReporting: false,
+      reportText: "comment",
+      processed: false,
+      commentId: comment.id,
+      // timestamp
+    });
+  };
   return (
     <Layout>
       {property && (
@@ -165,6 +191,17 @@ export default function PropertyPage() {
             {/* {property.street}-{property.streetNum} */}
           </div>
           <div className="mb-10">Amenities</div>
+          <div className="mt-10">MAP</div>
+          <div className="flex flex-col items-center justify-center">
+            {arrLocation.length > 0 && (
+              <Map2 setLoc={""} arrLoc={arrLocation} />
+            )}
+            {/* {loc && (
+            <div>
+              {JSON.parse(loc.split("-")[0])}-{JSON.parse(loc.split("-")[1])}
+            </div>
+          )} */}
+          </div>
           <div className="mb-10">
             REVIEWS{" "}
             {comments?.map((item: DocumentData) => {
@@ -191,14 +228,33 @@ export default function PropertyPage() {
                     />
                   </div>
                   <div className="font-normal">{item.data().comment}</div>
+
+                  <div className="mt-3">
+                    {myUser.host && (
+                      // <Button
+                      //   action={report(item)}
+                      //   text="Do you want to report?"
+                      //   type=""
+                      // />
+                      //TODO: ako je reportovano makni dugme
+                      //ovo sam pre radila tako sto odvojim u komponentu zasebnu
+                      <button
+                        onClick={() => {
+                          report(item);
+                        }}
+                      >
+                        Do you want to report?
+                      </button>
+                    )}
+                  </div>
                 </div>
               );
             })}
           </div>
-          <div className="mb-10">MAP</div>
-          <div className="mb-10">CALENDAR- RESERVE</div>
+
+          <div className="mt-10">CALENDAR- RESERVE</div>
           <div className="bg-slate-100">
-            <Extrawierd rese={true} property={property} />
+            <Extrawierd property={property} />
             {/* //TODO: ograniciti dokle ide broj gostiju ili skloniti */}
           </div>
         </div>

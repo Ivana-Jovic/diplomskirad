@@ -7,6 +7,8 @@ import {
   where,
   getDocs,
   onSnapshot,
+  QueryDocumentSnapshot,
+  DocumentData,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -17,6 +19,7 @@ import ReservationCard from "../components/reservationcard";
 // import Kk from "../components/kk";
 import dynamic from "next/dynamic";
 import FullCalendar from "@fullcalendar/react";
+import Map2 from "../components/map2";
 const Calendar = dynamic(() => import("../components/calendar"), {
   ssr: false,
 });
@@ -26,19 +29,24 @@ export default function HostsBoard() {
   const calendarRef2 = useRef<FullCalendar>(null);
   const { user, myUser } = useContext(AuthContext);
   const [arr, setArr] = useState<any[]>([]);
+  const [arrLocation, setArrLocation] = useState<
+    QueryDocumentSnapshot<DocumentData>[]
+  >([]);
 
   const bljuc = useRef<string[]>([]);
   const getHostProperties = useCallback(async () => {
+    // TODO when to use callback here and on other places
     bljuc.current = [];
     const arrData: any[] = [];
     const q = query(
       collection(db, "property"),
-      where("ownerId", "==", user.uid)
+      where("ownerId", "==", user?.uid)
       //?????????????
     );
     console.log("--------------");
     const querySnapshot = await getDocs(q);
     setArr([]);
+    setArrLocation([]);
     querySnapshot.forEach((doc) => {
       // console.log("\\\\\\\\\\\\]", doc.id);
       // arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
@@ -48,6 +56,7 @@ export default function HostsBoard() {
       // setArr(arrData);
 
       setArr((prev) => [...prev, doc.id + "---" + JSON.stringify(doc.data())]);
+      setArrLocation((prev) => [...prev, doc]);
     });
   }, [user?.uid]);
 
@@ -170,6 +179,15 @@ export default function HostsBoard() {
         {/* JEDAN KALENDAR */}
         {bljuc.current && <Calendar propertyId={bljuc.current} />}
         {(!bljuc.current || bljuc.current.length == 0) && <div>NEMA</div>}
+
+        <div className="flex flex-col items-center justify-center">
+          {arrLocation.length > 0 && <Map2 setLoc={""} arrLoc={arrLocation} />}
+          {/* {loc && (
+            <div>
+              {JSON.parse(loc.split("-")[0])}-{JSON.parse(loc.split("-")[1])}
+            </div>
+          )} */}
+        </div>
       </div>
     </Layout>
   );
