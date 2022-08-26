@@ -30,7 +30,7 @@ export default function CardSearch({
   const router = useRouter();
 
   const goToPropertyPage = () => {
-    if ((router.pathname = "/search")) {
+    if (router.pathname == "/search") {
       router.push({
         pathname: "/propertypage",
         query: {
@@ -135,7 +135,14 @@ cursor-pointer" //TODO dodaj ostalima
             <p className="text-xl font-semibold">{name}</p>
             <Heart propertyid={propertyid} />
           </div>
-          <p className="text-sm text-gray-600 flex-grow mb-5">{description}</p>
+          <p
+            className="text-sm text-gray-600 flex-grow mb-5
+          "
+          >
+            {description.length < 100
+              ? description
+              : description.slice(0, description.indexOf(" ", 100)) + "..."}
+          </p>
           <div className="text-lg flex items-center  mb-2">
             {price}€/
             <p className="text-md text-gray-500 ">night</p>

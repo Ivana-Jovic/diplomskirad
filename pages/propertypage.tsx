@@ -142,7 +142,7 @@ export default function PropertyPage() {
               </div>
             </div>
 
-            <Heart propertyid={propertyid ? propertyid[0] : ""} />
+            <Heart propertyid={propertyid as string} />
           </div>
 
           <div

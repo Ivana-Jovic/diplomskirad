@@ -40,7 +40,7 @@ export default function Heart({
   }, [myUser, propertyid]);
 
   const onHeart = async () => {
-    console.log("in heart onHeart");
+    console.log("in heart onHeart", propertyid);
     if (!inFaves) {
       //TODO: put in faves orr delete from SVUDA GDE JE SRCE
       await updateDoc(doc(db, "users", user?.uid), {

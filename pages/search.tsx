@@ -382,6 +382,7 @@ export default function Search() {
               }}
             /> */}
             <div className="dropdown">
+              {/* //TODO sredi na malim ekranima */}
               <div tabIndex={0} className=" ">
                 <Chip
                   label="Price"

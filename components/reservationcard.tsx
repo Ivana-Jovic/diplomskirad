@@ -129,7 +129,13 @@ export default function ReservationCard({
     await updateDoc(doc(db, "property", propertyId), {
       numberOfReviews: increment(1),
       totalStars: increment(stars ? stars : 1),
-
+      totalEarnings: increment(total),
+      totalOccupancyDays: increment(
+        Math.round(
+          (new Date(to).getTime() - new Date(from).getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      ),
       //TODO timestamp
       //TODO: when I need avg just divide
       // delete field stars in property
@@ -139,7 +145,7 @@ export default function ReservationCard({
     });
 
     const docSnap = await getDoc(doc(db, "property", propertyId));
-
+    //becoming a superhost
     if (docSnap.exists()) {
       if (
         docSnap.data().numberOfReviews >= 5 &&

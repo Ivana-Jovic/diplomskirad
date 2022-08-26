@@ -46,6 +46,7 @@ export default function ReportCard({
     }
     // reportedUser.current //TODO VRATI OVO
     await deleteDoc(doc(db, "users", "YSX0mxwY9CsRy4IJd8ft")); //Warning: Deleting a document does not delete its subcollections!
+    //TODO obrisi usera u auth tj disable
 
     // deleteUser(user)// TODO dodaj brisanje
     //   .then(() => {

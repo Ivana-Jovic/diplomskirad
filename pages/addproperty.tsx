@@ -97,6 +97,7 @@ export default function AddProperty() {
       numberOfReview: 0,
       isSuperhost: false,
       loc: loc ?? ",",
+      dateAddedProperty: new Date().toDateString(),
       // lng: loc ? JSON.parse(loc.split("-")[0]) : "",
       // lat: loc ? JSON.parse(loc.split("-")[1]) : "",
     });
