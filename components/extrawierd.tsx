@@ -7,7 +7,11 @@ import {
   doc,
   DocumentData,
   getDoc,
+  getDocs,
+  query,
   Timestamp,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import { MenuItem, Rating, TextField } from "@mui/material";
 // Menu,
@@ -33,7 +37,41 @@ type IFormInput = {
   timeFrom: Date;
   timeTo: Date;
 };
+//TODO PAZI OVO JE COPY PASE FJA IZ SEARCHA
+async function isAvailable(from: Date, to: Date, propertyId: string) {
+  const querySnapshot6 = await getDocs(
+    query(
+      collection(db, "reservations"),
+      where("propertyId", "==", propertyId)
+      //TODO: change from and to to DATE types in db!!!! and remove condition from if clause
+      // where("to" as Date, ">", from) //= means they are checkig out the same day others are checking in which is ok
+    )
+  );
+  for (let index = 0; index < querySnapshot6.docs.length; index++) {
+    const doc = querySnapshot6.docs[index];
+    console.log("KK ", propertyId, index, doc.id);
 
+    //oni koji se potencijalno poklapaju
+    if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
+      //ne poklapaju se
+    } else {
+      //poklapaju se kako god
+      //ako je doc.to izmedju to i from poklapaju se sigurno
+      //ako doc.to vece od to poklapaju se  ako je from iymedju ili pre from
+      //
+      console.log(
+        "ELSE GRANA",
+        propertyId,
+        from.toDateString(),
+        to.toDateString()
+      );
+      console.log("IS AVAILABLE JE FALSE", doc.id);
+      return false;
+    }
+  }
+  console.log("IS AVAILABLE JE TRUE");
+  return true;
+}
 export default function Extrawierd({ property }: { property: DocumentData }) {
   const {
     control,
@@ -50,12 +88,18 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
   });
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     console.log("QQQQQQQQQ", data);
-    reserve(data);
+    tryToReserve(data);
   };
   const router = useRouter();
   const { property: propertyid } = router.query;
-  const from = new Date(router.query.from as string);
-  const to = new Date(router.query.to as string);
+  const from =
+    router && router.query && router.query.from
+      ? new Date(router.query.from as string)
+      : new Date();
+  const to =
+    router && router.query && router.query.from
+      ? new Date(router.query.to as string)
+      : new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
   const numOfGuests = router.query.numOfGuests
     ? parseInt(router.query.numOfGuests as string)
     : 0;
@@ -69,7 +113,32 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
   const prId: string = propertyid?.toString() ?? "";
   const { user, myUser } = useContext(AuthContext);
   const [error, setError] = useState<string>("");
+  const tryToReserve = async (data: IFormInput) => {
+    if (!router || !router.query || !router.query.from || !router.query.to) {
+      isAvailable(dateFrom, dateTo, prId).then((isAv) => {
+        if (!isAv) {
+          console.log(" POKLAPAJU SE");
+          setError("NOT AVAILABLE, please select other dates");
+          // return;
+        } else {
+          console.log("NE POKLAPAJU SE");
+          reserve(data);
+        }
+      });
+    } else {
+      reserve(data);
+    }
+  };
   const reserve = async (data: IFormInput) => {
+    // if (!router || !router.query || !router.query.from || !router.query.to) {
+    //   isAvailable(dateFrom, dateTo, prId).then((isAv) => {
+    //     if (!isAv) {
+    //       console.log(" POKLAPAJU SE");
+    //       setError("NOT AVAILABLE, please select other dates");
+    //       return;
+    //     } else console.log("NE POKLAPAJU SE");
+    //   });
+    // }
     //TODO moze se birati datum ali treba proveriti isAvailible
     if (dateFrom && dateTo && dateFrom >= dateTo) {
       setError("Check out date must be after check in date");
@@ -120,6 +189,10 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
         specialReq: data.specialReq,
         leftFeedback: false,
         // timestamp
+      });
+
+      await updateDoc(doc(db, "reservations", docRef.id), {
+        id: docRef.id,
       });
     }
   };
@@ -263,7 +336,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
               <div className="flex justify-between w-full gap-3 mt-5 mb-3">
                 {/* <div className="mr-3"> */}
                 <DatePicker
-                  disabled
+                  // disabled
                   disablePast
                   label="Check in"
                   inputFormat="dd/MM/yyyy"
@@ -280,7 +353,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 {/* </div> */}
 
                 <DatePicker
-                  disabled
+                  // disabled
                   disablePast
                   shouldDisableDate={(date: Date) => {
                     if (dateTo && dateFrom && date <= dateFrom) {

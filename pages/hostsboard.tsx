@@ -126,7 +126,7 @@ export default function HostsBoard() {
             })}
           </div>
         </section>
-        <div className="pt-7 pb-5 text-center text-3xl font-bold">
+        {/* <div className="pt-7 pb-5 text-center text-3xl font-bold">
           Reservations
         </div>
         <div>
@@ -143,7 +143,7 @@ export default function HostsBoard() {
               );
             })}
           </div>
-        </div>
+        </div> */}
         <div className="pt-7 pb-5 text-center text-3xl font-bold">
           Statstics
         </div>
@@ -190,7 +190,7 @@ export default function HostsBoard() {
                     <div className="stat">
                       <div className="stat-title">Total occupancy</div>
                       <div className="stat-value">
-                        {property.totalOccupancyDays}days
+                        {property.totalOccupancyDays} days
                       </div>
                       <div className="stat-desc">
                         from {property.dateAddedProperty}
@@ -201,8 +201,11 @@ export default function HostsBoard() {
                         Average monthly occupancy
                       </div>
                       <div className="stat-value">
-                        {property.totalOccupancyDays /
-                          daysFromDateAddedProperty}
+                        {(
+                          (property.totalOccupancyDays /
+                            daysFromDateAddedProperty) *
+                          100
+                        ).toFixed(1)}
                         %
                       </div>
                       <div className="stat-desc">

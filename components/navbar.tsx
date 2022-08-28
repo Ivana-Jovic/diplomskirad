@@ -11,6 +11,7 @@ import Banner from "./banner";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
+import Link from "next/link";
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const { user, myUser } = useContext(AuthContext);
@@ -24,16 +25,16 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   };
 
   // ovaj dole nacinje oristan jer ovako mozemo da sharujemo nekom link da vidi nase reyultate
-  const search = () => {
-    router.push({
-      pathname: "/search",
-      query: {
-        location: searchInput,
-        // startdate i end... 1;31 day3
-        numOfGuests,
-      },
-    });
-  };
+  // const search = () => {
+  //   router.push({
+  //     pathname: "/search",
+  //     query: {
+  //       location: searchInput,
+  //       // startdate i end... 1;31 day3
+  //       numOfGuests,
+  //     },
+  //   });
+  // };
 
   const becomeAHost = async () => {
     const docRef = await addDoc(collection(db, "users"), {
@@ -42,41 +43,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
       host: true,
     });
   };
-  const addProperty = () => {
-    router.push({
-      pathname: "/addproperty",
-    });
-  };
-  const hostsBoard = () => {
-    router.push({
-      pathname: "/hostsboard",
-    });
-  };
-  const guestBoard = () => {
-    router.push({
-      pathname: "/guestboard",
-    });
-  };
-  const profileSettings = () => {
-    router.push({
-      pathname: "/profilesettings",
-    });
-  };
-  const adminBoard = () => {
-    router.push({
-      pathname: "/adminboard",
-    });
-  };
-  const faq = () => {
-    router.push({
-      pathname: "/faq",
-    });
-  };
-  const wishlist = () => {
-    router.push({
-      pathname: "/wishlist",
-    });
-  };
+
   const menu = (
     <Menu
       items={[
@@ -103,13 +70,11 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         {
           key: "2",
           label: (
-            <div
-              onClick={profileSettings}
-              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-              // className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
-            >
-              Profile
-            </div>
+            <Link href="/profilesettings">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                Profile
+              </a>
+            </Link>
           ),
         },
         {
@@ -129,72 +94,72 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         {
           key: "4",
           label: (
-            <div
-              onClick={addProperty}
-              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-
-              // className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
-            >
-              Add property
-            </div>
+            <Link href="/addproperty">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                Add property
+              </a>
+            </Link>
           ),
         },
         {
           key: "5",
           label: (
-            <div
-              onClick={hostsBoard}
-              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-
-              // className=" hover:bg-slate-50 hover:opacity-80 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
-            >
-              Host board
-            </div>
+            <Link href="/hostsboard">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                Host board
+              </a>
+            </Link>
           ),
         },
         {
           key: "6",
           label: (
-            <div
-              onClick={guestBoard}
-              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-            >
-              Guest board
-            </div>
+            <Link href="/guestboard">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                Guest board
+              </a>
+            </Link>
           ),
         },
 
         {
           key: "7",
           label: (
-            <div
-              onClick={adminBoard}
-              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-            >
-              Admin board
-            </div>
+            <Link href="/adminboard">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                Admin board
+              </a>
+            </Link>
           ),
         },
         {
           key: "8",
           label: (
-            <div
-              onClick={faq}
-              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-            >
-              FAQ
-            </div>
+            <Link href="/faq">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                FAQ
+              </a>
+            </Link>
           ),
         },
         {
           key: "9",
           label: (
-            <div
-              onClick={wishlist}
-              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-            >
-              Wishlist
-            </div>
+            <Link href="/wishlist">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                Wishlist
+              </a>
+            </Link>
+          ),
+        },
+        {
+          key: "10",
+          label: (
+            <Link href="/hostsreservations">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                Host reservations
+              </a>
+            </Link>
           ),
         },
       ]}
@@ -208,15 +173,22 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
        w-full sticky top-0 z-[100]"
     >
       <div className="sm:px-5  md:px-10 grid grid-cols-3">
-        <div
+        {/* <div
           onClick={() => router.push("/")}
           className=" text-2xl text-darkGreen  font-logo
          font-semibold mr-2 cursor-pointer pl-3 "
         >
           {/* mybnb */}
-          <LocationCityIcon fontSize="large" />
-        </div>
-
+        {/* <LocationCityIcon fontSize="large" />
+        </div> */}
+        <Link href="/">
+          <a
+            className=" text-2xl text-darkGreen  font-logo
+         font-semibold mr-2 cursor-pointer pl-3 "
+          >
+            <LocationCityIcon fontSize="large" />
+          </a>
+        </Link>
         <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
           {/* width i mr  justify-between*/}
           {/* <div

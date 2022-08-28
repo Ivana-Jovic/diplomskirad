@@ -7,51 +7,54 @@ import {
   onSnapshot,
   getDoc,
   doc,
+  DocumentData,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useId, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import ReservationCard from "../components/reservationcard";
 import CardSearch from "../components/cardsearch";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import nookies from "nookies";
+import { verifyIdToken } from "../firebaseadmin";
 
-export default function GuestBoard() {
+export default function GuestBoard({
+  uid,
+  reservations,
+}: {
+  uid: string;
+  reservations: string;
+}) {
   const { user, myUser } = useContext(AuthContext);
-  const [arr, setArr] = useState<any[]>([]);
-  // const [faves, setFaves] = useState<any[]>([]);
+  // const [arr, setArr] = useState<any[]>([]);
+  // const q = query(collection(db, "reservations"), where("userId", "==", uid)); //TODO ovdde mozda skloniti hydratation
 
-  const getGuestReservations = async () => {
-    const arrData: any[] = [];
-    const q = query(
-      collection(db, "reservations"),
-      where("userId", "==", user?.uid)
-    );
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      arrData.push(doc);
-      // console.log(doc.id + "---" + JSON.stringify(doc.data()));
-      //   console.log("||||||", doc.data());
-      setArr(arrData);
-    });
-  };
-  // const getFaves = async () => { //IN WISHLIST
-  //   //TODO potencijalnbo da postoji subkolekcija fave poperty
-  //   console.log("\\\\\\\\\\\\\\\n");
+  // const [realtimeReservations] = useCollectionData(q);
+  // const reserv = realtimeReservations || reservations;
+  const reserv: DocumentData[] = JSON.parse(reservations);
+  console.log(reserv);
+  // const getGuestReservations = async () => {
   //   const arrData: any[] = [];
-  //   myUser.faves.forEach(async (item: any) => {
-  //     const docSnap = await getDoc(doc(db, "property", item));
-
-  //     if (docSnap.exists()) {
-  //       arrData.push(docSnap);
-  //     }
-  //     setFaves(arrData);
+  //   const q = query(
+  //     collection(db, "reservations"),
+  //     where("userId", "==", user?.uid)
+  //   );
+  //   const querySnapshot = await getDocs(q);
+  //   setArr([]);
+  //   querySnapshot.forEach((doc) => {
+  //     arrData.push(doc);
+  //     // setArr(arrData);
+  //     setArr((prev) => {
+  //       return [...prev, doc];
+  //     });
   //   });
   // };
-  useEffect(() => {
-    if (user) {
-      getGuestReservations();
-    }
-    // if (myUser) getFaves(); IN WISHLIST
-  }, [user, myUser]);
+
+  // useEffect(() => {
+  //   if (user) {
+  //     getGuestReservations();
+  //   }
+  // }, [user, myUser]);
 
   return (
     <Layout>
@@ -62,11 +65,11 @@ export default function GuestBoard() {
             My reservations
           </div>
           <div className="flex flex-col ">
-            {arr.map((item) => {
+            {Array.from(reserv).map((item, index) => {
               return (
-                <div key={item.id}>
+                <div key={index}>
                   <ReservationCard
-                    {...item.data()}
+                    {...(item as any)} //TODO promeni u pravi tip
                     reservationId={item.id}
                     // isHost={myUser.host} TODO : VRATI NA OVO
                     isHost={false}
@@ -75,31 +78,36 @@ export default function GuestBoard() {
               );
             })}
           </div>
-          {/* <div className="flex flex-col mt-10 ">
-            <div className="pt-7 pb-5 text-center text-3xl font-bold">
-              Wishlist
-            </div>
-            {faves.map((property: any) => {
-              return (
-                <div key={property.id}>
-                  <CardSearch
-                    key={property.id}
-                    propertyid={property.id}
-                    name={property.data().title}
-                    description={property.data().description}
-                    image={property.data().images[0]}
-                    price={property.data().pricePerNight}
-                    // stars="5"
-                    totalStars={property.data().totalStars}
-                    numberOfReviews={property.data().numberOfReviews}
-                    numberOfNights={0}
-                  />
-                </div>
-              );
-            })}
-          </div> */}
         </div>
       </div>
     </Layout>
   );
+}
+export async function getServerSideProps(context) {
+  try {
+    const cookies = nookies.get(context);
+    const token = await verifyIdToken(cookies.token);
+    const { uid } = token;
+    const arrData: DocumentData[] = [];
+    const q = query(collection(db, "reservations"), where("userId", "==", uid)); //TODO ovdde mozda skloniti hydratation
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      //TODO ispravi i na drugim mestia
+      arrData.push(doc.data());
+    });
+    return {
+      props: {
+        uid: uid,
+        // reservations: { ...{ ...arrData } },
+        reservations: JSON.stringify(arrData),
+        // reservations: { ...{ ...querySnapshot.docs } },
+        // session: "Your email is ${email} and your UID is ${uid}",
+      },
+    };
+  } catch (err) {
+    context.res.writeHead(302, { location: "/" });
+    context.res.end();
+    return { props: [] };
+  }
 }

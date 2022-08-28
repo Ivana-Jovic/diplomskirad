@@ -141,7 +141,6 @@ export default function PropertyPage() {
                 {property.state}, {property.city}
               </div>
             </div>
-
             <Heart propertyid={propertyid as string} />
           </div>
 

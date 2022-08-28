@@ -19,6 +19,9 @@ const Map = (props: props) => {
     root.render(popup);
     const initMap = async () => {
       const tt = await import("@tomtom-international/web-sdk-maps");
+      // const SearchBox = await import(
+      //   "@tomtom-international/web-sdk-plugin-searchbox"
+      // );
       // const tt1=  await import('@tomtom-international/web-sdk-services')
       ///
       var center: tt.LngLatLike = [20.4609, 44.81647189463462];
@@ -62,7 +65,7 @@ const Map = (props: props) => {
           lngLat.lng,
           lngLat.lat
         );
-        // popup.setHTML(lngLat.toString());
+        popup.setHTML(lngLat.toString());
         popup.setLngLat(lngLat);
         marker.setPopup(popup);
         marker.togglePopup();
@@ -73,6 +76,24 @@ const Map = (props: props) => {
 
       //////
       setMap(ivaninaMapa);
+
+      // const ttSearchBox = new SearchBox(services, {
+      //   idleTimePress: 100,
+      //   minNumberOfCharacters: 0,
+      //   searchOptions: {
+      //     key: "g1vbv71TIZn39gozG2KycjVd1AuWJ9TC",
+      //     language: "en-GB",
+      //   },
+      //   autocompleteOptions: {
+      //     key: "g1vbv71TIZn39gozG2KycjVd1AuWJ9TC",
+      //     language: "en-GB",
+      //   },
+      //   noResultsMessage: "No results found.",
+      // });
+      // map.addControl(ttSearchBox, "top-left");
+      // ttSearchBox.on("tomtom.searchbox.resultsfound", function (data) {
+      //   console.log(data);
+      // });
     };
     initMap();
     return () => map?.remove();

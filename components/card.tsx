@@ -35,6 +35,7 @@ import { yellow, red } from "@mui/material/colors";
 import Heart from "./heart";
 import { Rating } from "@mui/material";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 //TODO vidi svuda za srce klik u fav
 export default function Card({
@@ -60,68 +61,68 @@ export default function Card({
 }) {
   const router = useRouter();
 
-  const goToPropertyPage = () => {
-    router.push({
-      pathname: "/propertypage",
-      query: {
-        property: propertyid,
-      },
-    });
-  };
   return (
-    <div
-      onClick={goToPropertyPage}
-      className="card rounded-md mx-auto  w-[17rem] flex-shrink-0 bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
-transition duration-200 ease-out
-cursor-pointer" //TODO dodaj ostalima
+    <Link
+      href={{
+        pathname: "/propertypage",
+        query: {
+          property: propertyid,
+        },
+      }}
     >
-      <figure className="relative h-48 flex-shrink-0">
-        <Image
-          src={image}
-          alt={name}
-          layout="fill"
-          objectFit="cover"
-          // objectPosition="bottom"
-        />
-      </figure>
-      <div className="card-body">
-        <div>
-          {/* className="flex flex-col flex-grow p-7" */}
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-xl font-semibold">{name}</p>
-            <Heart propertyid={propertyid} />
-          </div>
-          {/* <p className="text-sm text-gray-600 flex-grow mb-5">{description}</p> */}
-          {/* <div className="text-lg flex items-center  mb-2">
+      <a
+        className="card rounded-md mx-auto  w-[17rem] flex-shrink-0 bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
+    transition duration-200 ease-out
+    cursor-pointer" //TODO dodaj ostalima
+      >
+        <figure className="relative h-48 flex-shrink-0">
+          <Image
+            src={image}
+            alt={name}
+            layout="fill"
+            objectFit="cover"
+            // objectPosition="bottom"
+          />
+        </figure>
+        <div className="card-body">
+          <div>
+            {/* className="flex flex-col flex-grow p-7" */}
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-xl font-semibold">{name}</p>
+              <Heart propertyid={propertyid} />
+            </div>
+            {/* <p className="text-sm text-gray-600 flex-grow mb-5">{description}</p> */}
+            {/* <div className="text-lg flex items-center  mb-2">
             {price}€/
             <p className="text-md text-gray-500 ">night</p>
           </div> */}
-          <div className="flex justify-between items-center">
-            {/* <div className="text-sm flex items-center text-gray-500 ">
+            <div className="flex justify-between items-center">
+              {/* <div className="text-sm flex items-center text-gray-500 ">
               {parseInt(price) * numberOfNights}€/
               <p className="text-sm text-gray-500 ">total</p>
             </div> */}
-            <div className="text-lg flex items-center ">
-              {price}€/
-              <p className="text-md text-gray-500 ">night</p>
-            </div>
-            <div className="flex">
-              <p className="text-sm font-semibold">
-                {" "}
-                {(totalStars / numberOfReviews).toFixed(1)}
-              </p>
-              {/* <StarOutlineRoundedIcon sx={{ color: yellow[700] }} /> */}
-              <Rating
-                name="read-only"
-                value={totalStars / numberOfReviews}
-                readOnly
-                size="small"
-                precision={0.1}
-              />
+              <div className="text-lg flex items-center ">
+                {price}€/
+                <p className="text-md text-gray-500 ">night</p>
+              </div>
+              <div className="flex">
+                <p className="text-sm font-semibold">
+                  {" "}
+                  {(totalStars / numberOfReviews).toFixed(1)}
+                </p>
+                {/* <StarOutlineRoundedIcon sx={{ color: yellow[700] }} /> */}
+                <Rating
+                  name="read-only"
+                  value={totalStars / numberOfReviews}
+                  readOnly
+                  size="small"
+                  precision={0.1}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </a>
+    </Link>
   );
 }

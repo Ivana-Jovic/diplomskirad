@@ -27,7 +27,7 @@ export default function Heart({
     const pid: string = propertyid ? propertyid.toString() : "";
     // const docSnap = await getDoc(doc(db, "users", user?.uid)); //PROMENA POSLE PREKORACENJA FIREBASA
 
-    if (myUser) {
+    if (myUser && myUser.faves) {
       //PROMENA POSLE PREKORACENJA FIREBASA
       if (myUser.faves.includes(pid)) {
         setInFaves(true);

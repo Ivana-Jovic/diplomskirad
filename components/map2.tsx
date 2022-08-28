@@ -194,10 +194,10 @@ const Map2 = (props: props) => {
           createMarker(
             "accident.colors-white.jpg",
             [
-              element.data().loc
+              element.data().loc && element.data().loc != ","
                 ? JSON.parse(element.data().loc.split("-")[0])
                 : 20.447,
-              element.data().loc
+              element.data().loc && element.data().loc != ","
                 ? JSON.parse(element.data().loc.split("-")[1])
                 : 44.81,
             ],

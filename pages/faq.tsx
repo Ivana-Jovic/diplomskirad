@@ -1,7 +1,3 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import Banner from "../components/banner";
-import Card from "../components/card";
 import Layout from "../components/layout";
 export default function Faq() {
   return (

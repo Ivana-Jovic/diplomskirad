@@ -2,7 +2,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import React, { createContext, useEffect, useRef, useState } from "react";
 import { auth, db } from "./firebase";
-
+import nookies from "nookies";
 type ContextType = {
   user: User | null | undefined;
   myUser: any;
@@ -22,7 +22,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // User is signed in
+        const token = await user.getIdToken();
         setUser(user);
+        nookies.set(undefined, "token", token, {});
         // console.log("!!!!!!!!!!!", user);
         const docSnap = await getDoc(doc(db, "users", user.uid));
 
@@ -38,6 +40,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // User is signed out
         setUser(null);
         setMyUser(null);
+        nookies.set(undefined, "token", "", {});
       }
     });
 

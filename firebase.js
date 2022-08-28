@@ -17,7 +17,7 @@ const firebaseConfig = {
   messagingSenderId: "92632220826",
   appId: "1:92632220826:web:031aafd593f5b97fdecb23",
   measurementId: "G-TL1WHX4GL1",
-  databaseURL: "https://diplomski-55137.europe-west6.firebasedatabase.app", //PRODAJ BEZ OVOGA
+  // databaseURL: "https://diplomski-55137.europe-west6.firebasedatabase.app",
   //TODO JER OO JE RUCNO UPISANO
 };
 

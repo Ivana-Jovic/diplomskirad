@@ -140,10 +140,10 @@ export default function ReservationCard({
       //TODO: when I need avg just divide
       // delete field stars in property
     });
+
     await updateDoc(doc(db, "reservations", reservationId), {
       leftFeedback: true,
     });
-
     const docSnap = await getDoc(doc(db, "property", propertyId));
     //becoming a superhost
     if (docSnap.exists()) {
@@ -193,108 +193,9 @@ export default function ReservationCard({
       // timestamp
     });
   };
+
+  //TODO kad se doda feedback da se osvezi stranica
   return (
-    //     <div
-    //       className="flex my-3 border rounded-md cursor-pointer
-    // hover:shadow-lg
-    // transition duration-200 ease-out"
-    //     >
-    //       <div
-    //         className={`${
-    //           new Date(to) <= new Date()
-    //             ? " bg-red-50"
-    //             : "bg-green-50"
-    //         }`}
-    //       >
-    //         <div>
-    //           {new Date(to) <= new Date() ? "" : "**UPCOMING**"}
-    //         </div>
-    //         <div className="text-xl font-semibold">{title}</div>
-    //         {/* <div>{item.data().propertyId}</div> */}
-    //         <div className="text-lg font-semibold">
-    //           {user}-{userId}
-    //         </div>
-    //         <div className="text-lg font-semibold">
-    //           {from} - {to}
-    //         </div>
-    //         <div>Total: {total}e</div>
-    //         <div>Guests: {guests}</div>
-    //         <div>Garage: {garage ? "YES" : "NO"}</div>
-    //         {/* TODO */}
-    //         <div>
-    //           Time of check in/out: {timeCheckIn}:00 /{" "}
-    //           {timeCheckOut}:00
-    //         </div>
-    //         {/* TODO */}
-    //         <div>
-    //           Special request:
-    //           {specialReq
-    //             ? specialReq
-    //             : "none"}
-    //         </div>
-    //         {/* TODO */}
-
-    //         <div>
-    //           {new Date(to) <= new Date() && (
-    //             <div>
-    //               {!leftFB && (
-    //                 <button
-    //                   onClick={() => {
-    //                     togglePopup();
-    //                   }}
-    //                 >
-    //                   Leave feedback
-    //                 </button>
-    //               )}
-    //               {isPopupOpen && (
-    //                 <Popup
-    //                   content={
-    //                     <>
-    //                       Leave feedback:
-    //                       <div className="flex">
-    //                         {/* <input
-    //                           value={stars}
-    //                           onChange={(e) => {
-    //                             setStars(parseInt(e.target.value));
-    //                           }}
-    //                           type="number"
-    //                           placeholder="1"
-    //                           min={1}
-    //                           max={5}
-    //                           className="outline-0  bg-transparent text-lg text-gray-600"
-    //                         />
-    //                         <StarOutlineRoundedIcon /> */}
-    //                         <Rating
-    //                           name="simple-controlled"
-    //                           value={stars}
-    //                           onChange={(event, newValue) => {
-    //                             setStars(newValue);
-    //                           }}
-    //                         />
-    //                       </div>
-    //                       <textarea
-    //                         value={comment}
-    //                         onChange={(e) => {
-    //                           setComment(e.target.value);
-    //                         }}
-    //                         className="outline-0 border bg-transparent text-lg text-gray-600"
-    //                       />
-    //                       <Button
-    //                         action={leaveFeedback} //TODO: zasto ako je lambda ovde se poyove vise puta
-    //                         text="Leave feedback"
-    //                         type=""
-    //                       />
-    //                     </>
-    //                   }
-    //                   handleClose={togglePopup}
-    //                 />
-    //               )}
-    //             </div>
-    //           )}
-    //         </div>
-    //       </div>
-    //     </div>
-
     <div
       className={
         `card rounded-md shadow-lg my-3  max-w-5xl h-96 ` +
@@ -305,7 +206,6 @@ export default function ReservationCard({
   <span className="indicator-item indicator-center badge badge-secondary"></span>
   <div className="grid w-32 h-32 bg-base-300 place-items-center">content</div>
 </div> */}
-
       <div className="card-body">
         <div>
           <div className="text-center  text-xl font-semibold">
@@ -327,22 +227,6 @@ export default function ReservationCard({
           <div className="text-lg font-semibold text-center mb-5">
             {from} -{to}
           </div>
-          {/* <div>Total: {total}e</div>
-          <div>Guests: {guests}</div>
-          <div>Garage: {garage ? "YES" : "NO"}</div>
-          {/* TODO */}
-          {/* <div>
-            Time of check in/out: {timeCheckIn}:00 /{" "}
-            {timeCheckOut}:00
-          </div>
-          {/* TODO */}
-          {/*<div>
-            Special request:
-            {specialReq
-              ? specialReq
-              : "none"}
-          </div> */}
-          {/* TODO */}
           <div className="w-full overflow-x-auto">
             <table className="w-full">
               <tbody>
@@ -376,11 +260,6 @@ export default function ReservationCard({
               <div className="text-center mt-5">
                 {!leftFB && (
                   <>
-                    {/* // <Button
-                  //   action={togglePopup} //TODO: zasto ako je lambda ovde se poyove vise puta
-                  //   text="Leave feedback"
-                  //   type=""
-                  // /> */}
                     <label
                       htmlFor="my-modal-3"
                       className="btn btn-active bg-background hover:bg-background text-text border-none
@@ -488,57 +367,9 @@ export default function ReservationCard({
                           />
                         </div>
                       </label>
-                    </label>{" "}
+                    </label>
                   </>
                 )}
-                {/* {isPopupOpen && (
-                  <Popup
-                    content={
-                      <>
-                        Leave feedback:
-                        <div className="flex">
-                          {/* <input
-                          value={stars}
-                          onChange={(e) => {
-                            setStars(parseInt(e.target.value));
-                          }}
-                          type="number"
-                          placeholder="1"
-                          min={1}
-                          max={5}
-                          className="outline-0  bg-transparent text-lg text-gray-600"
-                        />
-                        <StarOutlineRoundedIcon /> */}
-                {/*   <Rating
-                            name="simple-controlled"
-                            value={stars}
-                            onChange={(event, newValue) => {
-                              setStars(newValue);
-                            }}
-                          />
-                        </div>
-                        <textarea
-                          value={comment}
-                          onChange={(e) => {
-                            setComment(e.target.value);
-                          }}
-                          className="outline-0 border bg-transparent text-lg text-gray-600"
-                        />
-                        <Button //ako je vlasnik onda ne ostavlja feedback vec samo reportuje
-                          action={leaveFeedback} //TODO: zasto ako je lambda ovde se poyove vise puta
-                          text="Leave feedback"
-                          type=""
-                        />
-                        <Button
-                          action={report} //TODO: zasto ako je lambda ovde se poyove vise puta
-                          text="Report"
-                          type=""
-                        />
-                      </>
-                    }
-                    handleClose={togglePopup}
-                  />
-                )} */}
               </div>
             )}
           </div>

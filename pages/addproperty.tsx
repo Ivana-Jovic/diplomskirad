@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import Layout from "../components/layout";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
+import { db, storage } from "../firebase";
 import Button from "../components/button";
 import Inputs from "../components/inputs";
 import FileForm from "../components/fileform";
@@ -11,6 +11,8 @@ import { InputAdornment, MenuItem, TextField } from "@mui/material";
 // import { FileForm } from "../components/fileform";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import Map from "../components/map";
+import ImageForm from "../components/imageform";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 type IFormInput = {
   title: string;
   desc: string;
@@ -28,12 +30,15 @@ type IFormInput = {
   addCosts: number;
   garage: boolean;
   images: string[];
+  picturesNEW: File[];
 };
 
 export default function AddProperty() {
   const [loc, setLoc] = useState<any>();
+  const [urlArr, setUrlArr] = useState<string[]>([]);
   const {
     control,
+    watch,
     handleSubmit,
     register,
     formState: { errors },
@@ -55,54 +60,86 @@ export default function AddProperty() {
       addCosts: 0,
       garage: false,
       images: [],
+      picturesNEW: [],
     },
   });
+  const { user } = useContext(AuthContext);
+  const imgNew: File[] = Array.from(watch("picturesNEW"));
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     console.log("QQQQQQQQQ", data);
     add(data);
   };
-  const { user } = useContext(AuthContext);
-  const [images, setImages] = useState<string[]>([]);
 
+  // const [images, setImages] = useState<string[]>([]);
+  const uploadPictures = async (data: IFormInput) => {
+    var urlArr: string[] = [];
+    const fileArr = data.picturesNEW ?? null;
+    setUrlArr([]);
+
+    for (let index = 0; index < fileArr.length; index++) {
+      const selected: File = fileArr[index];
+      if (
+        selected
+        // && allowedTypes.includes(selected.type)
+      ) {
+        const nn: string = "ppp-" + selected.name;
+        const storageRef = ref(storage, nn); //ref to file. file dosnt exist yet
+        //when we upload using this ref this file should have that name
+        const uploadTask = await uploadBytesResumable(storageRef, selected);
+        const url: string = await getDownloadURL(uploadTask.ref);
+        console.log("WWWWWWWWWWWWWWWWWWW");
+        urlArr.push(url);
+        // setError("");
+      } else {
+        // setError("Please select an image file (png or jpeg)");
+      }
+    }
+    return urlArr;
+  };
   //tTODO router replace umest puh sign//role
 
   // ovaj dole nacinje oristan jer ovako mozemo da sharujemo nekom link da vidi nase reyultate
   const add = async (data: IFormInput) => {
-    //PROVERI OVO treba .value a ne ovo sa zagradama
-    // if (titleRef.current && !titleRef.current["value"]) return;
-    //TODO dodati ove gore provere ya sve i ako nije nesto napisano poruka
-    const docRef = await addDoc(collection(db, "property"), {
-      title: data.title,
-      description: data.desc,
-      state: data.state,
-      city: data.city,
-      municipality: data.mun,
-      street: data.street,
-      streetNum: data.streetNum,
-      type: data.type,
-      numOfRooms: data.numRoooms,
-      numOfPersons: data.numPers,
-      image: "image",
-      galery: "galery",
-      pricePerNight: data.priceN,
-      additionalPerPerson: data.addPers,
-      additionalCosts: data.addCosts,
-      garage: data.garage,
-      // ownerId: session?.user?.name,<-GOOGLE
-      ownerId: user?.uid,
-      // promeni ovo!!!!!!!!!!!!!!!!!!!!!
-      images: data.images,
-      // stars: 0,
-      totalStars: 0,
-      numberOfReview: 0,
-      isSuperhost: false,
-      loc: loc ?? ",",
-      dateAddedProperty: new Date().toDateString(),
-      // lng: loc ? JSON.parse(loc.split("-")[0]) : "",
-      // lat: loc ? JSON.parse(loc.split("-")[1]) : "",
+    uploadPictures(data).then(async (urlArr) => {
+      console.log("LLLLLLLLLLLLLLL", urlArr.length);
+      //PROVERI OVO treba .value a ne ovo sa zagradama
+      // if (titleRef.current && !titleRef.current["value"]) return;
+      //TODO dodati ove gore provere ya sve i ako nije nesto napisano poruka
+      const docRef = await addDoc(collection(db, "property"), {
+        title: data.title,
+        description: data.desc,
+        state: data.state,
+        city: data.city,
+        municipality: data.mun,
+        street: data.street,
+        streetNum: data.streetNum,
+        type: data.type,
+        numOfRooms: data.numRoooms,
+        numOfPersons: data.numPers,
+        image: "image",
+        galery: "galery",
+        pricePerNight: data.priceN,
+        additionalPerPerson: data.addPers,
+        additionalCosts: data.addCosts,
+        garage: data.garage,
+        // ownerId: session?.user?.name,<-GOOGLE
+        ownerId: user?.uid,
+        // promeni ovo!!!!!!!!!!!!!!!!!!!!!
+        images: urlArr,
+        // images: data.picturesNEW,
+        // images: data.images,
+        // stars: 0,
+        totalStars: 0,
+        numberOfReview: 0,
+        isSuperhost: false,
+        loc: loc ?? ",",
+        dateAddedProperty: new Date().toDateString(),
+        // lng: loc ? JSON.parse(loc.split("-")[0]) : "",
+        // lat: loc ? JSON.parse(loc.split("-")[1]) : "",
+      });
+      console.log("lllll");
+      // console.log(titleRef.current ? titleRef.current.value"] : "");
     });
-    console.log("lllll");
-    // console.log(titleRef.current ? titleRef.current.value"] : "");
   };
   return (
     <>
@@ -517,19 +554,60 @@ export default function AddProperty() {
                   />
                 </div>
                 {/* </div> */}
-                Img and galery
+                {/* Img and galery */}
                 <label>
                   {/* <Controller
                     name="images"
                     control={control}
                     rules={{ required: "Please enter a image" }}
                     render={({ field: { onChange, value } }) => ( */}
-                  <FileForm images={images} setImages={setImages} />
+                  {/* <FileForm images={images} setImages={setImages} /> */}
                   {/* <FileForm images={value} setImages={onChange} /> */}
                   {/* // <FileForm /> */}
                   {/* )}
                   /> */}
                 </label>
+                <div>
+                  <label className="btn ">
+                    Select property pictures
+                    <input
+                      {...register("picturesNEW")}
+                      type="file"
+                      multiple
+                      className="hidden"
+                      accept="image/png, image/jpeg, image/jpg"
+                    />
+                  </label>
+                  <div className="flex flex-wrap gap-4 ">
+                    {imgNew &&
+                      imgNew.length > 0 &&
+                      imgNew.map((item, index) => {
+                        return (
+                          <div key={item.name}>
+                            {/* <button
+                              type="button"
+                              onClick={() => {
+                                imgNew.splice(index);
+                              }}
+                            >
+                              x
+                            </button> */}
+                            <ImageForm
+                              url={URL.createObjectURL(imgNew[index])}
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  {/* // ((item, index) => { */}
+                  {/* //   return (
+                  //     <div key={item.name}>
+                  //       <ImageForm url={URL.createObjectURL(imgNew[index])} />
+                  //     </div>
+                  //   );
+                  // })} */}
+                </div>
                 {/* <button type="submit">Add</button> */}
                 {/* <Button action={() => {}} text="Update" type="submit" /> */}
               </div>{" "}

@@ -12,6 +12,7 @@ import { TextField } from "@mui/material";
 
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import Image from "next/image";
+
 type IFormInput = {
   title: string;
   email: string;
@@ -19,12 +20,13 @@ type IFormInput = {
   username: string;
   firstName: string;
   lastName: string;
-  file: string;
   profilePicture: string;
+  profilePictureNEW: File[];
 };
 //TODO proveri svuda za  auth.currentUser da li ostaje ili na neki drugi nacin
 export default function ProfileSettings() {
   const { user, myUser } = useContext(AuthContext);
+
   console.log("88888888888888888888888888", myUser);
   const {
     control,
@@ -33,6 +35,7 @@ export default function ProfileSettings() {
     reset,
     register,
     getValues,
+    watch,
   } = useForm<IFormInput>({
     defaultValues: {
       email: user?.email ?? "",
@@ -40,11 +43,10 @@ export default function ProfileSettings() {
       username: myUser?.username,
       firstName: myUser?.firstName,
       lastName: myUser?.lastName,
-      file: "",
-      profilePicture: myUser?.photoURL,
+      profilePictureNEW: [],
     },
   });
-  const [url2, setUrl2] = useState<string | null | ArrayBuffer>(null);
+  const imgNew = watch("profilePictureNEW");
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     console.log(data);
     router.push({
@@ -55,84 +57,27 @@ export default function ProfileSettings() {
 
   const router = useRouter();
 
-  // const [emailState, setEmailState] = useState<string>("");
-  // const [passwordState, setPasswordState] = useState<string>("");
-  // const [usernameState, setUsernameState] = useState<string>("");
-
-  // const [firstName, setFirstName] = useState<string>("");
-  // const [lastName, setLastName] = useState<string>("");
   const [error, setError] = useState<any>("");
-  const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState<string>("");
-  const allowedTypes = ["image/png", "image/jpeg"];
 
   useEffect(() => {
-    // if (user) {
-    //   setEmailState(user.email);
-    // }
-    // if (myUser) {
-    //   if (myUser.username) setUsernameState(myUser.username);
-    //   if (myUser.passwordState) setPasswordState(myUser.passwordState);
-    //   //TOD: vidi za pass, posto se ne cuva u users colekciji pravi problem ya dugme plus trebalo bi da se ispisuje stari ili sta vec
-    //   if (myUser.firstName) setFirstName(myUser.firstName);
-    //   if (myUser.lastName) setLastName(myUser.lastName);
-    //   if (myUser.photoURL) setUrl(myUser.photoURL);
-    //   console.log("{{{{{{{{{{{{{{", myUser.username);
-    // }
     reset({
       email: user?.email ?? "",
       password: myUser?.passwordState,
       username: myUser?.username,
       firstName: myUser?.firstName,
       lastName: myUser?.lastName,
-      file: "",
-      profilePicture: myUser?.photoURL,
     });
   }, [user, myUser, reset]); //TODO VIDI DA LI OVOR Radi
 
   useEffect(() => {
     //MOZDA JE VSIAK
     if (url) {
-      setFile(null);
-      console.log("klll");
+      // setFile(null);
+      // console.log("klll");
     }
   }, [url]);
 
-  const changeHandler = (e: any) => {
-    const selected: File = e.target.files[0];
-
-    if (selected && allowedTypes.includes(selected.type)) {
-      setFile(selected);
-      console.log("AAAAAAAAAAAAAAA", selected);
-      // const nn: string = "ppp-" + selected.name;
-      // const storageRef = ref(storage, nn); //ref to file. file dosnt exist yet
-      // //when we upload using this ref this file should have that name
-      // const uploadTask = uploadBytesResumable(storageRef, selected);
-
-      // uploadTask.on(
-      //   "state_changed",
-      //   (snapshot) => {
-      //     console.log(
-      //       "zdravo"
-      //       // +(snapshot.bytesTransferred / snapshot.totalBytes) * 100 +"%"
-      //     );
-      //   },
-      //   (err) => {
-      //     console.log("ovo je greska");
-      //     setError(err);
-      //   },
-      //   () => {
-      //     getDownloadURL(uploadTask.snapshot.ref).then((urll) => {
-      //       setUrl(urll);
-      //     });
-      //   }
-      // );
-      setError("");
-    } else {
-      setFile(null);
-      setError("Please select an image file (png or jpeg)");
-    }
-  };
   const changeProfile = async (data: IFormInput) => {
     // const changeProfile = async (event: React.FormEvent<HTMLFormElement>) => {
     //   event.preventDefault();
@@ -176,7 +121,8 @@ export default function ProfileSettings() {
     //     .catch((error) => {
     //       console.log("ERROR in photo updated ", error.message);
     //     });
-
+    const fileArr = data.profilePictureNEW ?? null;
+    const file = fileArr.length > 0 ? fileArr[0] : null;
     const nn: string = "ppp-" + file?.name;
     const storageRef = ref(storage, nn); //ref to file. file dosnt exist yet
     //when we upload using this ref this file should have that name
@@ -238,25 +184,6 @@ export default function ProfileSettings() {
       });
     }
   };
-
-  function previewFile(file: File) {
-    const reader = new FileReader();
-
-    reader.addEventListener(
-      "load",
-      () => {
-        // convert image file to base64 string
-        setUrl2(reader.result);
-        // setUrl3((prev: any) => [...prev, reader.result]);
-        // return  reader.result
-      },
-      false
-    );
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  }
 
   //TODO AKO SE NESTO UPDAATUJE DOVUCI PONOVO MY USER IZ KONTEKSTA
   return (
@@ -365,28 +292,29 @@ export default function ProfileSettings() {
             {/*   )}
             /> */}
           </div>
-          <>{file && previewFile(file)}</>
           <div className=" text-center">
-            {!url2 && (
-              <div className="grid justify-items-center  mx-auto">
-                {myUser && myUser?.photoURL && (
-                  <ImageForm url={myUser?.photoURL} />
-                )}
-              </div>
-            )}
             <label className="btn ">
               Select profile picture
               <input
-                {...register("profilePicture")}
+                {...register("profilePictureNEW")}
                 type="file"
-                onChange={changeHandler}
+                // onChange={changeHandler}
                 className="hidden"
                 accept="image/png, image/jpeg, image/jpg"
               />
             </label>
             <div className="grid justify-items-center  mx-auto">
               <div>New:</div>
-              {url2 && typeof url2 === "string" && <ImageForm url={url2} />}
+              {((myUser && myUser?.photoURL) ||
+                (imgNew && imgNew.length > 0)) && (
+                <ImageForm
+                  url={
+                    imgNew && imgNew.length > 0
+                      ? URL.createObjectURL(imgNew[0])
+                      : myUser?.photoURL
+                  }
+                />
+              )}
             </div>
           </div>
 
