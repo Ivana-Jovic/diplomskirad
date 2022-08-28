@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import SearchBox from "@tomtom-international/web-sdk-plugin-searchbox";
 import { services } from "@tomtom-international/web-sdk-services";
 import * as ReactDOM from "react-dom/client";
-import CardPopup from "./cardPopup";
+import CardPopup from "./cardpopup";
 
 interface props {
   setLoc: any;
@@ -147,7 +147,7 @@ const Map2 = (props: props) => {
         // iconElement.style.backgroundImage = "url('/images/banner.jpg')";
 
         // markerContentElement.appendChild(iconElement);
-        const popup = new tt.Popup({ offset: 30 })
+        const popup = new tt.Popup({ offset: { bottom: [0, -30] } })
           // .setText(popupText)
           // .setHTML("<p>title:</p><p>" + popupText + "</p>");
           .setDOMContent(popupMarker);
@@ -169,25 +169,6 @@ const Map2 = (props: props) => {
           .addTo(ivaninaMapa);
       }
       ivaninaMapa.on("load", (param) => {
-        // const marker = new tt.Marker().setLngLat(center).addTo(ivaninaMapa);
-        // createMarker(
-        //   "accident.colors-white.svg",
-        //   [20.47222965087945, 44.81877],
-        //   "#5327c3",
-        //   "SVG icon"
-        // );
-        // createMarker(
-        //   "accident.colors-white.png",
-        //   [20.4689, 44.822],
-        //   "#c30b82",
-        //   "PNG icon"
-        // );
-        // createMarker(
-        //   "accident.colors-white.jpg",
-        //   [20.45729511, 44.8083064467661],
-        //   "#c31a26",
-        //   "JPG icon"
-        // );
         console.log("BBBBBBBBBBBB", arrLoc.length);
         arrLoc.forEach((element, index) => {
           console.log("UUUUUUUUU");

@@ -36,6 +36,11 @@ type IFormInput = {
 export default function AddProperty() {
   const [loc, setLoc] = useState<any>();
   const [urlArr, setUrlArr] = useState<string[]>([]);
+  const [state, setState] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [streetName, setStreetName] = useState<string>("");
+  const [streetNum, setStreetNum] = useState<string>("");
+  const [selectedStreet, setSelectedStreet] = useState<boolean>(false);
   const {
     control,
     watch,
@@ -108,11 +113,15 @@ export default function AddProperty() {
       const docRef = await addDoc(collection(db, "property"), {
         title: data.title,
         description: data.desc,
-        state: data.state,
-        city: data.city,
+        state: state,
+        //  data.state,
+        city: city,
+        // data.city,
         municipality: data.mun,
-        street: data.street,
-        streetNum: data.streetNum,
+        street: streetName,
+        // data.street,
+        streetNum: streetNum,
+        // data.streetNum,
         type: data.type,
         numOfRooms: data.numRoooms,
         numOfPersons: data.numPers,
@@ -175,11 +184,11 @@ export default function AddProperty() {
                 /> */}
                 <div className="mx-3 mb-2">
                   {/* <Controller
-  name="desc"
-  control={control}
-  rules={{ required: "Please enter a description" }}
-  render={({ field: { onChange, value } }) => (
-    <> */}
+                  name="desc"
+                  control={control}
+                  rules={{ required: "Please enter a description" }}
+                  render={({ field: { onChange, value } }) => (
+                    <> */}
                   <TextField
                     {...register("desc", {
                       required: "Please enter  a description",
@@ -196,128 +205,10 @@ export default function AddProperty() {
                     helperText={errors.desc ? errors.desc.message : " "}
                   />
                   {/* </>
-  )}
-/> */}
+                    )}
+                  /> */}
                 </div>
-                <div className="grid sm:grid-cols-3 grid-cols-1">
-                  {/* <Controller
-  name="state"
-  control={control}
-  rules={{ required: "Please enter a state name" }}
-  render={({ field: { onChange, value } }) => (
-    <> */}
-                  <TextField
-                    {...register("state", {
-                      required: "Please enter a state name",
-                    })}
-                    className="mx-3 mb-2"
-                    id="outlined-required"
-                    label="State"
-                    // value={value}
-                    // onChange={(e) => {
-                    //   onChange(e.target.value);
-                    // }}
-                    helperText={errors.state ? errors.state.message : " "}
-                  />
-                  {/* </>
-  )}
-/> */}
 
-                  {/* <Controller
-  name="city"
-  control={control}
-  rules={{ required: "Please enter a city name" }}
-  render={({ field: { onChange, value } }) => (
-    <> */}
-                  <TextField
-                    {...register("city", {
-                      required: "Please enter a city name",
-                    })}
-                    className="mx-3 mb-2"
-                    id="outlined-required"
-                    label="City"
-                    // value={value}
-                    // onChange={(e) => {
-                    //   onChange(e.target.value);
-                    // }}
-                    helperText={errors.city ? errors.city.message : " "}
-                  />
-                  {/* </>
-  )}
-/> */}
-                  <div></div>
-                </div>
-                <div className="grid sm:grid-cols-3 grid-cols-1  ">
-                  {/* <Controller
-  name="mun"
-  control={control}
-  rules={{ required: "Please enter a municipality" }}
-  render={({ field: { onChange, value } }) => (
-    <> */}
-                  <TextField //TODO: remove municipality
-                    {...register("mun", {
-                      required: "Please enter a municipality",
-                    })}
-                    className="mx-3 mb-2"
-                    id="outlined-required"
-                    label="Municipality"
-                    // value={value}
-                    // onChange={(e) => {
-                    //   onChange(e.target.value);
-                    // }}
-                    helperText={errors.mun ? errors.mun.message : " "}
-                  />
-                  {/* </>
-  )}
-/> */}
-
-                  {/* <Controller
-  name="street"
-  control={control}
-  rules={{ required: "Please enter a street name" }}
-  render={({ field: { onChange, value } }) => (
-    <> */}
-                  <TextField
-                    {...register("street", {
-                      required: "Please enter a street name",
-                    })}
-                    className="mx-3 mb-2"
-                    id="outlined-required"
-                    label="Street"
-                    // value={value}
-                    // onChange={(e) => {
-                    //   onChange(e.target.value);
-                    // }}
-                    helperText={errors.street ? errors.street.message : " "}
-                  />
-                  {/* </>
-  )}
-/> */}
-                  {/* <Controller
-  name="streetNum"
-  control={control}
-  rules={{ required: "Please enter a value" }}
-  render={({ field: { onChange, value } }) => (
-    <> */}
-                  <TextField
-                    {...register("streetNum", {
-                      required: "Please entera value",
-                    })}
-                    className="mx-3 mb-2"
-                    id="outlined-required"
-                    label="StreetNum"
-                    // value={value}
-                    // onChange={(e) => {
-                    //   onChange(e.target.value);
-                    // }}
-                    helperText={
-                      errors.streetNum ? errors.streetNum.message : " "
-                    }
-                  />
-                  {/* </>
-  )}
-/> */}
-                </div>
                 <div className="grid grid-cols-3 ">
                   <div className="mx-3  mb-2">
                     <Controller
@@ -610,23 +501,109 @@ export default function AddProperty() {
                 </div>
                 {/* <button type="submit">Add</button> */}
                 {/* <Button action={() => {}} text="Update" type="submit" /> */}
-              </div>{" "}
-              <div className="flex flex-col items-center justify-center">
-                <Map setLoc={setLoc} />
-                {loc && (
-                  <div>
-                    {JSON.parse(loc.split("-")[0])}-
-                    {JSON.parse(loc.split("-")[1])}
+
+                {!selectedStreet && (
+                  <div className="pt-7 pb-5 text-center text-lg font-bold">
+                    Please enter street name and number
                   </div>
                 )}
-              </div>
-              <Button
-                action={() => {
-                  // console.log("OOOOOOOOO");
-                }}
-                text="Add"
-                type="submit"
-              />
+                <div className="flex flex-col items-center justify-center mx-3">
+                  <Map
+                    setLoc={setLoc}
+                    setState={setState}
+                    setCity={setCity}
+                    setStreetName={setStreetName}
+                    setStreetNum={setStreetNum}
+                    setSelectedStreet={setSelectedStreet}
+                  />
+                  {loc && (
+                    <div>
+                      {JSON.parse(loc.split("-")[0])}-
+                      {JSON.parse(loc.split("-")[1])}
+                    </div>
+                  )}
+                </div>
+                <div className="grid sm:grid-cols-3 grid-cols-1 mt-14">
+                  <TextField
+                    // {...register("state", {
+                    //   required: "Please enter a state name",
+                    // })}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    className="mx-3 mb-2"
+                    id="outlined-required"
+                    label="State"
+                    value={state}
+                    helperText={errors.state ? errors.state.message : " "}
+                  />
+
+                  <TextField
+                    // {...register("city", {
+                    //   required: "Please enter a city name",
+                    // })}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                    className="mx-3 mb-2"
+                    id="outlined-required"
+                    label="City"
+                    value={city}
+                    helperText={errors.city ? errors.city.message : " "}
+                  />
+
+                  <div></div>
+                </div>
+                <div className="grid sm:grid-cols-3 grid-cols-1  ">
+                  {/* 
+                  <TextField //TODO: remove municipality
+                    {...register("mun", {
+                      required: "Please enter a municipality",
+                    })}
+                    className="mx-3 mb-2"
+                    id="outlined-required"
+                    label="Municipality"
+                 
+                    helperText={errors.mun ? errors.mun.message : " "}
+                  /> */}
+
+                  <TextField
+                    disabled
+                    // {...register("street", {
+                    //   required: "Please enter a street name",
+                    // })}
+                    InputLabelProps={{ shrink: true }}
+                    className="mx-3 mb-2"
+                    id="outlined-required"
+                    label="Street"
+                    value={streetName}
+                    helperText={errors.street ? errors.street.message : " "}
+                  />
+
+                  <TextField
+                    disabled
+                    // {...register("streetNum", {
+                    //   required: "Please entera value",
+                    // })}
+                    InputLabelProps={{ shrink: true }}
+                    className="mx-3 mb-2"
+                    id="outlined-required"
+                    label="StreetNum"
+                    value={streetNum}
+                    // onChange={(e) => {
+                    //   set(e.target.value);
+                    // }}
+                    // helperText={
+                    //   errors.streetNum ? errors.streetNum.message : " "
+                    // }
+                  />
+                </div>
+                <Button
+                  action={() => {
+                    // console.log("OOOOOOOOO");
+                  }}
+                  text="Add"
+                  type="submit"
+                />
+              </div>{" "}
             </form>
           </Layout>
         </>

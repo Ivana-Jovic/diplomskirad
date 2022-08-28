@@ -34,7 +34,7 @@ export default function HostsReservations({
 
   const reserv: DocumentData[] =
     realtimeReservations || JSON.parse(reservations);
-  console.log(reserv);
+
   // const reserv = useRef<any[]>([]);
 
   // TODO: OVO TREBA SREDITI DA SE NE POZIVA ZILION PUTA!!!!!!!!!!!
@@ -72,7 +72,7 @@ export default function HostsReservations({
                     {...(item as any)} //TODO promeni u pravi tip
                     // {...item.data()}
                     reservationId={item.id}
-                    isHost={myUser.host} //TODO ovde mozda uvek true
+                    isHost={true}
                   />
                 </div>
               );
@@ -105,7 +105,6 @@ export async function getServerSideProps(context) {
       // });
     });
     ////
-    console.log(q);
     return {
       props: {
         uid: uid,

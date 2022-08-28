@@ -4,17 +4,12 @@ import {
   query,
   where,
   getDocs,
-  onSnapshot,
-  getDoc,
-  doc,
   DocumentData,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useContext, useEffect, useId, useRef, useState } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import ReservationCard from "../components/reservationcard";
-import CardSearch from "../components/cardsearch";
-import { useCollectionData } from "react-firebase-hooks/firestore";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 
@@ -25,7 +20,7 @@ export default function GuestBoard({
   uid: string;
   reservations: string;
 }) {
-  const { user, myUser } = useContext(AuthContext);
+  // const { user, myUser } = useContext(AuthContext);
   // const [arr, setArr] = useState<any[]>([]);
   // const q = query(collection(db, "reservations"), where("userId", "==", uid)); //TODO ovdde mozda skloniti hydratation
 
