@@ -3,15 +3,16 @@ import Image from "next/image";
 export default function ImageForm({ url }: { url: string }) {
   return (
     <div
-      className="my-5 rounded-lg shadow-md cursor-pointer 
-      transition transform duration-300 ease-out hover:scale-105 
+      className="my-5 rounded-md shadow-md 
       relative h-60 w-60"
     >
+      {/* // cursor-pointer 
+      // transition transform duration-300 ease-out hover:scale-105  */}
       <Image
         src={url}
         alt=""
         layout="fill"
-        className="rounded-xl"
+        className="rounded-md"
         objectFit="cover"
       />
     </div>

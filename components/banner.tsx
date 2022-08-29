@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./button";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -14,6 +14,9 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { Autocomplete } from "@mui/material";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 // const theme = createTheme({
 //   components: {
 //     MuiDatePicker: {
@@ -39,9 +42,23 @@ export default function Banner() {
   );
   const [error, setError] = useState<string>("");
   const router = useRouter();
-
+  ///
+  const [locations, setLocations] = useState<any[]>([]);
+  const getLocations = async () => {
+    const querySnapshot = await getDocs(collection(db, "locations"));
+    setLocations([]);
+    querySnapshot.forEach((doc) => {
+      setLocations((prev) => [...prev, doc.id]);
+    });
+  };
+  useEffect(() => {
+    getLocations();
+  }, []);
+  ///
   const search = () => {
-    if (dateFrom && dateTo && dateFrom >= dateTo) {
+    if (location == null || location == "") {
+      setError("Please choose a location");
+    } else if (dateFrom && dateTo && dateFrom >= dateTo) {
       setError("Check out date must be after check in date");
     } else {
       router.push({
@@ -63,13 +80,13 @@ export default function Banner() {
   };
   const menu = (
     <Menu
-      className="rounded-lg py-3"
+      className="rounded-xl py-3"
       items={[
         {
           key: "1",
           label: (
             <>
-              <div className="flex mb-2 lg:mb-0  items-center">
+              <div className="flex mb-2 xl:mb-0  items-center">
                 <label className="mx-5">guests</label>
                 <button
                   className={
@@ -102,7 +119,7 @@ export default function Banner() {
           key: "2",
           label: (
             <>
-              <div className="flex lg:mr-7  items-center">
+              <div className="flex xl:mr-7  items-center">
                 <label className="mx-5">rooms</label>
                 <button
                   className="roundButton"
@@ -142,7 +159,6 @@ export default function Banner() {
           className="relative h-[300px] sm:h-[400px] lg:h-[500px] 
     xl:h-[600px] 2xl:h-[600px]  grid place-items-center"
         >
-          {/* <div className="w-full h-[50vh] bg-[url('/images/banner.jpg')] bg-center bg-no-repeat bg-cover"> */}
           <Image
             src="/images/banner3.jpg"
             alt=""
@@ -150,23 +166,14 @@ export default function Banner() {
             objectFit="cover"
             className="opacity-80"
           />
-          {/* <div className="absolute text-textFooter pl-7 top-1/4 w-fit">
-          {/* <div className="absolute text-textFooter h-[50vh] bg-footer pt-[20vh] p-12 w-2/5"> */}
-          {/* <div className="bg-footer text-xl sm:text-3xl font-bold ">
-            Accomodation around the world in one place
-          </div>
-          <br />
-          <ButtonBanner text="Find your next stay"></ButtonBanner>
-        </div> */}
 
-          {/* //TODO nije u istoj liniji nekako */}
           <div
-            className="absolute flex  flex-col lg:flex-row items-center
-         rounded-xl lg:rounded-full border-2 border-solid py-5  text-xl
-         justify-around bg-background opacity-95 pr-5 mx-5 pl-5 lg:pl-0
+            className="absolute flex  flex-col xl:flex-row items-center
+         rounded-xl xl:rounded-full border-2 border-solid py-5  text-xl
+         justify-around bg-background opacity-95 pr-5 mx-5 pl-5 xl:pl-0
        "
           >
-            <input
+            {/* <input
               value={location}
               onChange={(e) => {
                 setLocation(e.target.value);
@@ -176,15 +183,34 @@ export default function Banner() {
               className="outline-0  bg-transparent 
               placeholder:text-text p-3 items-center text-center
               w-80   mb-3 lg:mb-0"
-            />
-            {/* <TextField
-              id="standard-search"
-              // label="Search field"
-              placeholder="Where do you want to go?"
-              type="search"
-              variant="standard"
             /> */}
-            <div className="flex mb-3 lg:mb-0 lg:mr-7 mr-2">
+            <div className=" mb-5 xl:mb-0 xl:mr-7 xl:ml-7 mr-2">
+              <Autocomplete
+                disablePortal
+                id="combo-box-demo"
+                options={locations}
+                sx={{ width: 300 }}
+                // value={location}
+                // onChange={(e) => {
+                //   setLocation(e.target.value);
+                // }}
+                inputValue={location}
+                onInputChange={(event, newInputValue) => {
+                  setLocation(newInputValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Where do you want to go?"
+                    className="outline-0  bg-transparent 
+              placeholder:text-text  items-center text-center
+             "
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex mb-3 xl:mb-0 xl:mr-7 mr-2">
               <div className="mr-3">
                 <DatePicker
                   disablePast
@@ -228,7 +254,8 @@ export default function Banner() {
             >
               <a onClick={(e) => e.preventDefault()}>
                 <Space>
-                  <div className="flex lg:flex-col xl:flex-row">
+                  <div className="flex">
+                    {/* xl:flex-col xl:flex-row */}
                     <div> {guests} guests |&nbsp;</div>
                     <div>{rooms} rooms</div>
                   </div>
@@ -236,7 +263,7 @@ export default function Banner() {
                 </Space>
               </a>
             </Dropdown>
-            <div className="-mt-3 -mb-5 lg:-mt-0 lg:mb-3 ml-3">
+            <div className="-mt-3 -mb-5 xl:-mt-0 xl:mb-3 ml-3">
               <Button action={search} text="search" type="" />
             </div>
             {error}

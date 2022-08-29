@@ -62,6 +62,7 @@ const Map = (props: props) => {
         searchOptions: {
           key: "g1vbv71TIZn39gozG2KycjVd1AuWJ9TC",
           language: "en-GB",
+          // idxSet: "PAD,Addr",
         },
         autocompleteOptions: {
           key: "g1vbv71TIZn39gozG2KycjVd1AuWJ9TC",
@@ -87,7 +88,12 @@ const Map = (props: props) => {
           marker.setLngLat(bl).addTo(ivaninaMapa);
           ivaninaMapa.easeTo({ center: bl });
           var lngLat = marker.getLngLat();
-          setLoc(lngLat.lng + "-" + lngLat.lat);
+          // setLoc(lngLat.lng + "-" + lngLat.lat);
+          setLoc(
+            event.data.result.position.lng +
+              "-" +
+              event.data.result.position.lat
+          );
           setState(event.data.result.address.country);
           setCity(event.data.result.address.localName);
           // countrySecondarySubdivision);
@@ -107,3 +113,23 @@ const Map = (props: props) => {
 };
 
 export default Map;
+
+// This option specifies indexes to use for the search. The predefined indexes are:
+// Addr: Address range interpolation (when there is no PAD)
+// Geo: Geographies
+// PAD: Point Addresses
+// POI: Points of interest
+// Str: Streets
+// Xstr: Cross Streets (intersections)
+// Example
+// // search Points Of Interest only
+// tt.services.geometrySearch({
+//   query: 'pizza',
+//   idxSet: 'POI'
+// }).then(handleResults);
+// // search addresses only
+// tt.services.geometrySearch()
+// tt.services.geometrySearch({
+//   query: 'pizza',
+//   idxSet: 'PAD,Addr'
+// }).then(handleResults);

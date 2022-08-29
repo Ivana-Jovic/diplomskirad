@@ -84,7 +84,7 @@ export default function PropertyPage() {
       guestFirstName: comment.data().firstName,
       guestLastName: comment.data().lastName,
       reservationId: comment.data().reservationId,
-      hostId: user?.uid ?? "", //TODO maybe put username
+      hostId: user?.uid ?? "",
       // reportedFirstName: myUser.firstName,//TODO Put in db in reserv and in rep
       // reportedLastName: myUser.lastName,
       guestIsReporting: false,

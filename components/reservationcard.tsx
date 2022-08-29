@@ -184,7 +184,7 @@ export default function ReservationCard({
       guestFirstName: firstName,
       guestLastName: lastName,
       reservationId: reservationId,
-      hostId: hostId, //TODO maybe put username
+      hostId: hostId,
       // reportedFirstName: myUser.firstName,//TODO Put in db in reserv and in rep
       // reportedLastName: myUser.lastName,
       guestIsReporting: true, //TODO change to !isHost

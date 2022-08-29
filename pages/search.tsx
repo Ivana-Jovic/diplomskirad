@@ -1,16 +1,13 @@
 import {
   Box,
   Chip,
-  Popover,
   Rating,
   Slider,
+  SliderThumb,
   ToggleButton,
   ToggleButtonGroup,
-  Typography,
 } from "@mui/material";
 import * as React from "react";
-import { Console } from "console";
-import { previousDay } from "date-fns";
 import {
   collection,
   DocumentData,
@@ -25,7 +22,11 @@ import CardSearch from "../components/cardsearch";
 import Layout from "../components/layout";
 import { db } from "../firebase";
 import { styled } from "@mui/material/styles";
-import { Dropdown, Menu, Space } from "antd";
+import Map2 from "../components/map2";
+import nookies from "nookies";
+import { verifyIdToken } from "../firebaseadmin";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+
 const AirbnbSlider = styled(Slider)(({ theme }) => ({
   color: "#3a8589",
   height: 3,
@@ -73,6 +74,7 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     },
   },
 }));
+
 //TODO: dodati datume u search i ostale
 function valuetext(value: number) {
   return `${value}°C`;
@@ -89,7 +91,7 @@ async function isAvailable(from: Date, to: Date, propertyId: string) {
   );
   for (let index = 0; index < querySnapshot6.docs.length; index++) {
     const doc = querySnapshot6.docs[index];
-    console.log("KK ", propertyId, index, doc.id);
+    // console.log("KK ", propertyId, index, doc.id);
 
     //oni koji se potencijalno poklapaju
     if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
@@ -116,11 +118,14 @@ export default function Search() {
   const [sumPricesPropertiesLocation, setSumPricesPropertiesLocation] =
     useState<number>(0);
   const router = useRouter();
-  const { location, from, to } = router.query; //,rooms,numOfGuests, from, to
+  const { location: locationQuery, from, to } = router.query;
+  const location: string = locationQuery
+    ? locationQuery.includes(", ")
+      ? (locationQuery as string).split(", ")[0]
+      : (locationQuery as string)
+    : "";
   const fromDate = new Date(router.query.from as string);
-  // fromDate.setHours(0, 0, 0, 0);
   const toDate = new Date(router.query.to as string);
-  // toDate.setHours(0, 0, 0, 0);
 
   const rooms = (router.query.rooms ?? 0) as number;
   // router.query.rooms ? +router.query.rooms : undefined;
@@ -129,21 +134,24 @@ export default function Search() {
   // : undefined;
   const [arr, setArr] = useState<any[]>([]);
   const [filteredArr, setFilteredArr] = useState<any[]>([]);
-
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [selectedSuperhost, setSelectedSuperhost] = useState<boolean>(false);
   const [selectedRatingFourAndUp, setSelectedRatingFourAndUp] =
     useState<boolean>(false);
   const [selectedGarage, setSelectedGarage] = useState<boolean>(false);
   const [selectedPrice, setSelectedPrice] = useState<boolean>(false);
   const [sortPrice, setSortPrice] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<number[]>([1, 100]); //put max when adding property
+  const [priceRange, setPriceRange] = useState<number[]>([0, 100]); //put max when adding property
   const factorPrice = 10;
+
+  // const [arrLocation, setArrLocation] = useState<
+  //   QueryDocumentSnapshot<DocumentData>[]
+  // >([]);
+
   const getSearchProperties = async () => {
     console.log("in search gethostproperty");
     const qs44: string[] = [];
     const qs33: string[] = [];
-
-    const arrData: any[] = [];
 
     const querySnapshot1 = await getDocs(
       query(collection(db, "property"), where("city", "==", location))
@@ -152,25 +160,8 @@ export default function Search() {
     const querySnapshot2 = await getDocs(
       query(collection(db, "property"), where("state", "==", location))
     );
-    // const querySnapshot3 = await getDocs(
-    //   query(
-    //     collection(db, "property"),
-    //     where("numOfPersons", ">=", numOfGuests)
-    //   )
-    // );
-    // const querySnapshot4 = await getDocs(
-    //   query(collection(db, "property"), where("numOfRooms", ">=", rooms))
-    // );
-
-    // querySnapshot4.docs.forEach((doc) => {
-    //   qs44.push(doc.id);
-    //   console.log("/", doc.id);
-    // });
-    // querySnapshot3.docs.forEach((doc) => {
-    //   qs33.push(doc.id);
-    //   console.log("//", doc.id);
-    // });
-
+    setFilteredArr([]);
+    setArr([]);
     let r: QueryDocumentSnapshot<DocumentData>[] = querySnapshot1.docs.concat(
       querySnapshot2.docs
     );
@@ -178,7 +169,6 @@ export default function Search() {
     setNumPropertiesLocation(0);
     setSumPricesPropertiesLocation(0);
     r.forEach(async (doc) => {
-      // console.log()
       setNumPropertiesLocation((prev) => prev + 1);
       setSumPricesPropertiesLocation((prev) => prev + doc.data().pricePerNight);
       if (
@@ -190,53 +180,43 @@ export default function Search() {
         console.log("MAIN", fromDate, toDate);
         isAvailable(fromDate, toDate, doc.id).then((isAv) => {
           if (isAv) {
-            arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
-            // setArr(arrData);
+            // setArr((prev) => {
+            //   return [...prev, doc.id + "---" + JSON.stringify(doc.data())];
+            // });
+            // setFilteredArr((prev) => {
+            //   return [...prev, doc.id + "---" + JSON.stringify(doc.data())];
+            // });
             setArr((prev) => {
-              return [...prev, doc.id + "---" + JSON.stringify(doc.data())];
+              return [...prev, doc];
             });
             setFilteredArr((prev) => {
-              return [...prev, doc.id + "---" + JSON.stringify(doc.data())];
+              return [...prev, doc];
             });
-            console.log("MAIN2", fromDate, toDate, doc.id, arrData.length, arr);
           }
         });
       }
-
-      //PRESEK
-      // console.log("unutra");
-      // console.log("4- " + querySnapshot4.docs[0].id);
-      // console.log("4+ " + doc.id);
-
-      // console.log('"', qs44?.length);
-
-      ///// DATUMI
-      // const querySnapshot5 = await getDocs(
-      //   query(collection(db, "reservations"), where("propertyId", "==", doc.id),
-      //   where("resFrom",">=",fromDate))
-      // );
-
-      // if (qs33?.includes(doc.id) && qs44?.includes(doc.id)) {
-      // console.log("sadrzi");
-      // arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
-      // setArr(arrData);
-      // }
     });
   };
-  //, [location, numOfGuests, rooms]);
 
-  const shouldBeShown = (selected: boolean, is: boolean) => {
+  const shouldBeShown = (
+    num: number,
+    propertyid: string,
+    selected: boolean,
+    is: boolean
+  ) => {
     if ((selected && is) || !selected) {
-      console.log("shouldBeShown TRUE");
+      console.log(propertyid, "shouldBeShown TRUE", selected, is, num);
       return true;
     } else {
-      console.log("shouldBeShown FALSE", selected, is);
+      console.log(propertyid, "shouldBeShown FALSE", selected, is, num);
       return false;
     }
   };
   const filterProperties = (item: any) => {
-    const property = JSON.parse(item.split("---")[1]);
-    const propertyid = item.split("---")[0];
+    // const property = JSON.parse(item.split("---")[1]);
+    // const propertyid = item.split("---")[0];
+    const property = item.data();
+    const propertyid = item.id;
     //if selectedSuperhost and isSuperhost
     // or !selectedSuperhost   -> SHOULD BE SHOWN
     console.log(
@@ -246,28 +226,45 @@ export default function Search() {
       priceRange[1] * factorPrice
     );
     if (
-      shouldBeShown(selectedSuperhost, property.isSuperhost) &&
+      shouldBeShown(1, propertyid, selectedSuperhost, property.isSuperhost) &&
       shouldBeShown(
+        2,
+        propertyid,
         selectedRatingFourAndUp,
         property.totalStars / property.numberOfReviews >= 4
       ) &&
-      shouldBeShown(selectedGarage, property.garage) &&
+      shouldBeShown(3, propertyid, selectedGarage, property.garage) &&
       //TODO: namestiti da je 2000 max za noc u bazi
       shouldBeShown(
+        4,
+        propertyid,
         true,
         priceRange[0] * factorPrice <= property.pricePerNight &&
           priceRange[1] * factorPrice >= property.pricePerNight
       )
     ) {
-      console.log("TRUE", sortPrice);
+      console.log(propertyid, "TRUE", sortPrice);
       return true;
     }
 
-    console.log("FALSE", selectedSuperhost, property.isSuperhost);
+    console.log(
+      propertyid,
+      "FALSE",
+      selectedGarage,
+      property.garage,
+      selectedSuperhost,
+      property.isSuperhost,
+      priceRange[0],
+      priceRange[0] * factorPrice <= property.pricePerNight
+    );
     return false;
   };
 
   useEffect(() => {
+    if (firstLoad) {
+      setArr([]);
+      setFilteredArr([]);
+    }
     if (
       selectedSuperhost ||
       selectedRatingFourAndUp ||
@@ -288,8 +285,9 @@ export default function Search() {
             .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
             .sort(
               (a: any, b: any) =>
-                JSON.parse(a.split("---")[1]).pricePerNight -
-                JSON.parse(b.split("---")[1]).pricePerNight
+                // JSON.parse(a.split("---")[1]).pricePerNight -
+                // JSON.parse(b.split("---")[1]).pricePerNight
+                a.data().pricePerNight - b.data().pricePerNight
             )
         );
       } else if (sortPrice == "desc") {
@@ -299,8 +297,9 @@ export default function Search() {
             .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
             .sort(
               (a: any, b: any) =>
-                JSON.parse(b.split("---")[1]).pricePerNight -
-                JSON.parse(a.split("---")[1]).pricePerNight
+                // JSON.parse(b.split("---")[1]).pricePerNight -
+                // JSON.parse(a.split("---")[1]).pricePerNight
+                b.data().pricePerNight - a.data().pricePerNight
             )
         );
       } else {
@@ -323,6 +322,8 @@ export default function Search() {
   ]); //TODO proveriti sve useeffect nizove
 
   useEffect(() => {
+    setArr([]);
+    setFilteredArr([]);
     if (
       location != undefined &&
       rooms != undefined &&
@@ -335,6 +336,7 @@ export default function Search() {
       fromDate &&
       toDate
     ) {
+      setFirstLoad(false);
       setArr([]);
       setFilteredArr([]);
       getSearchProperties();
@@ -347,9 +349,8 @@ export default function Search() {
         location + " | " + numOfGuests + " guests" + " | " + rooms + " rooms"
       }
     >
-      <div className=" flex max-w-7xl mx-auto px-8 sm:px-16">
+      <div className=" flex  flex-col max-w-7xl mx-auto px-8 sm:px-16">
         <section className="  px-10 py-10 w-full ">
-          {/* flexgrow */}
           <p className="text-sm pb-5">
             Stay in {location} <br />
             from {from} to {to} <br />
@@ -358,194 +359,113 @@ export default function Search() {
             {sumPricesPropertiesLocation / numPropertiesLocation}e
           </p>
           <p className="text-4xl mb-6">Stays in {location}</p>
-          {/* dodati burger  ya telefone */}
-          {/* hidden sm:inline-flex */}
-          <div className="flex mb-5 space-x-3 text-gray-800">
-            {/* <p className="buttonfilter flex items-center">
-              <Rating name="read-only" value={4} readOnly size="small" /> & up
-            </p> */}
-            <Chip
-              icon={<Rating name="read-only" value={4} readOnly size="small" />}
-              label="& up"
-              variant={selectedRatingFourAndUp ? "filled" : "outlined"}
-              onClick={() => {
-                setSelectedRatingFourAndUp(!selectedRatingFourAndUp);
-              }}
-            />
-            {/* <p className="buttonfilter">Price</p> */}
-            {/* <Chip
-              label="Price"
-              variant={selectedPrice ? "filled" : "outlined"}
-              onClick={(event: any) => {
-                // setSelectedPrice(!selectedPrice);
-                setAnchorEl(event.currentTarget);
-              }}
-            /> */}
-            <div className="dropdown">
-              {/* //TODO sredi na malim ekranima */}
-              <div tabIndex={0} className=" ">
-                <Chip
-                  label="Price"
-                  variant={selectedPrice ? "filled" : "outlined"}
-                  onClick={(event: any) => {
-                    // setSelectedPrice(!selectedPrice);
-                    setAnchorEl(event.currentTarget);
-                  }}
-                />
-              </div>
-              <ul
-                tabIndex={0}
-                className="border dropdown-content menu p-2 shadow bg-base-100 rounded-box w-96 "
-              >
-                <li>
-                  <div className="mt-10 flex flex-col ">
-                    <Box sx={{ width: 300 }}>
-                      <AirbnbSlider
-                        getAriaLabel={() => "Price range"}
-                        value={priceRange}
-                        onChange={(e: Event, newValue: number | number[]) => {
-                          setPriceRange(newValue as number[]);
+          <div className="flex flex-col sm:flex-row mb-5 space-y-3 sm:space-y-0 sm:space-x-3 text-gray-800">
+            <div className="flex space-x-3">
+              <div className="dropdown ">
+                <div tabIndex={0} className=" ">
+                  <Chip
+                    label="Price"
+                    variant={selectedPrice ? "filled" : "outlined"}
+                    onClick={(event: any) => {
+                      setAnchorEl(event.currentTarget);
+                    }}
+                  />
+                </div>
+                <ul
+                  tabIndex={0}
+                  className="border dropdown-content menu p-2 shadow 
+                  bg-base-100 rounded-box w-64 sm:w-96 
+                 flex items-center
+                  "
+                >
+                  <li>
+                    <div className="mt-10 flex flex-col w-52 hover:bg-inherit">
+                      <Box sx={{ width: 300 }} className="w-52 sm:w-80">
+                        <AirbnbSlider
+                          getAriaLabel={() => "Price range"}
+                          value={priceRange}
+                          onChange={(e: Event, newValue: number | number[]) => {
+                            setPriceRange(newValue as number[]);
+                            setSelectedPrice(true);
+                          }}
+                          getAriaValueText={valuetext}
+                          marks={[
+                            {
+                              value: 0,
+                              label: "0e",
+                            },
+                            {
+                              value: 100,
+                              label: "1000e",
+                            },
+                          ]}
+                        />
+                      </Box>
+                      <div className="mb-4  flex">
+                        Price from&nbsp;
+                        <p className="font-medium">
+                          {priceRange[0] * factorPrice}e
+                        </p>
+                        &nbsp;to&nbsp;
+                        <p className="font-medium">
+                          {priceRange[1] * factorPrice}e
+                        </p>
+                      </div>
+                      <StyledToggleButtonGroup
+                        value={sortPrice}
+                        exclusive
+                        onChange={(e: MouseEvent, val: string | null) => {
+                          setSortPrice(val);
                           setSelectedPrice(true);
                         }}
-                        getAriaValueText={valuetext}
-                        marks={[
-                          {
-                            value: 0,
-                            label: "0e",
-                          },
-                          {
-                            value: 100,
-                            label: "1000e",
-                          },
-                        ]}
-                      />
-                    </Box>
-                    <div className="mb-4  flex">
-                      Price from&nbsp;
-                      <p className="font-medium">
-                        {priceRange[0] * factorPrice}e
-                      </p>
-                      &nbsp;to&nbsp;
-                      <p className="font-medium">
-                        {priceRange[1] * factorPrice}e
-                      </p>
+                        aria-label="sortPrice"
+                      >
+                        <ToggleButton value="asc" aria-label="asc">
+                          {/* TODO: sta su aria label */}
+                          Sort ascending
+                        </ToggleButton>
+                        <ToggleButton value="desc" aria-label="desc">
+                          Sort descending
+                        </ToggleButton>
+                      </StyledToggleButtonGroup>
                     </div>
-                    <StyledToggleButtonGroup
-                      value={sortPrice}
-                      exclusive
-                      onChange={(e: MouseEvent, val: string | null) => {
-                        setSortPrice(val);
-                        setSelectedPrice(true);
-                      }}
-                      aria-label="sortPrice"
-                    >
-                      <ToggleButton value="asc" aria-label="asc">
-                        {/* TODO: sta su aria label */}
-                        Sort ascending
-                      </ToggleButton>
-                      <ToggleButton value="desc" aria-label="desc">
-                        Sort descending
-                      </ToggleButton>
-                    </StyledToggleButtonGroup>
-                    {/* sortPrice:{sortPrice ?? "none"} */}
-                  </div>
-                </li>
-              </ul>
+                  </li>
+                </ul>
+              </div>
+              <Chip
+                icon={
+                  <Rating name="read-only" value={4} readOnly size="small" />
+                }
+                label="& up"
+                variant={selectedRatingFourAndUp ? "filled" : "outlined"}
+                onClick={() => {
+                  setSelectedRatingFourAndUp(!selectedRatingFourAndUp);
+                }}
+              />
             </div>
-
-            {/* {
-              <Popover
-                id={Boolean(anchorEl) ? "simple-popover" : undefined}
-                open={Boolean(anchorEl)}
-                anchorEl={anchorEl}
-                onClose={() => {
-                  setAnchorEl(null);
+            <div className="flex space-x-3">
+              <Chip
+                label="Garage"
+                variant={selectedGarage ? "filled" : "outlined"}
+                onClick={() => {
+                  setSelectedGarage(!selectedGarage);
                 }}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "center",
+              />
+              <Chip
+                label="Superhost"
+                variant={selectedSuperhost ? "filled" : "outlined"}
+                onClick={() => {
+                  setSelectedSuperhost(!selectedSuperhost);
                 }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "center",
-                }}
-              >
-                <div className="m-7 mt-10 flex flex-col items-center">
-                  <Box sx={{ width: 300 }}>
-                    <AirbnbSlider
-                      getAriaLabel={() => "Price range"}
-                      value={priceRange}
-                      onChange={(e: Event, newValue: number | number[]) => {
-                        setPriceRange(newValue as number[]);
-                        setSelectedPrice(true);
-                      }}
-                      getAriaValueText={valuetext}
-                      marks={[
-                        {
-                          value: 0,
-                          label: "0e",
-                        },
-                        {
-                          value: 100,
-                          label: "1000e",
-                        },
-                      ]}
-                    />
-                  </Box>
-                  <div className="mb-4  flex">
-                    Price from&nbsp;
-                    <p className="font-medium">
-                      {priceRange[0] * factorPrice}e
-                    </p>
-                    &nbsp;to&nbsp;
-                    <p className="font-medium">
-                      {priceRange[1] * factorPrice}e
-                    </p>
-                  </div>
-                  <StyledToggleButtonGroup
-                    value={sortPrice}
-                    exclusive
-                    onChange={(e: MouseEvent, val: string | null) => {
-                      setSortPrice(val);
-                      setSelectedPrice(true);
-                    }}
-                    aria-label="sortPrice"
-                  >
-                    <ToggleButton value="asc" aria-label="asc">
-                      {/* TODO: sta su aria label */}
-            {/*   Sort ascending
-                    </ToggleButton>
-                    <ToggleButton value="desc" aria-label="desc">
-                      Sort descending
-                    </ToggleButton>
-                  </StyledToggleButtonGroup>
-                  {/* sortPrice:{sortPrice ?? "none"} */}
-            {/* </div>
-              </Popover> */}
-            {/*  }
-            {/* <p className="buttonfilter">Garage</p> */}
-            <Chip
-              label="Garage"
-              variant={selectedGarage ? "filled" : "outlined"}
-              onClick={() => {
-                setSelectedGarage(!selectedGarage);
-              }}
-            />
-            {/* <p className="buttonfilter">Superhost</p> */}
-            <Chip
-              label="Superhost"
-              variant={selectedSuperhost ? "filled" : "outlined"}
-              onClick={() => {
-                setSelectedSuperhost(!selectedSuperhost);
-              }}
-            />
-
-            {/* <p className="buttonfilter">more</p> */}
+              />
+            </div>
           </div>
           <div className="flex flex-col ">
             {filteredArr.map((item) => {
-              const property = JSON.parse(item.split("---")[1]);
-              const propertyid = item.split("---")[0];
+              const property = item.data();
+              const propertyid = item.id;
+              // const property = JSON.parse(item.split("---")[1]);
+              // const propertyid = item.split("---")[0];
               return (
                 <CardSearch
                   key={propertyid}
@@ -554,7 +474,6 @@ export default function Search() {
                   description={property.description}
                   image={property.images[0]}
                   price={property.pricePerNight}
-                  // stars="5"
                   totalStars={property.totalStars}
                   numberOfReviews={property.numberOfReviews}
                   numberOfNights={
@@ -570,11 +489,12 @@ export default function Search() {
             })}
           </div>
         </section>
+
+        <div className="flex flex-col items-center justify-center">
+          {filteredArr.length > 0 && <Map2 setLoc={""} arrLoc={filteredArr} />}
+          {filteredArr.length}
+        </div>
       </div>
     </Layout>
-    // {/* </div> */}
   );
 }
-// export async function getServerSideProps(params: type) {
-//   // const searchresults= await fetch(...).then(res.....)
-// }

@@ -170,7 +170,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
         userId: user.uid,
         firstName: myUser.firstName,
         lastName: myUser.lastName,
-        user: myUser.username,
+        // user: myUser.username,
         hostId: property.ownerId,
         from: dateFrom?.toDateString(),
         to: dateTo?.toDateString(),

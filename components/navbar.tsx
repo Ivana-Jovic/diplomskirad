@@ -19,7 +19,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   const [searchInput, setSearchInput] = useState<string>("");
   const [numOfGuests, setNumOfGuests] = useState<number>(1);
   const router = useRouter();
-
   const resetSearch = () => {
     setSearchInput("");
   };
@@ -189,9 +188,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             <LocationCityIcon fontSize="large" />
           </a>
         </Link>
-        <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
-          {/* width i mr  justify-between*/}
-          {/* <div
+        {myUser != undefined && (
+          <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
+            {/* width i mr  justify-between*/}
+            {/* <div
             className="flex items-center
          rounded-full border-2 border-solid py-2
          "
@@ -205,43 +205,46 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             />
             <div className="hidden sm:inline-flex pr-0.5  cursor-pointer">
               {/* namesti da se i klikom na ikonicu ide u search */}
-          {/* <SearchRoundedIcon /> */}
-          {/* </div>*/}
-          <button
-            onClick={() => {
-              setOpenSearch(!openSearch);
-            }}
-          >
-            <SearchRoundedIcon />
-          </button>
-          {/*</div> */}
-          {/* session ||  <-GOOGLE*/}
-          {user ? (
-            <>
-              <div>
-                <Dropdown overlay={menu}>
-                  <a onClick={(e) => e.preventDefault()}>
-                    <Space>
-                      <Image
-                        // src={session.user?.image}<-GOOGLE
-                        src="/images/app3.jpg"
-                        height="20"
-                        width="20"
-                        alt=""
-                        className="rounded-sm"
-                      />
-                      <ExpandMoreRoundedIcon />
-                    </Space>
-                  </a>
-                </Dropdown>
-              </div>
-            </>
-          ) : (
-            <>
-              <SignInRegisterPopup />
-            </>
-          )}
-        </div>
+            {/* <SearchRoundedIcon /> */}
+            {/* </div>*/}
+            <button
+              onClick={() => {
+                setOpenSearch(!openSearch);
+              }}
+            >
+              <SearchRoundedIcon />
+            </button>
+            {/*</div> */}
+            {/* session ||  <-GOOGLE*/}
+
+            {user && myUser ? (
+              <>
+                <div>
+                  <Dropdown overlay={menu}>
+                    <a onClick={(e) => e.preventDefault()}>
+                      <Space>
+                        <Image
+                          // src={session.user?.image}<-GOOGLE
+                          // src="/images/app3.jpg"
+                          src={myUser?.photoURL}
+                          height="25"
+                          width="25"
+                          alt=""
+                          className="rounded-md"
+                        />
+                        <ExpandMoreRoundedIcon />
+                      </Space>
+                    </a>
+                  </Dropdown>
+                </div>
+              </>
+            ) : (
+              <>
+                <SignInRegisterPopup />
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {openSearch && router.pathname != "/" && (

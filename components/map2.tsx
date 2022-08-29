@@ -17,6 +17,7 @@ const Map2 = (props: props) => {
   const mapElement = useRef();
   const [map, setMap] = useState<tt.Map>();
 
+  // const [mm, setMm] = useState<QueryDocumentSnapshot<DocumentData>[]>(arrLoc);
   const router = useRouter();
   useEffect(() => {
     const divs = arrLoc.map((elem) => {
@@ -168,10 +169,11 @@ const Map2 = (props: props) => {
           .setPopup(popup)
           .addTo(ivaninaMapa);
       }
+      console.log("PPPPP", arrLoc.length);
       ivaninaMapa.on("load", (param) => {
         console.log("BBBBBBBBBBBB", arrLoc.length);
         arrLoc.forEach((element, index) => {
-          console.log("UUUUUUUUU");
+          console.log("UUUUUUUUU", element.data().title);
           createMarker(
             "accident.colors-white.jpg",
             [
@@ -195,7 +197,7 @@ const Map2 = (props: props) => {
     };
     initMap();
     return () => map?.remove();
-  }, []);
+  }, [arrLoc]);
   return <div ref={mapElement} className="w-full h-96"></div>;
 };
 

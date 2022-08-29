@@ -1,6 +1,13 @@
 import { useContext, useState } from "react";
 import Layout from "../components/layout";
-import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
 import { db, storage } from "../firebase";
 import Button from "../components/button";
 import Inputs from "../components/inputs";
@@ -13,6 +20,7 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import Map from "../components/map";
 import ImageForm from "../components/imageform";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { useRouter } from "next/router";
 type IFormInput = {
   title: string;
   desc: string;
@@ -28,7 +36,7 @@ type IFormInput = {
   priceN: number;
   addPers: number;
   addCosts: number;
-  garage: boolean;
+  garage: string;
   images: string[];
   picturesNEW: File[];
 };
@@ -63,16 +71,22 @@ export default function AddProperty() {
       priceN: 0,
       addPers: 0,
       addCosts: 0,
-      garage: false,
+      garage: "",
       images: [],
       picturesNEW: [],
     },
   });
   const { user } = useContext(AuthContext);
   const imgNew: File[] = Array.from(watch("picturesNEW"));
+
+  const router = useRouter();
+
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     console.log("QQQQQQQQQ", data);
     add(data);
+    router.push({
+      pathname: "/",
+    });
   };
 
   // const [images, setImages] = useState<string[]>([]);
@@ -87,8 +101,12 @@ export default function AddProperty() {
         selected
         // && allowedTypes.includes(selected.type)
       ) {
+        const extension = selected.type.split("/")[1];
+        const nnNEW: string = `uploads/${
+          user.uid
+        }/properties/${Date.now()}.${extension}`;
         const nn: string = "ppp-" + selected.name;
-        const storageRef = ref(storage, nn); //ref to file. file dosnt exist yet
+        const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
         //when we upload using this ref this file should have that name
         const uploadTask = await uploadBytesResumable(storageRef, selected);
         const url: string = await getDownloadURL(uploadTask.ref);
@@ -130,7 +148,7 @@ export default function AddProperty() {
         pricePerNight: data.priceN,
         additionalPerPerson: data.addPers,
         additionalCosts: data.addCosts,
-        garage: data.garage,
+        garage: data.garage == "Yes" ? true : false,
         // ownerId: session?.user?.name,<-GOOGLE
         ownerId: user?.uid,
         // promeni ovo!!!!!!!!!!!!!!!!!!!!!
@@ -143,11 +161,21 @@ export default function AddProperty() {
         isSuperhost: false,
         loc: loc ?? ",",
         dateAddedProperty: new Date().toDateString(),
-        // lng: loc ? JSON.parse(loc.split("-")[0]) : "",
-        // lat: loc ? JSON.parse(loc.split("-")[1]) : "",
       });
       console.log("lllll");
-      // console.log(titleRef.current ? titleRef.current.value"] : "");
+      //if state doesnt exist add
+      const docSnap1 = await getDoc(doc(db, "locations", state));
+      if (docSnap1.exists()) {
+        //if city doesnt exist add
+        const docSnap2 = await getDoc(doc(db, "locations", city + "," + state));
+        if (!docSnap2.exists()) {
+          await setDoc(doc(db, "locations", city + "," + state), {});
+        }
+      } else {
+        await setDoc(doc(db, "locations", state), {});
+        //add city
+        await setDoc(doc(db, "locations", city + "," + state), {});
+      }
     });
   };
   return (
@@ -160,57 +188,31 @@ export default function AddProperty() {
                 <div className="pt-7 pb-5 text-center text-3xl font-bold">
                   New property
                 </div>
-                {/* <Controller
-                  name="title"
-                  control={control}
-                  rules={{ required: "Please enter a title" }}
-                  render={({ field: { onChange, value } }) => (
-                    <> */}
+
                 <TextField
                   {...register("title", {
                     required: "Please enter your last name",
-                  })} //
-                  className="mx-3 mb-2"
+                  })}
+                  className="w-full mb-2"
                   id="outlined-required"
                   label="Title"
-                  // value={value}
-                  // onChange={(e) => {
-                  //   onChange(e.target.value);
-                  // }}
                   helperText={errors.title ? errors.title.message : " "}
                 />
-                {/* </>
-                  )}
-                /> */}
-                <div className="mx-3 mb-2">
-                  {/* <Controller
-                  name="desc"
-                  control={control}
-                  rules={{ required: "Please enter a description" }}
-                  render={({ field: { onChange, value } }) => (
-                    <> */}
-                  <TextField
-                    {...register("desc", {
-                      required: "Please enter  a description",
-                    })}
-                    className="w-full"
-                    id="outlined-required"
-                    label="Description"
-                    multiline
-                    maxRows={15}
-                    // value={value}
-                    // onChange={(e) => {
-                    //   onChange(e.target.value);
-                    // }}
-                    helperText={errors.desc ? errors.desc.message : " "}
-                  />
-                  {/* </>
-                    )}
-                  /> */}
-                </div>
+
+                <TextField
+                  {...register("desc", {
+                    required: "Please enter  a description",
+                  })}
+                  className="w-full mb-2 "
+                  id="outlined-required"
+                  label="Description"
+                  multiline
+                  maxRows={15}
+                  helperText={errors.desc ? errors.desc.message : " "}
+                />
 
                 <div className="grid grid-cols-3 ">
-                  <div className="mx-3  mb-2">
+                  <div className="mr-3  mb-2">
                     <Controller
                       name="type"
                       control={control}
@@ -283,7 +285,7 @@ export default function AddProperty() {
                           //  {...register("lastName", {
                           //   required: "Please enter your last name",
                           // })}
-                          className="mx-3  mb-2"
+                          className="ml-3  mb-2"
                           id="outlined-required"
                           label="Number of Persons"
                           value={value}
@@ -315,7 +317,8 @@ export default function AddProperty() {
                           // {...register("lastName", {
                           //   required: "Please enter your last name",
                           // })}
-                          className="mx-3  mb-2"
+
+                          className="mr-3  mb-2"
                           id="outlined-required"
                           label="Price per night"
                           value={value}
@@ -340,7 +343,7 @@ export default function AddProperty() {
                       </>
                     )}
                   />
-                  <Controller
+                  {/* <Controller
                     name="addPers"
                     control={control}
                     rules={{ required: "Please enter a value" }}
@@ -374,7 +377,7 @@ export default function AddProperty() {
                         />
                       </>
                     )}
-                  />
+                  /> */}
                   <Controller
                     name="addCosts"
                     control={control}
@@ -385,7 +388,7 @@ export default function AddProperty() {
                           //  {...register("lastName", {
                           //   required: "Please enter your last name",
                           // })}
-                          className="mx-3 mb-2"
+                          className="ml-3 mb-2"
                           id="outlined-required"
                           label="Additional costs"
                           value={value}
@@ -410,9 +413,41 @@ export default function AddProperty() {
                       </>
                     )}
                   />
-                </div>
-                <div className="mx-3  mb-2">
                   <Controller
+                    name="garage"
+                    control={control}
+                    rules={{ required: "Please enter a value" }}
+                    render={({ field: { onChange, value } }) => (
+                      <>
+                        <TextField
+                          //  {...register("lastName", {
+                          //   required: "Please enter your last name",
+                          // })}
+                          // className="w-full"
+                          className="ml-3 mb-2"
+                          id="outlined-select-currency"
+                          select
+                          label="Is there any parking spot"
+                          value={value}
+                          onChange={(e) => {
+                            onChange(e.target.value);
+                          }}
+                          helperText={
+                            errors.garage ? errors.garage.message : " "
+                          }
+                        >
+                          {["Yes", "No"].map((option) => (
+                            <MenuItem key={option} value={option}>
+                              {option}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </>
+                    )}
+                  />
+                </div>
+                <div className="mb-2">
+                  {/* <Controller
                     name="garage"
                     control={control}
                     rules={{ required: "Please enter a value" }}
@@ -428,21 +463,21 @@ export default function AddProperty() {
                           label="Is there any parking spot"
                           value={value}
                           onChange={(e) => {
-                            onChange(e.target.value == "true" ? true : false);
+                            onChange(e.target.value);
                           }}
                           helperText={
                             errors.garage ? errors.garage.message : " "
                           }
                         >
-                          {["true", "false"].map((option) => (
+                          {["Yes", "No"].map((option) => (
                             <MenuItem key={option} value={option}>
-                              {option == "true" ? "Yes" : "No"}
+                              {option}
                             </MenuItem>
                           ))}
                         </TextField>
                       </>
                     )}
-                  />
+                  /> */}
                 </div>
                 {/* </div> */}
                 {/* Img and galery */}
@@ -458,47 +493,7 @@ export default function AddProperty() {
                   {/* )}
                   /> */}
                 </label>
-                <div>
-                  <label className="btn ">
-                    Select property pictures
-                    <input
-                      {...register("picturesNEW")}
-                      type="file"
-                      multiple
-                      className="hidden"
-                      accept="image/png, image/jpeg, image/jpg"
-                    />
-                  </label>
-                  <div className="flex flex-wrap gap-4 ">
-                    {imgNew &&
-                      imgNew.length > 0 &&
-                      imgNew.map((item, index) => {
-                        return (
-                          <div key={item.name}>
-                            {/* <button
-                              type="button"
-                              onClick={() => {
-                                imgNew.splice(index);
-                              }}
-                            >
-                              x
-                            </button> */}
-                            <ImageForm
-                              url={URL.createObjectURL(imgNew[index])}
-                            />
-                          </div>
-                        );
-                      })}
-                  </div>
 
-                  {/* // ((item, index) => { */}
-                  {/* //   return (
-                  //     <div key={item.name}>
-                  //       <ImageForm url={URL.createObjectURL(imgNew[index])} />
-                  //     </div>
-                  //   );
-                  // })} */}
-                </div>
                 {/* <button type="submit">Add</button> */}
                 {/* <Button action={() => {}} text="Update" type="submit" /> */}
 
@@ -523,7 +518,7 @@ export default function AddProperty() {
                     </div>
                   )}
                 </div>
-                <div className="grid sm:grid-cols-3 grid-cols-1 mt-14">
+                <div className="grid sm:grid-cols-2 grid-cols-1 mt-14">
                   <TextField
                     // {...register("state", {
                     //   required: "Please enter a state name",
@@ -552,7 +547,7 @@ export default function AddProperty() {
 
                   <div></div>
                 </div>
-                <div className="grid sm:grid-cols-3 grid-cols-1  ">
+                <div className="grid sm:grid-cols-2 grid-cols-1  ">
                   {/* 
                   <TextField //TODO: remove municipality
                     {...register("mun", {
@@ -595,6 +590,47 @@ export default function AddProperty() {
                     //   errors.streetNum ? errors.streetNum.message : " "
                     // }
                   />
+                </div>
+                <div>
+                  <label className="btn ">
+                    Select property pictures
+                    <input
+                      {...register("picturesNEW")}
+                      type="file"
+                      multiple
+                      className="hidden"
+                      accept="image/png, image/jpeg, image/jpg"
+                    />
+                  </label>
+                  <div className="flex flex-wrap gap-4 justify-center">
+                    {imgNew &&
+                      imgNew.length > 0 &&
+                      imgNew.map((item, index) => {
+                        return (
+                          <div key={item.name}>
+                            {/* <button
+                              type="button"
+                              onClick={() => {
+                                imgNew.splice(index);
+                              }}
+                            >
+                              x
+                            </button> */}
+                            <ImageForm
+                              url={URL.createObjectURL(imgNew[index])}
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  {/* // ((item, index) => { */}
+                  {/* //   return (
+                  //     <div key={item.name}>
+                  //       <ImageForm url={URL.createObjectURL(imgNew[index])} />
+                  //     </div>
+                  //   );
+                  // })} */}
                 </div>
                 <Button
                   action={() => {

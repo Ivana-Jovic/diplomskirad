@@ -1,63 +1,14 @@
-import { fail } from "assert";
-import { randomBytes } from "crypto";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Banner from "../components/banner";
 import Card from "../components/card";
 import Layout from "../components/layout";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  onSnapshot,
-  QueryDocumentSnapshot,
-  DocumentData,
-  orderBy,
-  limit,
-  FieldPath,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { collection, query, getDocs, orderBy, limit } from "firebase/firestore";
 import { db } from "../firebase";
-import AdminBoard from "./adminboard";
 import { useEffect, useState } from "react";
-import CardHostsProperty from "../components/cardhostsproperty";
-import CardSearch from "../components/cardsearch";
-// import { randomBytes } from "firebase/firestore/platform/random_bytes";
-// import { debugAssert } from './assert';
 
 const Home: NextPage = () => {
   const [arr, setArr] = useState<any[]>([]);
-  // const newId = () => {
-  //   // Alphanumeric characters
-  //   const chars =
-  //     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  //   // The largest byte value that is a multiple of `char.length`.
-  //   const maxMultiple = Math.floor(256 / chars.length) * chars.length;
-  //   if (0 < maxMultiple && maxMultiple < 256) {
-  //     fail(`Expect maxMultiple to be (0, 256), but got ${maxMultiple}`);
-  //   }
-
-  //   let autoId = "";
-  //   const targetLength = 20;
-  //   while (autoId.length < targetLength) {
-  //     const bytes = randomBytes(40);
-  //     // rand;
-  //     for (let i = 0; i < bytes.length; ++i) {
-  //       // Only accept values that are [0, maxMultiple), this ensures they can
-  //       // be evenly mapped to indices of `chars` via a modulo operation.
-  //       if (autoId.length < targetLength && bytes[i] < maxMultiple) {
-  //         autoId += chars.charAt(bytes[i] % chars.length);
-  //       }
-  //     }
-  //   }
-  //   if (autoId.length === targetLength) {
-  //     fail("Invalid auto ID: " + autoId);
-  //   }
-
-  //   return autoId;
-  // };
 
   const getRanodomProperties = async () => {
     const q = query(
@@ -73,6 +24,7 @@ const Home: NextPage = () => {
       setArr((prev) => [...prev, doc]);
     });
   };
+
   useEffect(() => {
     getRanodomProperties();
   }, []);
@@ -88,69 +40,14 @@ const Home: NextPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-8 sm:px-16  ">
-        {/* grid place-items-center */}
-        {/* <section className="pt-5">
-          <div className="">
-            {/* ml-12 mt-10 -mb-7 */}
-        {/*   <h2 className="pb-4">Explore cities</h2>
-            <h3>Here are some of the most popular ones</h3>
-          </div>
-          <div className="flex overflow-x-scroll sm:overflow-auto">
-            {/* sm:overflow-auto */}
-        {/* overflow-scroll scrollbar-hide  */}
-        {/* space-x-3 */}
-        {/* <Card
-              // key="/images/app1.jpg"!!!!!!!!!!!!!!!!!!!!!!!!!
-              // pri mapiranju ide blabal?.map.....!!!!!!!!!!!!!!!
-              image="/images/app1.jpg"
-              name="Beograd"
-              description=""
-              price="from 100"
-            />
-            <Card
-              image="/images/app2.jpg"
-              name="Kragujevac"
-              description=""
-              price="from 100"
-            />
-            <Card
-              image="/images/app3.jpg"
-              name="Novi Sad"
-              description=""
-              price="from 100"
-            /> */}
-        {/*  </div>
-        </section> */}
         <section className="pt-10">
-          <div className="">
+          <div className="mb-10">
             <h2 className="pb-4">Get inspiration for your next trip </h2>
             {/* <h3>Here are a few interesting accomodations</h3> */}
             <h3>Here are the most popular accomodations around the world</h3>
           </div>
-          {/* <div className="flex  overflow-x-scroll sm:overflow-auto ">
-            {/* overflow-scroll scrollbar-hide  */}
-          {/*<Card
-              image="/images/app1.jpg"
-              name="New app"
-              description="Modern 2 bedroom app, garage"
-              price="100"
-            />
-            <Card
-              image="/images/app2.jpg"
-              name="New app"
-              description="Modern 2 bedroom app, garage,"
-              price="100"
-            />
-            <Card
-              image="/images/app3.jpg"
-              name="New app"
-              description="Modern 2 bedroom app, garage"
-              price="100"
-            />
-          </div> */}
-          <div className="flex gap-4 flex-wrap   ">
-            {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 "> */}
-            {/* <div className="flex  gap-4   overflow-x-scroll "> */}
+
+          <div className="flex gap-4 flex-wrap">
             {arr.map((item) => {
               const property = item.data();
               const propertyid = item.id;
@@ -162,7 +59,6 @@ const Home: NextPage = () => {
                   description={""}
                   image={property.images[0]}
                   price={property.pricePerNight}
-                  // stars="5"
                   totalStars={property.totalStars}
                   numberOfReviews={property.numberOfReviews}
                   numberOfNights={0}

@@ -166,7 +166,7 @@ h3{
   cursor: pointer;
   background-color: transparent;
 }
-
+/* //loader */
 .loader {
   border: 10px solid var(--color-bg); 
   border-top: 10px solid var(--color-blue); 

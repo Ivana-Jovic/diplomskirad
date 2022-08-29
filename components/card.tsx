@@ -71,7 +71,7 @@ export default function Card({
       }}
     >
       <a
-        className="card rounded-md mx-auto  w-[17rem] flex-shrink-0 bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
+        className="card rounded-md mx-auto  w-[20rem] flex-shrink-0 bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
     transition duration-200 ease-out
     cursor-pointer" //TODO dodaj ostalima
       >
@@ -86,31 +86,23 @@ export default function Card({
         </figure>
         <div className="card-body">
           <div>
-            {/* className="flex flex-col flex-grow p-7" */}
             <div className="flex justify-between items-center mb-2">
-              <p className="text-xl font-semibold">{name}</p>
-              <Heart propertyid={propertyid} />
+              <p className="text-xl font-semibold">
+                {/* {name} */}
+                {name.length < 23 ? name : name.slice(0, 23) + "..."}
+              </p>
+              {/* <Heart propertyid={propertyid} /> */}
             </div>
-            {/* <p className="text-sm text-gray-600 flex-grow mb-5">{description}</p> */}
-            {/* <div className="text-lg flex items-center  mb-2">
-            {price}€/
-            <p className="text-md text-gray-500 ">night</p>
-          </div> */}
+
             <div className="flex justify-between items-center">
-              {/* <div className="text-sm flex items-center text-gray-500 ">
-              {parseInt(price) * numberOfNights}€/
-              <p className="text-sm text-gray-500 ">total</p>
-            </div> */}
               <div className="text-lg flex items-center ">
                 {price}€/
                 <p className="text-md text-gray-500 ">night</p>
               </div>
               <div className="flex">
                 <p className="text-sm font-semibold">
-                  {" "}
                   {(totalStars / numberOfReviews).toFixed(1)}
                 </p>
-                {/* <StarOutlineRoundedIcon sx={{ color: yellow[700] }} /> */}
                 <Rating
                   name="read-only"
                   value={totalStars / numberOfReviews}

@@ -1,38 +1,15 @@
 import Layout from "../components/layout";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  onSnapshot,
-  getDoc,
-  doc,
-} from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
-import ReservationCard from "../components/reservationcard";
 import CardSearch from "../components/cardsearch";
-
+import Loader from "../components/loader";
+//TODO pomeri secrets file
 export default function Wishlist() {
   const { user, myUser } = useContext(AuthContext);
-  //   const [arr, setArr] = useState<any[]>([]);
   const [faves, setFaves] = useState<any[]>([]);
-
-  //   const getGuestReservations = async () => {
-  //     const arrData: any[] = [];
-  //     const q = query(
-  //       collection(db, "reservations"),
-  //       where("userId", "==", user?.uid)
-  //     );
-  //     const querySnapshot = await getDocs(q);
-  //     querySnapshot.forEach((doc) => {
-  //       arrData.push(doc);
-  //       // console.log(doc.id + "---" + JSON.stringify(doc.data()));
-  //       //   console.log("||||||", doc.data());
-  //       setArr(arrData);
-  //     });
-  //   };
+  const [showProgress, setShowProgress] = useState<boolean>(true);
   const getFaves = async () => {
     //TODO potencijalnbo da postoji subkolekcija fave poperty
     console.log("\\\\\\\\\\\\\\\n");
@@ -47,10 +24,10 @@ export default function Wishlist() {
     });
   };
   useEffect(() => {
-    // if (user) {
-    //   getGuestReservations();
-    // }
-    if (myUser) getFaves();
+    if (myUser)
+      getFaves().then(() => {
+        setShowProgress(false);
+      });
   }, [user, myUser]);
 
   return (
@@ -58,24 +35,8 @@ export default function Wishlist() {
       {/* THIS IS Guest BOARD */}
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
         <div>
-          {/* <div className="pt-7 pb-5 text-center text-3xl font-bold">
-            My reservations
-          </div>
-          <div className="flex flex-col ">
-            {arr.map((item) => {
-              return (
-                <div key={item.id}>
-                  <ReservationCard
-                    {...item.data()}
-                    reservationId={item.id}
-                    // isHost={myUser.host} TODO : VRATI NA OVO
-                    isHost={false}
-                  />
-                </div>
-              );
-            })}
-          </div> */}
           <div className="flex flex-col mt-10 ">
+            {showProgress && <progress className="progress w-full"></progress>}
             <div className="pt-7 pb-5 text-center text-3xl font-bold">
               Wishlist
             </div>
@@ -100,6 +61,7 @@ export default function Wishlist() {
           </div>
         </div>
       </div>
+      <div></div>
     </Layout>
   );
 }

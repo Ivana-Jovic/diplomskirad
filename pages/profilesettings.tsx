@@ -17,7 +17,7 @@ type IFormInput = {
   title: string;
   email: string;
   password: string;
-  username: string;
+  // username: string;
   firstName: string;
   lastName: string;
   profilePicture: string;
@@ -40,7 +40,7 @@ export default function ProfileSettings() {
     defaultValues: {
       email: user?.email ?? "",
       password: myUser?.passwordState,
-      username: myUser?.username,
+      // username: myUser?.username,
       firstName: myUser?.firstName,
       lastName: myUser?.lastName,
       profilePictureNEW: [],
@@ -49,10 +49,11 @@ export default function ProfileSettings() {
   const imgNew = watch("profilePictureNEW");
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     console.log(data);
+
+    changeProfile(data);
     router.push({
       pathname: "/",
     });
-    changeProfile(data);
   };
 
   const router = useRouter();
@@ -64,7 +65,7 @@ export default function ProfileSettings() {
     reset({
       email: user?.email ?? "",
       password: myUser?.passwordState,
-      username: myUser?.username,
+      // username: myUser?.username,
       firstName: myUser?.firstName,
       lastName: myUser?.lastName,
     });
@@ -123,8 +124,12 @@ export default function ProfileSettings() {
     //     });
     const fileArr = data.profilePictureNEW ?? null;
     const file = fileArr.length > 0 ? fileArr[0] : null;
+    const extension = file.type.split("/")[1];
     const nn: string = "ppp-" + file?.name;
-    const storageRef = ref(storage, nn); //ref to file. file dosnt exist yet
+    const nnNEW: string = `uploads/${
+      user.uid
+    }/profile/${Date.now()}.${extension}`;
+    const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
     //when we upload using this ref this file should have that name
     if (file) {
       console.log("BBBBBBBBBBBBBB", file);
@@ -157,14 +162,14 @@ export default function ProfileSettings() {
         }
       );
     }
-    // update username
-    if (user && myUser.username != data.username) {
-      const docRef = await updateDoc(doc(db, "users", user.uid), {
-        username: data.username,
-      }).catch((err) => {
-        console.log("ERROR ", err.message);
-      });
-    }
+    // // update username
+    // if (user && myUser.username != data.username) {
+    //   const docRef = await updateDoc(doc(db, "users", user.uid), {
+    //     username: data.username,
+    //   }).catch((err) => {
+    //     console.log("ERROR ", err.message);
+    //   });
+    // }
 
     // update first name
     if (user && myUser.firstName != data.firstName) {
@@ -276,7 +281,7 @@ export default function ProfileSettings() {
               control={control}
               rules={{ required: "Please enter a username" }}
               render={({ field: { onChange, value } }) => (*/}
-            <TextField
+            {/* <TextField
               {...register("username", { required: "Please enter a username" })}
               className="mx-3 mb-2"
               // required
@@ -288,7 +293,7 @@ export default function ProfileSettings() {
               // }}
               InputLabelProps={getValues("username") ? { shrink: true } : {}} //TODO ubaci watch
               helperText={errors.username ? errors.username.message : " "}
-            />
+            /> */}
             {/*   )}
             /> */}
           </div>
