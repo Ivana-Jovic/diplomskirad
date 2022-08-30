@@ -67,30 +67,29 @@ export default function HostsBoard() {
       });
   }, [getHostProperties, user]);
   /////////////////// reservations
-  // const [reserv, setReserv] = useState<any[]>([]);
-  const reserv = useRef<any[]>([]);
-  const q = query(
-    collection(db, "reservations"),
-    where("hostId", "==", "x18ohaIjc6ZDHW54IBqcwRERR4X2")
-    // user ? user.uid : ""
-  );
+  // const reserv = useRef<any[]>([]);
+  // const q = query(
+  //   collection(db, "reservations"),
+  //   where("hostId", "==", "x18ohaIjc6ZDHW54IBqcwRERR4X2")
+  //   // user ? user.uid : ""
+  // );
   // TODO: OVO TREBA SREDITI DA SE NE POZIVA ZILION PUTA!!!!!!!!!!!
   // MOZDA DA SE STALNO DOHVATAJU REZERVACIJE IZ BAZE, ALI KAKO ONDA REFRESH???
-  const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    const res: any[] = [];
-    querySnapshot.forEach((doc) => {
-      res.push(doc);
+  // const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  //   const res: any[] = [];
+  //   querySnapshot.forEach((doc) => {
+  //     res.push(doc);
 
-      console.log(
-        "NEW RESRVATION",
-        doc.data().propertyId,
-        doc.data().from,
-        doc.data().to
-      );
-    });
-    reserv.current = res;
-    // setReserv(res);// sa ovim poludi
-  });
+  //     console.log(
+  //       "NEW RESRVATION",
+  //       doc.data().propertyId,
+  //       doc.data().from,
+  //       doc.data().to
+  //     );
+  //   });
+  //   reserv.current = res;
+  //   // setReserv(res);// sa ovim poludi
+  // });
   return (
     <Layout>
       {/* THIS IS HOSTS BOARD */}
@@ -103,14 +102,6 @@ export default function HostsBoard() {
           </div>
           <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16 ">
             <section className=" w-full ">
-              {/* <div className="hidden sm:inline-flex mb-5 space-x-3 text-gray-800">
-            <p className="buttonfilter">filter1</p>
-            <p className="buttonfilter">filter1</p>
-            <p className="buttonfilter">filter1</p>
-            <p className="buttonfilter">filter1</p>
-            <p className="buttonfilter">filter1</p>
-            <p className="buttonfilter">more</p>
-          </div> */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {arr.map((item) => {
                   const property = JSON.parse(item.split("---")[1]);
@@ -124,7 +115,6 @@ export default function HostsBoard() {
                       description={property.description}
                       image={property.images[0]}
                       price={property.pricePerNight}
-                      // stars="5"/
                       totalStars={property.totalStars}
                       numberOfReviews={property.numberOfReviews}
                     />
@@ -209,7 +199,6 @@ export default function HostsBoard() {
               </div>
             </div>
 
-            {/* JEDAN KALENDAR */}
             <div className="pt-7 pb-5 text-center text-3xl font-bold">
               Calendar
             </div>

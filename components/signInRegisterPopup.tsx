@@ -11,13 +11,8 @@ import { doc, setDoc } from "firebase/firestore";
 import { AuthContext } from "../firebase-authProvider";
 import { useRouter } from "next/router";
 
-export default function SignInRegisterPopup({}: // isLoggedIn,//sad
-// setIsLoggedIn,sad
-{
-  // isLoggedIn: boolean;sad
-  // setIsLoggedIn: Dispatch<SetStateAction<boolean>>;sad
-}) {
-  const { user } = useContext(AuthContext); //!NOVO
+export default function SignInRegisterPopup() {
+  const { user } = useContext(AuthContext);
   const router = useRouter();
 
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
@@ -54,9 +49,6 @@ export default function SignInRegisterPopup({}: // isLoggedIn,//sad
         });
         router.push({
           pathname: "/profilesettings",
-          // query: {
-
-          // },
         });
       })
       .catch((err) => {
@@ -65,22 +57,17 @@ export default function SignInRegisterPopup({}: // isLoggedIn,//sad
   };
 
   const signin = (event: React.FormEvent<HTMLFormElement>) => {
-    // () => {
-    // signinn
-    console.log("khm");
     event.preventDefault(); // Preventing the page from reloading
     signInWithEmailAndPassword(auth, emailState2, passwordState2)
       .then((cred) => {
         console.log("User signedin:", cred.user);
         setEmailState2("");
         setPasswordState2("");
-        // setIsLoggedIn(true);//sad
       })
       .catch((err) => {
         console.log(err.message);
       });
   };
-  //TODO: on x delecte polja
   return (
     <div className="">
       <button
@@ -149,14 +136,6 @@ export default function SignInRegisterPopup({}: // isLoggedIn,//sad
                       type="password"
                     />
                     <Button type="submit" text="Sign in" action="" />
-                    {/* <button
-        onClick={() => {
-          signin();
-          setIsPopupOpen(false);
-        }}
-      >
-        klk
-      </button> */}
                   </form>
                   <div>
                     Don&apos;t have an account? Register&nbsp;

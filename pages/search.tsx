@@ -3,7 +3,6 @@ import {
   Chip,
   Rating,
   Slider,
-  SliderThumb,
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
@@ -75,24 +74,16 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   },
 }));
 
-//TODO: dodati datume u search i ostale
 function valuetext(value: number) {
-  return `${value}°C`;
+  return `${value}€`;
 }
 //PROMENI KEY!!!
 async function isAvailable(from: Date, to: Date, propertyId: string) {
   const querySnapshot6 = await getDocs(
-    query(
-      collection(db, "reservations"),
-      where("propertyId", "==", propertyId)
-      //TODO: change from and to to DATE types in db!!!! and remove condition from if clause
-      // where("to" as Date, ">", from) //= means they are checkig out the same day others are checking in which is ok
-    )
+    query(collection(db, "reservations"), where("propertyId", "==", propertyId))
   );
   for (let index = 0; index < querySnapshot6.docs.length; index++) {
     const doc = querySnapshot6.docs[index];
-    // console.log("KK ", propertyId, index, doc.id);
-
     //oni koji se potencijalno poklapaju
     if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
       //ne poklapaju se
@@ -126,12 +117,8 @@ export default function Search() {
     : "";
   const fromDate = new Date(router.query.from as string);
   const toDate = new Date(router.query.to as string);
-
   const rooms = (router.query.rooms ?? 0) as number;
-  // router.query.rooms ? +router.query.rooms : undefined;
   const numOfGuests = (router.query.numOfGuests ?? 0) as number;
-  // ? +router.query.numOfGuests
-  // : undefined;
   const [arr, setArr] = useState<any[]>([]);
   const [filteredArr, setFilteredArr] = useState<any[]>([]);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
@@ -143,10 +130,6 @@ export default function Search() {
   const [sortPrice, setSortPrice] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<number[]>([0, 100]); //put max when adding property
   const factorPrice = 10;
-
-  // const [arrLocation, setArrLocation] = useState<
-  //   QueryDocumentSnapshot<DocumentData>[]
-  // >([]);
 
   const getSearchProperties = async () => {
     console.log("in search gethostproperty");
@@ -180,12 +163,6 @@ export default function Search() {
         console.log("MAIN", fromDate, toDate);
         isAvailable(fromDate, toDate, doc.id).then((isAv) => {
           if (isAv) {
-            // setArr((prev) => {
-            //   return [...prev, doc.id + "---" + JSON.stringify(doc.data())];
-            // });
-            // setFilteredArr((prev) => {
-            //   return [...prev, doc.id + "---" + JSON.stringify(doc.data())];
-            // });
             setArr((prev) => {
               return [...prev, doc];
             });
@@ -213,8 +190,6 @@ export default function Search() {
     }
   };
   const filterProperties = (item: any) => {
-    // const property = JSON.parse(item.split("---")[1]);
-    // const propertyid = item.split("---")[0];
     const property = item.data();
     const propertyid = item.id;
     //if selectedSuperhost and isSuperhost
@@ -234,7 +209,6 @@ export default function Search() {
         property.totalStars / property.numberOfReviews >= 4
       ) &&
       shouldBeShown(3, propertyid, selectedGarage, property.garage) &&
-      //TODO: namestiti da je 2000 max za noc u bazi
       shouldBeShown(
         4,
         propertyid,
@@ -275,8 +249,6 @@ export default function Search() {
     ) {
       setFilteredArr([]);
       setFilteredArr(arr);
-      // getSearchProperties().then(() => {
-      // const arrData5: any[] = filteredArr.filter(filterProperties);
       setFilteredArr((prev) => [...prev].filter(filterProperties));
       if (sortPrice == "asc") {
         console.log("ASC");
@@ -285,8 +257,6 @@ export default function Search() {
             .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
             .sort(
               (a: any, b: any) =>
-                // JSON.parse(a.split("---")[1]).pricePerNight -
-                // JSON.parse(b.split("---")[1]).pricePerNight
                 a.data().pricePerNight - b.data().pricePerNight
             )
         );
@@ -297,8 +267,6 @@ export default function Search() {
             .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
             .sort(
               (a: any, b: any) =>
-                // JSON.parse(b.split("---")[1]).pricePerNight -
-                // JSON.parse(a.split("---")[1]).pricePerNight
                 b.data().pricePerNight - a.data().pricePerNight
             )
         );
@@ -351,14 +319,14 @@ export default function Search() {
     >
       <div className=" flex  flex-col max-w-7xl mx-auto px-8 sm:px-16">
         <section className="  px-10 py-10 w-full ">
-          <p className="text-sm pb-5">
+          <div className="text-sm pb-5">
             Stay in {location} <br />
             from {from} to {to} <br />
             {numOfGuests} guests - {rooms} rooms <br />
             Average price per night in {location} is{" "}
             {sumPricesPropertiesLocation / numPropertiesLocation}e
-          </p>
-          <p className="text-4xl mb-6">Stays in {location}</p>
+          </div>
+          <div className="text-4xl mb-6">Stays in {location}</div>
           <div className="flex flex-col sm:flex-row mb-5 space-y-3 sm:space-y-0 sm:space-x-3 text-gray-800">
             <div className="flex space-x-3">
               <div className="dropdown ">
@@ -421,7 +389,6 @@ export default function Search() {
                         aria-label="sortPrice"
                       >
                         <ToggleButton value="asc" aria-label="asc">
-                          {/* TODO: sta su aria label */}
                           Sort ascending
                         </ToggleButton>
                         <ToggleButton value="desc" aria-label="desc">
@@ -464,8 +431,6 @@ export default function Search() {
             {filteredArr.map((item) => {
               const property = item.data();
               const propertyid = item.id;
-              // const property = JSON.parse(item.split("---")[1]);
-              // const propertyid = item.split("---")[0];
               return (
                 <CardSearch
                   key={propertyid}

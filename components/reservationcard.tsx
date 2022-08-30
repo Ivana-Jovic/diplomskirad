@@ -2,31 +2,24 @@ import {
   addDoc,
   collection,
   doc,
-  DocumentData,
   getDoc,
   getDocs,
   increment,
   query,
-  QueryDocumentSnapshot,
-  Timestamp,
   updateDoc,
   where,
 } from "firebase/firestore";
 import { useState } from "react";
-import Popup from "./popup";
-import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import Button from "./button";
 import { db } from "../firebase";
 import Rating from "@mui/material/Rating";
 import {
-  createTheme,
   FormControl,
   FormControlLabel,
   FormLabel,
   Radio,
   RadioGroup,
 } from "@mui/material";
-//TODO mmaxdozvoljeni broj propertija je 10
 
 // const theme = createTheme({
 //   components: {
@@ -53,8 +46,6 @@ import {
 
 //TODO vidi svuda za srce klik u fav
 export default function ReservationCard({
-  // item: reservation, //reservation
-
   userId,
   firstName,
   lastName,
@@ -75,8 +66,6 @@ export default function ReservationCard({
   reservationId,
   isHost,
 }: {
-  // item: QueryDocumentSnapshot<DocumentData>;
-
   userId: string;
   firstName: string;
   lastName: string;
@@ -97,21 +86,13 @@ export default function ReservationCard({
   reservationId: string;
   isHost: boolean;
 }) {
-  // const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-
   const [leftFB, setLeftFB] = useState<boolean>(leftFeedback);
   const [comment, setComment] = useState<string>("");
   const [stars, setStars] = useState<number | null>(1);
   const [reportOpen, setReportOpen] = useState<boolean>(isHost ? true : false);
   const [reportReason, setReportReason] = useState<string>("");
-  // const togglePopup = () => {
-  //   setIsPopupOpen(!isPopupOpen);
-  // };
 
   const leaveFeedback = async () => {
-    //TODO:
-    //racunanje za superhosta
-
     const propertiesRef = collection(db, "property");
     const docRef = await addDoc(
       collection(propertiesRef, propertyId, "comments"),
@@ -119,10 +100,10 @@ export default function ReservationCard({
         comment: comment,
         stars: stars ? stars : 1,
         userId: userId,
-        firstName: firstName ?? "dummy", //TODO makni ovo
-        lastName: lastName ?? "dummy",
+        firstName: firstName,
+        lastName: lastName,
         date: to,
-        reservationId: reservationId ?? "dummy",
+        reservationId: reservationId,
       }
     );
 
@@ -136,9 +117,6 @@ export default function ReservationCard({
             (1000 * 60 * 60 * 24)
         )
       ),
-      //TODO timestamp
-      //TODO: when I need avg just divide
-      // delete field stars in property
     });
 
     await updateDoc(doc(db, "reservations", reservationId), {
@@ -202,10 +180,6 @@ export default function ReservationCard({
         `${new Date(to) <= new Date() ? " bg-[#f1efef]" : " bg-[#eff5ef]"}`
       }
     >
-      {/* <div className="indicator">
-  <span className="indicator-item indicator-center badge badge-secondary"></span>
-  <div className="grid w-32 h-32 bg-base-300 place-items-center">content</div>
-</div> */}
       <div className="card-body">
         <div>
           <div className="text-center  text-xl font-semibold">
@@ -308,7 +282,7 @@ export default function ReservationCard({
                           )}
                           {!isHost && (
                             <Button
-                              action={() => setReportOpen(!reportOpen)} //TODO: zasto ako je lambda ovde se poyove vise puta
+                              action={() => setReportOpen(!reportOpen)}
                               text="Do you want to report?"
                               type=""
                             />
@@ -361,7 +335,7 @@ export default function ReservationCard({
                             </div>
                           )}
                           <Button //ako je vlasnik onda ne ostavlja feedback vec samo reportuje
-                            action={leaveFeedback} //TODO: zasto ako je lambda ovde se poyove vise puta
+                            action={leaveFeedback}
                             text={isHost ? "Report" : "Leave feedback"}
                             type=""
                           />

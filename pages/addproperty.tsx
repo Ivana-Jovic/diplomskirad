@@ -3,19 +3,16 @@ import Layout from "../components/layout";
 import {
   collection,
   addDoc,
-  updateDoc,
   doc,
   setDoc,
   getDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import Button from "../components/button";
-import Inputs from "../components/inputs";
-import FileForm from "../components/fileform";
 import ErrorPage from "./errorpage";
 import { AuthContext } from "../firebase-authProvider";
 import { InputAdornment, MenuItem, TextField } from "@mui/material";
-// import { FileForm } from "../components/fileform";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import Map from "../components/map";
 import ImageForm from "../components/imageform";
@@ -24,11 +21,11 @@ import { useRouter } from "next/router";
 type IFormInput = {
   title: string;
   desc: string;
-  state: string;
-  city: string;
-  mun: string;
-  street: string;
-  streetNum: string;
+  // state: string;
+  // city: string;
+  // mun: string;
+  // street: string;
+  // streetNum: string;
   type: string;
   numRoooms: number;
   numPers: number;
@@ -49,6 +46,7 @@ export default function AddProperty() {
   const [streetName, setStreetName] = useState<string>("");
   const [streetNum, setStreetNum] = useState<string>("");
   const [selectedStreet, setSelectedStreet] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   const {
     control,
     watch,
@@ -59,11 +57,11 @@ export default function AddProperty() {
     defaultValues: {
       title: "",
       desc: "",
-      state: "",
-      city: "",
-      mun: "",
-      street: "",
-      streetNum: "",
+      // state: "",
+      // city: "",
+      // mun: "",
+      // street: "",
+      // streetNum: "",
       type: "",
       numRoooms: 0,
       numPers: 0,
@@ -82,14 +80,44 @@ export default function AddProperty() {
   const router = useRouter();
 
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
+    setError("");
     console.log("QQQQQQQQQ", data);
-    add(data);
-    router.push({
-      pathname: "/",
-    });
+    if (data.title.length > 50) {
+      setError("Title must be shorter than 50 characters");
+    } else if (data.desc.length > 500) {
+      setError("Description must be shorter than 500 characters");
+    } else if (
+      state == "" ||
+      city == "" ||
+      streetName == "" ||
+      streetNum == ""
+    ) {
+      setError("Street name and number must be entered in map searchbox");
+    } else if (
+      data.numRoooms == 0 ||
+      data.numPers == 0 ||
+      data.priceN == 0 ||
+      data.addCosts == 0
+    ) {
+      setError("Numerical fields must be grater than 0");
+    } else if (data.numRoooms > 20 || data.numPers > 20) {
+      setError("Number of rooms and/or number of persons must be less then 20");
+    } else if (data.priceN > 200 || data.addCosts > 200) {
+      setError("Prices must be less then 200");
+    } else if (
+      !data.picturesNEW ||
+      (data.picturesNEW && data.picturesNEW.length < 3) ||
+      (data.picturesNEW && data.picturesNEW.length > 20)
+    ) {
+      setError("You must upload 3 to 10 picures at most");
+    } else {
+      add(data);
+      router.push({
+        pathname: "/",
+      });
+    }
   };
 
-  // const [images, setImages] = useState<string[]>([]);
   const uploadPictures = async (data: IFormInput) => {
     var urlArr: string[] = [];
     const fileArr = data.picturesNEW ?? null;
@@ -105,7 +133,7 @@ export default function AddProperty() {
         const nnNEW: string = `uploads/${
           user.uid
         }/properties/${Date.now()}.${extension}`;
-        const nn: string = "ppp-" + selected.name;
+        // const nn: string = "ppp-" + selected.name;
         const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
         //when we upload using this ref this file should have that name
         const uploadTask = await uploadBytesResumable(storageRef, selected);
@@ -119,27 +147,19 @@ export default function AddProperty() {
     }
     return urlArr;
   };
-  //tTODO router replace umest puh sign//role
 
-  // ovaj dole nacinje oristan jer ovako mozemo da sharujemo nekom link da vidi nase reyultate
   const add = async (data: IFormInput) => {
+    //TODO mora da ima manje od 10 propertija
     uploadPictures(data).then(async (urlArr) => {
       console.log("LLLLLLLLLLLLLLL", urlArr.length);
-      //PROVERI OVO treba .value a ne ovo sa zagradama
-      // if (titleRef.current && !titleRef.current["value"]) return;
-      //TODO dodati ove gore provere ya sve i ako nije nesto napisano poruka
+
       const docRef = await addDoc(collection(db, "property"), {
         title: data.title,
         description: data.desc,
         state: state,
-        //  data.state,
         city: city,
-        // data.city,
-        municipality: data.mun,
         street: streetName,
-        // data.street,
         streetNum: streetNum,
-        // data.streetNum,
         type: data.type,
         numOfRooms: data.numRoooms,
         numOfPersons: data.numPers,
@@ -149,18 +169,14 @@ export default function AddProperty() {
         additionalPerPerson: data.addPers,
         additionalCosts: data.addCosts,
         garage: data.garage == "Yes" ? true : false,
-        // ownerId: session?.user?.name,<-GOOGLE
         ownerId: user?.uid,
-        // promeni ovo!!!!!!!!!!!!!!!!!!!!!
         images: urlArr,
-        // images: data.picturesNEW,
-        // images: data.images,
-        // stars: 0,
         totalStars: 0,
         numberOfReview: 0,
         isSuperhost: false,
         loc: loc ?? ",",
         dateAddedProperty: new Date().toDateString(),
+        created: Timestamp.now(),
       });
       console.log("lllll");
       //if state doesnt exist add
@@ -202,6 +218,7 @@ export default function AddProperty() {
                 <TextField
                   {...register("desc", {
                     required: "Please enter  a description",
+                    // maxLength: 2,
                   })}
                   className="w-full mb-2 "
                   id="outlined-required"
@@ -446,56 +463,7 @@ export default function AddProperty() {
                     )}
                   />
                 </div>
-                <div className="mb-2">
-                  {/* <Controller
-                    name="garage"
-                    control={control}
-                    rules={{ required: "Please enter a value" }}
-                    render={({ field: { onChange, value } }) => (
-                      <>
-                        <TextField
-                          //  {...register("lastName", {
-                          //   required: "Please enter your last name",
-                          // })}
-                          className="w-full"
-                          id="outlined-select-currency"
-                          select
-                          label="Is there any parking spot"
-                          value={value}
-                          onChange={(e) => {
-                            onChange(e.target.value);
-                          }}
-                          helperText={
-                            errors.garage ? errors.garage.message : " "
-                          }
-                        >
-                          {["Yes", "No"].map((option) => (
-                            <MenuItem key={option} value={option}>
-                              {option}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      </>
-                    )}
-                  /> */}
-                </div>
-                {/* </div> */}
-                {/* Img and galery */}
-                <label>
-                  {/* <Controller
-                    name="images"
-                    control={control}
-                    rules={{ required: "Please enter a image" }}
-                    render={({ field: { onChange, value } }) => ( */}
-                  {/* <FileForm images={images} setImages={setImages} /> */}
-                  {/* <FileForm images={value} setImages={onChange} /> */}
-                  {/* // <FileForm /> */}
-                  {/* )}
-                  /> */}
-                </label>
-
-                {/* <button type="submit">Add</button> */}
-                {/* <Button action={() => {}} text="Update" type="submit" /> */}
+                {/* <div className="mb-2"></div> */}
 
                 {!selectedStreet && (
                   <div className="pt-7 pb-5 text-center text-lg font-bold">
@@ -529,7 +497,7 @@ export default function AddProperty() {
                     id="outlined-required"
                     label="State"
                     value={state}
-                    helperText={errors.state ? errors.state.message : " "}
+                    // helperText={errors.state ? errors.state.message : " "}
                   />
 
                   <TextField
@@ -542,24 +510,12 @@ export default function AddProperty() {
                     id="outlined-required"
                     label="City"
                     value={city}
-                    helperText={errors.city ? errors.city.message : " "}
+                    // helperText={errors.city ? errors.city.message : " "}
                   />
 
                   <div></div>
                 </div>
                 <div className="grid sm:grid-cols-2 grid-cols-1  ">
-                  {/* 
-                  <TextField //TODO: remove municipality
-                    {...register("mun", {
-                      required: "Please enter a municipality",
-                    })}
-                    className="mx-3 mb-2"
-                    id="outlined-required"
-                    label="Municipality"
-                 
-                    helperText={errors.mun ? errors.mun.message : " "}
-                  /> */}
-
                   <TextField
                     disabled
                     // {...register("street", {
@@ -570,7 +526,7 @@ export default function AddProperty() {
                     id="outlined-required"
                     label="Street"
                     value={streetName}
-                    helperText={errors.street ? errors.street.message : " "}
+                    // helperText={errors.street ? errors.street.message : " "}
                   />
 
                   <TextField
@@ -608,14 +564,6 @@ export default function AddProperty() {
                       imgNew.map((item, index) => {
                         return (
                           <div key={item.name}>
-                            {/* <button
-                              type="button"
-                              onClick={() => {
-                                imgNew.splice(index);
-                              }}
-                            >
-                              x
-                            </button> */}
                             <ImageForm
                               url={URL.createObjectURL(imgNew[index])}
                             />
@@ -631,6 +579,9 @@ export default function AddProperty() {
                   //     </div>
                   //   );
                   // })} */}
+                </div>
+                <div className="pt-7 pb-5 text-center text-sm font-thin">
+                  {error}
                 </div>
                 <Button
                   action={() => {

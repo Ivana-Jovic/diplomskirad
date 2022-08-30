@@ -35,26 +35,6 @@ export default function HostsReservations({
   const reserv: DocumentData[] =
     realtimeReservations || JSON.parse(reservations);
 
-  // const reserv = useRef<any[]>([]);
-
-  // TODO: OVO TREBA SREDITI DA SE NE POZIVA ZILION PUTA!!!!!!!!!!!
-  // MOZDA DA SE STALNO DOHVATAJU REZERVACIJE IZ BAZE, ALI KAKO ONDA REFRESH???
-  // const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //   //TODO react FIREBASE HOOKS -- PITATI MIKIJA usecollectiondata
-  //   const res: any[] = [];
-  //   querySnapshot.forEach((doc) => {
-  //     res.push(doc);
-
-  //     console.log(
-  //       "NEW RESRVATION",
-  //       doc.data().propertyId,
-  //       doc.data().from,
-  //       doc.data().to
-  //     );
-  //   });
-  //   reserv.current = res;
-  //   // setReserv(res);// sa ovim poludi
-  // });
   return (
     <Layout>
       {/* THIS IS HOSTS BOARD */}
@@ -69,8 +49,7 @@ export default function HostsReservations({
               return (
                 <div key={index}>
                   <ReservationCard
-                    {...(item as any)} //TODO promeni u pravi tip
-                    // {...item.data()}
+                    {...(item as any)}
                     reservationId={item.id}
                     isHost={true}
                   />

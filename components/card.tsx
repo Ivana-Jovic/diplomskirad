@@ -37,14 +37,12 @@ import { Rating } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-//TODO vidi svuda za srce klik u fav
 export default function Card({
   propertyid,
   name,
   description,
   price,
   image,
-  // stars,
   totalStars,
   numberOfReviews,
   numberOfNights,
@@ -54,7 +52,6 @@ export default function Card({
   description: string;
   price: string;
   image: string;
-  // stars: string;
   totalStars: number;
   numberOfReviews: number;
   numberOfNights: number;
@@ -73,7 +70,7 @@ export default function Card({
       <a
         className="card rounded-md mx-auto  w-[20rem] flex-shrink-0 bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
     transition duration-200 ease-out
-    cursor-pointer" //TODO dodaj ostalima
+    cursor-pointer"
       >
         <figure className="relative h-48 flex-shrink-0">
           <Image

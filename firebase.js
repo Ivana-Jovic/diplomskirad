@@ -4,7 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import { getFirestore, serverTimestamp } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
+//  Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
@@ -18,7 +18,7 @@ const firebaseConfig = {
   appId: "1:92632220826:web:031aafd593f5b97fdecb23",
   measurementId: "G-TL1WHX4GL1",
   // databaseURL: "https://diplomski-55137.europe-west6.firebasedatabase.app",
-  //TODO JER OO JE RUCNO UPISANO
+  // JER OO JE RUCNO UPISANO
 };
 
 // Initialize Firebase

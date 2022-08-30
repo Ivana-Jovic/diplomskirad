@@ -6,7 +6,6 @@ import { Rating } from "@mui/material";
 import { useRouter } from "next/router";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
-//TODO vidi svuda za srce klik u fav
 export default function CardPopup({
   //   propertyid,
   //   name,
@@ -53,13 +52,7 @@ export default function CardPopup({
   //   }
   // };
   return (
-    <div
-      // onClick={goToPropertyPage}
-      className="card card-side  p-2 rounded-md  cursor-pointer bg-base-100 shadow-md hover:opacity-90 hover:shadow-lg"
-      //       className="card rounded-md lg:card-side bg-base-100 shadow-md  max-w-5xl hover:opacity-90 hover:shadow-lg
-      // transition duration-200 ease-out
-      // cursor-pointer" //TODO dodaj ostalima
-    >
+    <div className="card card-side  p-2 rounded-md  cursor-pointer bg-base-100 shadow-md hover:opacity-90 hover:shadow-lg">
       <figure className="relative h-auto w-1/3  flex-shrink-0">
         <Image
           src={property.data().images[0]}
@@ -70,7 +63,6 @@ export default function CardPopup({
         />
       </figure>
       <div className="card-body flex flex-col p-2">
-        {/* <div className=""> */}
         <div className="flex justify-between items-center ">
           <div className="flex">
             <p className="text-sm ">
@@ -93,7 +85,6 @@ export default function CardPopup({
           {property.data().price}€/
           <p className="text-md text-gray-500 ">night</p>
         </div>
-        {/* </div> */}
       </div>
     </div>
   );

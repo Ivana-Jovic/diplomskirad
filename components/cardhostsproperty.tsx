@@ -50,11 +50,11 @@ export default function CardHostsProperty({
               <p className="text-xl font-semibold">{name}</p>
               <Heart propertyid={propertyid} />
             </div>
-            <p className="text-sm text-gray-600 flex-grow mb-5">
+            <div className="text-sm text-gray-600 flex-grow mb-5">
               {description.length < 100
                 ? description
                 : description.slice(0, description.indexOf(" ", 100)) + "..."}
-            </p>
+            </div>
 
             <div className="flex justify-between items-center">
               <div className="flex">

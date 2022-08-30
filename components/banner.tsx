@@ -29,7 +29,6 @@ import { db } from "../firebase";
 //   },
 // });
 
-//TODO check String vs string num vs Num idt
 //TODO check if div, label, p..... instead of many many divs
 //TODO svudagde su dugmici proveriti d ali je sve popunjeno plus ok formati
 export default function Banner() {
@@ -65,15 +64,10 @@ export default function Banner() {
         pathname: "/search",
         query: {
           location: location,
-          // startdate i end... 1;31 day3
           from: dateFrom?.toDateString(),
           to: dateTo?.toDateString(),
-          //  `${dateTo?.getDate()}-${
-          //   dateTo?.getMonth() ? dateTo?.getMonth() : 0 + 1
-          // }-${dateTo?.getFullYear()}`,
           numOfGuests: guests,
           rooms: rooms,
-          //TODO add other
         },
       });
     }

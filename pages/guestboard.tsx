@@ -20,36 +20,8 @@ export default function GuestBoard({
   uid: string;
   reservations: string;
 }) {
-  // const { user, myUser } = useContext(AuthContext);
-  // const [arr, setArr] = useState<any[]>([]);
-  // const q = query(collection(db, "reservations"), where("userId", "==", uid)); //TODO ovdde mozda skloniti hydratation
-
-  // const [realtimeReservations] = useCollectionData(q);
-  // const reserv = realtimeReservations || reservations;
   const reserv: DocumentData[] = JSON.parse(reservations);
   console.log(reserv);
-  // const getGuestReservations = async () => {
-  //   const arrData: any[] = [];
-  //   const q = query(
-  //     collection(db, "reservations"),
-  //     where("userId", "==", user?.uid)
-  //   );
-  //   const querySnapshot = await getDocs(q);
-  //   setArr([]);
-  //   querySnapshot.forEach((doc) => {
-  //     arrData.push(doc);
-  //     // setArr(arrData);
-  //     setArr((prev) => {
-  //       return [...prev, doc];
-  //     });
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   if (user) {
-  //     getGuestReservations();
-  //   }
-  // }, [user, myUser]);
 
   return (
     <Layout>

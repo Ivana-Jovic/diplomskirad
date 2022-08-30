@@ -118,12 +118,6 @@ export default function ReportCard({
               )}
               <Button
                 action={processReport}
-                // action={async () => {
-                //   await updateDoc(doc(db, "reports", item.id), {
-                //     processed: true,
-                //   });
-                //   return;
-                // }}
                 text="Report processed - false report"
                 type=""
               />

@@ -1,6 +1,6 @@
 import type {} from "@mui/x-date-pickers/themeAugmentation";
 
-import Wierder from "./wierder";
+// import Wierder from "./wierder";
 import {
   addDoc,
   collection,
@@ -40,12 +40,7 @@ type IFormInput = {
 //TODO PAZI OVO JE COPY PASE FJA IZ SEARCHA
 async function isAvailable(from: Date, to: Date, propertyId: string) {
   const querySnapshot6 = await getDocs(
-    query(
-      collection(db, "reservations"),
-      where("propertyId", "==", propertyId)
-      //TODO: change from and to to DATE types in db!!!! and remove condition from if clause
-      // where("to" as Date, ">", from) //= means they are checkig out the same day others are checking in which is ok
-    )
+    query(collection(db, "reservations"), where("propertyId", "==", propertyId))
   );
   for (let index = 0; index < querySnapshot6.docs.length; index++) {
     const doc = querySnapshot6.docs[index];
@@ -114,38 +109,26 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
   const { user, myUser } = useContext(AuthContext);
   const [error, setError] = useState<string>("");
   const tryToReserve = async (data: IFormInput) => {
-    if (!router || !router.query || !router.query.from || !router.query.to) {
-      isAvailable(dateFrom, dateTo, prId).then((isAv) => {
-        if (!isAv) {
-          console.log(" POKLAPAJU SE");
-          setError("NOT AVAILABLE, please select other dates");
-          // return;
-        } else {
-          console.log("NE POKLAPAJU SE");
-          reserve(data);
-        }
-      });
-    } else {
-      reserve(data);
-    }
+    // if (!router || !router.query || !router.query.from || !router.query.to) {
+    isAvailable(dateFrom, dateTo, prId).then((isAv) => {
+      if (!isAv) {
+        console.log(" POKLAPAJU SE");
+        setError("NOT AVAILABLE, please select other dates");
+      } else {
+        console.log("NE POKLAPAJU SE");
+        reserve(data);
+      }
+    });
+    // } else {
+    //   reserve(data);
+    // }
   };
   const reserve = async (data: IFormInput) => {
-    // if (!router || !router.query || !router.query.from || !router.query.to) {
-    //   isAvailable(dateFrom, dateTo, prId).then((isAv) => {
-    //     if (!isAv) {
-    //       console.log(" POKLAPAJU SE");
-    //       setError("NOT AVAILABLE, please select other dates");
-    //       return;
-    //     } else console.log("NE POKLAPAJU SE");
-    //   });
-    // }
-    //TODO moze se birati datum ali treba proveriti isAvailible
     if (dateFrom && dateTo && dateFrom >= dateTo) {
       setError("Check out date must be after check in date");
     } else {
-      // const querySnapshot = await getDocs(query(collection(db, "property"), where("propertyid", "==", true)));
-      const docSnap = await getDoc(doc(db, "property", prId)); //TODO: da li je moguce ovo uraditi kod deklaracije propId
-      let title = ""; //TODO: ispravi svuda gde je let
+      const docSnap = await getDoc(doc(db, "property", prId));
+      let title = "";
       console.log("++++++++++++++++++", prId);
       if (docSnap.exists()) {
         title = docSnap.data().title;
@@ -273,7 +256,6 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 // `${rese === false ? " lg:flex-row lg:rounded-full lg:pl-0 " : ""}`
               }
             >
-              {/* {rese && ( */}
               <div className="w-full flex justify-between px-10 py-2 mb-5 text-sm">
                 <div>{property.pricePerNight}e night</div>
                 <div className="flex  items-center">
@@ -288,33 +270,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                   - {property.numberOfReviews} reviews
                 </div>
               </div>
-              {/* )} */}
-              {/* <Wierder
-              rese={rese}
-              totall={rese ? 230 : 0}
-              property={property}
-              setGuests={setGuests}
-              setRooms={setRooms}
-              setDateFrom={setDateFrom}
-              setDateTo={setDateTo}
-              dateTo={dateTo}
-              dateFrom={dateFrom}
-              rooms={rooms}
-              guests={guests}
-            /> */}
-              {/* {!rese && ( */}
-              {/* <input
-                value={location}
-                onChange={(e) => {
-                  setLocation(e.target.value);
-                }}
-                type="text"
-                placeholder="Where do you want to go?"
-                className="outline-0  bg-transparent 
-              placeholder:text-text p-3
-              w-80  text-center mb-3 lg:mb-0"
-              />
-            )} */}
+
               <Dropdown
                 overlay={menu}
                 onVisibleChange={handleVisibleChange}
@@ -373,40 +329,42 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 />
               </div>
 
-              <div className="w-full  my-3 ">
-                <Controller
-                  name="garage"
-                  control={control}
-                  // rules={{ required: "Please enter a value" }}
-                  render={({ field: { onChange, value } }) => (
-                    <>
-                      <TextField
-                        // {...register("garage", {
-                        //   required: "Please enter if you need a garage",
-                        // })}
-                        className="w-full"
-                        id="outlined-select-currency"
-                        select
-                        label="Do you need a garage?"
-                        value={value}
-                        onChange={(e) => {
-                          onChange(e.target.value == "true" ? true : false);
-                        }}
-                        InputLabelProps={{ shrink: true }}
-                        // helperText={
-                        //   errors.garage ? errors.garage.message : " "
-                        // }
-                      >
-                        {["true", "false"].map((option) => (
-                          <MenuItem key={option} value={option}>
-                            {option == "true" ? "Yes" : "No"}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </>
-                  )}
-                />
-              </div>
+              {property.garage && (
+                <div className="w-full  my-3 ">
+                  <Controller
+                    name="garage"
+                    control={control}
+                    // rules={{ required: "Please enter a value" }}
+                    render={({ field: { onChange, value } }) => (
+                      <>
+                        <TextField
+                          // {...register("garage", {
+                          //   required: "Please enter if you need a garage",
+                          // })}
+                          className="w-full"
+                          id="outlined-select-currency"
+                          select
+                          label="Do you need a garage?"
+                          value={value}
+                          onChange={(e) => {
+                            onChange(e.target.value == "true" ? true : false);
+                          }}
+                          InputLabelProps={{ shrink: true }}
+                          // helperText={
+                          //   errors.garage ? errors.garage.message : " "
+                          // }
+                        >
+                          {["true", "false"].map((option) => (
+                            <MenuItem key={option} value={option}>
+                              {option == "true" ? "Yes" : "No"}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </>
+                    )}
+                  />
+                </div>
+              )}
               <div className="flex justify-between gap-3 w-full  my-3">
                 <Controller
                   name="timeFrom"
@@ -479,9 +437,6 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 {/* </div> */}
               </div>
 
-              {/* //TODO: polje postoji ako postoji u nekretnini garaza */}
-
-              {/* {rese && ( */}
               <div className="w-full mt-5 text-sm">
                 <div className="flex justify-between px-10 ">
                   <div>
@@ -494,7 +449,6 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                       : 0}
                     nights
                   </div>
-
                   <div>
                     {dateTo && dateFrom
                       ? property.pricePerNight *
@@ -529,14 +483,9 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 <hr />
               </div>
               <div className="">
-                {/* {!rese && <Button action={search} text="search" type="" />} */}
-                {/* {rese && */}
                 <Button action={() => {}} text="Reserve" type="submit" />
-
-                {/* } */}
               </div>
               {error}
-              {/* )} */}
             </div>
           </div>
         </form>

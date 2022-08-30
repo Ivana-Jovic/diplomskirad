@@ -2,7 +2,7 @@
 @import '~antd/dist/antd.css';
 @import "@tomtom-international/web-sdk-maps/dist/maps.css";
 @import "@tomtom-international/web-sdk-plugin-searchbox/dist/SearchBox.css";
-
+/* @import "~react-image-gallery/styles/css/image-gallery.css"; */
 @layer components{
   .buttonfilter{
     @apply p-2 border rounded-xl shadow-sm hover:shadow-lg

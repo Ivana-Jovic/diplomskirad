@@ -40,8 +40,7 @@ export default function PropertyPage() {
     "December",
   ];
 
-  // const arrr = [1, 2, 3];
-
+  const [more, setMore] = useState<boolean>(false);
   const { user, myUser } = useContext(AuthContext);
   const router = useRouter();
   const { property: propertyid, from, to, numOfGuests } = router.query;
@@ -148,7 +147,7 @@ export default function PropertyPage() {
             className="h-[300px] sm:h-[400px] lg:h-[500px] mt-2
     xl:h-[600px] 2xl:h-[600px] grid grid-cols-3 mb-5"
           >
-            <div className="relative col-span-3 sm:col-span-2 row-span-2 mr-2">
+            <div className="relative col-span-3 sm:col-span-2 row-span-2 sm:mr-2">
               <Image
                 src={property.images[0]}
                 alt=""
@@ -157,7 +156,7 @@ export default function PropertyPage() {
                 className="rounded-md"
               />
             </div>
-            <div className="relative mb-2 ml-2 hidden sm:inline-grid">
+            <div className="relative col-span-2 sm:col-span-1 sm:mb-2 sm:ml-2 ml-0 mt-2 sm:mt-0 mb-0">
               <Image
                 src={property.images[1]}
                 alt=""
@@ -166,7 +165,7 @@ export default function PropertyPage() {
                 className="rounded-md"
               />
             </div>
-            <div className="relative mt-2 ml-2 hidden sm:inline-grid">
+            <div className="relative mt-2 ml-2 ">
               <Image
                 src={property.images[2]}
                 alt=""
@@ -176,6 +175,38 @@ export default function PropertyPage() {
               />
             </div>
           </div>
+
+          {more && property.images.length > 3 && (
+            <div className="flex flex-row gap-4 flex-wrap">
+              {property.images.map((item: string, index: number) => {
+                return (
+                  <>
+                    {index.valueOf() >= 3 && (
+                      <>
+                        <div key={item} className="relative mb-2 h-48 w-full">
+                          <Image
+                            src={property.images[index]}
+                            alt=""
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-md"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </>
+                );
+              })}
+            </div>
+          )}
+          <button
+            className="btn"
+            onClick={() => {
+              setMore(!more);
+            }}
+          >
+            More
+          </button>
           <div className="mb-5">
             {property.numOfPersons} guests · {property.numOfRooms} bedroom ·{" "}
             {property.type}
