@@ -224,7 +224,10 @@ export default function ProfileSettings() {
             </div>
           )}
 
-          <Button action={() => {}} text="Update" type="submit" />
+          {/* <Button action={() => {}} text="Update" type="submit" /> */}
+          <button className="btn" type="submit">
+            Update
+          </button>
         </form>
       </div>
     </Layout>

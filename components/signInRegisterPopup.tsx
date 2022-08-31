@@ -46,6 +46,7 @@ export default function SignInRegisterPopup() {
           userId: cred.user.uid,
           host: false,
           isSuperhost: false,
+          numberOfProperties: 0,
         });
         router.push({
           pathname: "/profilesettings",

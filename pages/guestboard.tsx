@@ -5,6 +5,7 @@ import {
   where,
   getDocs,
   DocumentData,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useContext } from "react";
@@ -36,9 +37,9 @@ export default function GuestBoard({
               return (
                 <div key={index}>
                   <ReservationCard
-                    {...(item as any)} //TODO promeni u pravi tip
+                    {...(item as any)} //ovde mora any
                     reservationId={item.id}
-                    // isHost={myUser.host} TODO : VRATI NA OVO
+                    // TODO : Kad napravis modove u oba resrvation carda obrati paznju na isHost
                     isHost={false}
                   />
                 </div>
@@ -56,11 +57,14 @@ export async function getServerSideProps(context) {
     const token = await verifyIdToken(cookies.token);
     const { uid } = token;
     const arrData: DocumentData[] = [];
-    const q = query(collection(db, "reservations"), where("userId", "==", uid)); //TODO ovdde mozda skloniti hydratation
+    const q = query(
+      collection(db, "reservations"),
+      where("userId", "==", uid)
+      // orderBy("createdAt")// TODO zasto ovo pokrsi sve
+    );
 
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      //TODO ispravi i na drugim mestia
       arrData.push(doc.data());
     });
     return {

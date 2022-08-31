@@ -37,6 +37,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
 
   const becomeAHost = async () => {
     const docRef = await addDoc(collection(db, "users"), {
+      //TODO ovdetreba update a ne add
       // userId: session?.user?.name,<-GOOGLE
       userId: user?.uid,
       host: true,

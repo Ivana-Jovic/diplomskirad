@@ -13,7 +13,7 @@ interface props {
 }
 
 const Map2 = (props: props) => {
-  const { setLoc, popup, arrLoc } = props;
+  const { popup, arrLoc } = props;
   const mapElement = useRef();
   const [map, setMap] = useState<tt.Map>();
 
@@ -57,20 +57,6 @@ const Map2 = (props: props) => {
             }
           }
         >
-          {/* <p>title:</p>
-          <p> {elem.data().title} </p>
-          <button
-            onClick={() =>
-              router.push({
-                pathname: "/propertypage",
-                query: {
-                  property: elem.id,
-                },
-              })
-            }
-          >
-            goto{" "}
-          </button> */}
           <CardPopup property={elem} />
         </div>
       );

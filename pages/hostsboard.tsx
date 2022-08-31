@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import CardHostsProperty from "../components/cardhostsproperty";
 import Layout from "../components/layout";
 import {
@@ -6,21 +5,17 @@ import {
   query,
   where,
   getDocs,
-  onSnapshot,
   QueryDocumentSnapshot,
   DocumentData,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
-import ReservationCard from "../components/reservationcard";
-
-// import Kal from "../components/kal";
-// import Kk from "../components/kk";
 import dynamic from "next/dynamic";
-import FullCalendar from "@fullcalendar/react";
+// import FullCalendar from "@fullcalendar/react";
 import Map2 from "../components/map2";
-import { responsiveProperty } from "@mui/material/styles/cssUtils";
+// import { responsiveProperty } from "@mui/material/styles/cssUtils";
 const Calendar = dynamic(() => import("../components/calendar"), {
   ssr: false,
 });
@@ -40,7 +35,8 @@ export default function HostsBoard() {
     const arrData: any[] = [];
     const q = query(
       collection(db, "property"),
-      where("ownerId", "==", user?.uid)
+      where("ownerId", "==", user?.uid),
+      orderBy("createdAt")
       //?????????????
     );
     console.log("--------------");
@@ -55,7 +51,7 @@ export default function HostsBoard() {
       console.log("WWWWWWWWWWWW", bljuc.current.length);
       // setArr(arrData);
 
-      setArr((prev) => [...prev, doc.id + "---" + JSON.stringify(doc.data())]);
+      setArr((prev) => [...prev, doc]);
       setArrLocation((prev) => [...prev, doc]);
     });
   }, [user?.uid]);
@@ -66,30 +62,7 @@ export default function HostsBoard() {
         setShowProgress(false);
       });
   }, [getHostProperties, user]);
-  /////////////////// reservations
-  // const reserv = useRef<any[]>([]);
-  // const q = query(
-  //   collection(db, "reservations"),
-  //   where("hostId", "==", "x18ohaIjc6ZDHW54IBqcwRERR4X2")
-  //   // user ? user.uid : ""
-  // );
-  // TODO: OVO TREBA SREDITI DA SE NE POZIVA ZILION PUTA!!!!!!!!!!!
-  // MOZDA DA SE STALNO DOHVATAJU REZERVACIJE IZ BAZE, ALI KAKO ONDA REFRESH???
-  // const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //   const res: any[] = [];
-  //   querySnapshot.forEach((doc) => {
-  //     res.push(doc);
 
-  //     console.log(
-  //       "NEW RESRVATION",
-  //       doc.data().propertyId,
-  //       doc.data().from,
-  //       doc.data().to
-  //     );
-  //   });
-  //   reserv.current = res;
-  //   // setReserv(res);// sa ovim poludi
-  // });
   return (
     <Layout>
       {/* THIS IS HOSTS BOARD */}
@@ -104,8 +77,8 @@ export default function HostsBoard() {
             <section className=" w-full ">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {arr.map((item) => {
-                  const property = JSON.parse(item.split("---")[1]);
-                  const propertyid = item.split("---")[0];
+                  const property = item.data();
+                  const propertyid = item.id;
                   // { title, description, images, pricePerNight }
                   return (
                     <CardHostsProperty
@@ -128,8 +101,8 @@ export default function HostsBoard() {
             <div>
               <div className="grid  grid-cols-2 lg:grid-cols-1 gap-4">
                 {arr.map((item) => {
-                  const property = JSON.parse(item.split("---")[1]);
-                  const propertyid = item.split("---")[0];
+                  const property = item.data();
+                  const propertyid = item.id;
                   const monthsFromDateAddedProperty = Math.round(
                     (new Date().getTime() -
                       new Date(property.dateAddedProperty).getTime()) /
@@ -199,13 +172,13 @@ export default function HostsBoard() {
               </div>
             </div>
 
-            <div className="pt-7 pb-5 text-center text-3xl font-bold">
+            <div className="pt-7 pb-5 text-center text-3xl font-bold ">
               Calendar
             </div>
             {bljuc.current && <Calendar propertyId={bljuc.current} />}
             {(!bljuc.current || bljuc.current.length == 0) && <div>NEMA</div>}
 
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center mt-10">
               {arrLocation.length > 0 && (
                 <Map2 setLoc={""} arrLoc={arrLocation} />
               )}

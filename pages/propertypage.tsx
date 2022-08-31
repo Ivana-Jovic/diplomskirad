@@ -2,27 +2,33 @@ import Image from "next/image";
 import {
   addDoc,
   collection,
+  collectionGroup,
   doc,
   DocumentData,
   getDoc,
   getDocs,
+  orderBy,
+  query,
   QueryDocumentSnapshot,
-  updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useRef, useState } from "react";
 import Layout from "../components/layout";
 import { db } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
-import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
-import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
-import { yellow, red } from "@mui/material/colors";
 import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
 import Heart from "../components/heart";
 import Extrawierd from "../components/extrawierd";
 import { Rating } from "@mui/material";
 import Button from "../components/button";
 import Map2 from "../components/map2";
+import ImageGallery from "react-image-gallery";
+
+type imgGalleryType = {
+  original: string;
+  thumbnail: string;
+};
 
 export default function PropertyPage() {
   const months = [
@@ -50,23 +56,39 @@ export default function PropertyPage() {
   const [arrLocation, setArrLocation] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
+  const [galleryImages, setGalleryImages] = useState<imgGalleryType[]>([]);
+
   const getProperty = async () => {
     const comm: any[] = [];
-
-    // const pid: string = propertyid ? propertyid.toString() : "";
     const docSnap = await getDoc(doc(db, "property", pid));
     setArrLocation([]);
     if (docSnap.exists()) {
       setProperty(docSnap.data());
-      setArrLocation((prev) => [...prev, docSnap]);
+      setGalleryImages([]);
+      docSnap.data().images.forEach((element, index) => {
+        setGalleryImages((prev) => {
+          return [
+            ...prev,
+            {
+              original: element,
+              thumbnail: element,
+            },
+          ];
+        });
+      });
+      // setArrLocation((prev) => [...prev, docSnap]);
+      // const subColl = query(
+      //   collectionGroup(db, "property", pid, "comments"),
+      //   orderBy("createdAt")
+      // );
+
+      // const subDocSnap = await getDocs(subColl);
       const subColl = collection(db, "property", pid, "comments");
       const subDocSnap = await getDocs(subColl);
       subDocSnap.forEach((doc) => {
         comm.push(doc);
-        // console.log(" such document!", doc.data());
       });
       setComments(comm);
-      // console.log(" such !", comm);
     } else {
       console.log("No such document!");
     }
@@ -80,17 +102,17 @@ export default function PropertyPage() {
     //report comment
     const docRef = await addDoc(collection(db, "reports"), {
       guestId: comment.data().userId, //ko je komentarisao
-      guestFirstName: comment.data().firstName,
-      guestLastName: comment.data().lastName,
+      // guestFirstName: comment.data().firstName,
+      // guestLastName: comment.data().lastName,
       reservationId: comment.data().reservationId,
       hostId: user?.uid ?? "",
-      // reportedFirstName: myUser.firstName,//TODO Put in db in reserv and in rep
+      // reportedFirstName: myUser.firstName,
       // reportedLastName: myUser.lastName,
       guestIsReporting: false,
       reportText: "comment",
       processed: false,
       commentId: comment.id,
-      // timestamp
+      createdAt: Timestamp.now(),
     });
   };
   return (
@@ -103,20 +125,11 @@ export default function PropertyPage() {
           >
             {property.title}
           </div>
-
           <div className="flex justify-between font-semibold ">
             <div className="flex space-x-4">
               <div className="flex  items-center">
-                {/* {property.stars} */}
                 {(property.totalStars / property.numberOfReviews).toFixed(1)}
-                {/* <StarOutlineRoundedIcon sx={{ fontSize: 18 }} /> */}
-                {/* <Rating
-                  name="read-only"
-                  value={property.totalStars / property.numberOfReviews}
-                  readOnly
-                  size="small"
-                  precision={0.1}
-                /> */}
+
                 <Rating
                   name="read-only"
                   value={1}
@@ -142,7 +155,6 @@ export default function PropertyPage() {
             </div>
             <Heart propertyid={propertyid as string} />
           </div>
-
           <div
             className="h-[300px] sm:h-[400px] lg:h-[500px] mt-2
     xl:h-[600px] 2xl:h-[600px] grid grid-cols-3 mb-5"
@@ -175,38 +187,36 @@ export default function PropertyPage() {
               />
             </div>
           </div>
-
-          {more && property.images.length > 3 && (
-            <div className="flex flex-row gap-4 flex-wrap">
-              {property.images.map((item: string, index: number) => {
-                return (
-                  <>
-                    {index.valueOf() >= 3 && (
-                      <>
-                        <div key={item} className="relative mb-2 h-48 w-full">
-                          <Image
-                            src={property.images[index]}
-                            alt=""
-                            layout="fill"
-                            objectFit="cover"
-                            className="rounded-md"
-                          />
-                        </div>
-                      </>
-                    )}
-                  </>
-                );
-              })}
+          {!more && (
+            <button
+              className="btn mb-10"
+              onClick={() => {
+                setMore(!more);
+              }}
+            >
+              See all pictures
+            </button>
+          )}
+          {more && (
+            <button
+              className="btn mb-10"
+              onClick={() => {
+                setMore(!more);
+              }}
+            >
+              See less pictures
+            </button>
+          )}
+          {more && galleryImages.length == property.images.length && (
+            <div className="w-full h-96 ">
+              <ImageGallery
+                items={galleryImages}
+                showPlayButton={false}
+                showFullscreenButton={false}
+              />
             </div>
           )}
-          <button
-            className="btn"
-            onClick={() => {
-              setMore(!more);
-            }}
-          >
-            More
-          </button>
+
           <div className="mb-5">
             {property.numOfPersons} guests · {property.numOfRooms} bedroom ·{" "}
             {property.type}
@@ -218,37 +228,35 @@ export default function PropertyPage() {
             >
               {property.description}
             </div>
-            {/* {property.street}-{property.streetNum} */}
           </div>
-          <div className="mb-10">Amenities</div>
-          <div className="mt-10">MAP</div>
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center  mb-10">
             {arrLocation.length > 0 && (
               <Map2 setLoc={""} arrLoc={arrLocation} />
             )}
-            {/* {loc && (
-            <div>
-              {JSON.parse(loc.split("-")[0])}-{JSON.parse(loc.split("-")[1])}
-            </div>
-          )} */}
           </div>
-          <div className="mb-10">
-            REVIEWS{" "}
+          <div className=" w-full  grid place-content-center  mb-10 ">
+            <Extrawierd property={property} />
+          </div>
+          <div className="mb-10 mt-10">
+            <div className="pt-7 pb-5 text-center text-3xl font-bold">
+              Reviews
+            </div>
             {comments?.map((item: DocumentData) => {
               return (
                 <div key={item.id} className="my-5 p-2 border">
-                  {/* <div>{item.data().userId}</div> */}
                   <div>
                     {item.data().firstName}-{item.data().lastName}
                   </div>
+                  <div>
+                    {new Date(
+                      item.data().createdAt.seconds * 1000
+                    ).toDateString()}
+                  </div>
                   <div className="text-xs">
-                    {/* jun 2022. */}
                     {months[new Date(item.data().date).getMonth()]}
                     &nbsp;
                     {new Date(item.data().date).getFullYear()}
-                    {/* // .toLocaleString("default", { style: "long" })} */}
                   </div>
-                  {/* //TODO: timestamp */}
                   <div>
                     <Rating
                       name="read-only"
@@ -258,17 +266,13 @@ export default function PropertyPage() {
                     />
                   </div>
                   <div className="font-normal">{item.data().comment}</div>
-
+                  {/* //TODO TIMESTAMPOVI - poredjaj */}
                   <div className="mt-3">
                     {myUser.host && (
-                      // <Button
-                      //   action={report(item)}
-                      //   text="Do you want to report?"
-                      //   type=""
-                      // />
                       //TODO: ako je reportovano makni dugme
                       //ovo sam pre radila tako sto odvojim u komponentu zasebnu
                       <button
+                        className="btn"
                         onClick={() => {
                           report(item);
                         }}
@@ -280,12 +284,6 @@ export default function PropertyPage() {
                 </div>
               );
             })}
-          </div>
-
-          <div className="mt-10">CALENDAR- RESERVE</div>
-          <div className="bg-slate-100">
-            <Extrawierd property={property} />
-            {/* //TODO: ograniciti dokle ide broj gostiju ili skloniti */}
           </div>
         </div>
       )}

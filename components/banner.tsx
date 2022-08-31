@@ -29,7 +29,6 @@ import { db } from "../firebase";
 //   },
 // });
 
-//TODO check if div, label, p..... instead of many many divs
 //TODO svudagde su dugmici proveriti d ali je sve popunjeno plus ok formati
 export default function Banner() {
   const [location, setLocation] = useState<string>("");
@@ -257,9 +256,10 @@ export default function Banner() {
                 </Space>
               </a>
             </Dropdown>
-            <div className="-mt-3 -mb-5 xl:-mt-0 xl:mb-3 ml-3">
-              <Button action={search} text="search" type="" />
-            </div>
+            {/* <Button action={search} text="search" type="" /> */}
+            <button className="btn mt-3" onClick={search}>
+              search
+            </button>
             {error}
           </div>
         </div>

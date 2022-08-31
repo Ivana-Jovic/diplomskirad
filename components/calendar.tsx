@@ -1,30 +1,8 @@
-// import "../styles/global.css";
 import FullCalendar, { EventApi, EventSourceApi } from "@fullcalendar/react";
-import interactionPlugin from "@fullcalendar/interaction";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
-import {
-  collection,
-  doc,
-  DocumentData,
-  DocumentSnapshot,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
-import {
-  LegacyRef,
-  RefObject,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from "react";
-import Popup from "./popup";
-import { EventInput } from "@fullcalendar/react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import ReservationCard from "./reservationcard";
 const arrColour = ["#f7cbc8", "#c9eef0", "#d0e8c8", "#e8dcc1"];
 const arrColour3 = ["bg-[#f7cbc8]", "bg-[#c9eef0]"];

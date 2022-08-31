@@ -7,6 +7,8 @@ import {
   setDoc,
   getDoc,
   Timestamp,
+  updateDoc,
+  increment,
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import Button from "../components/button";
@@ -21,11 +23,6 @@ import { useRouter } from "next/router";
 type IFormInput = {
   title: string;
   desc: string;
-  // state: string;
-  // city: string;
-  // mun: string;
-  // street: string;
-  // streetNum: string;
   type: string;
   numRoooms: number;
   numPers: number;
@@ -57,11 +54,6 @@ export default function AddProperty() {
     defaultValues: {
       title: "",
       desc: "",
-      // state: "",
-      // city: "",
-      // mun: "",
-      // street: "",
-      // streetNum: "",
       type: "",
       numRoooms: 0,
       numPers: 0,
@@ -74,7 +66,7 @@ export default function AddProperty() {
       picturesNEW: [],
     },
   });
-  const { user } = useContext(AuthContext);
+  const { user, myUser } = useContext(AuthContext);
   const imgNew: File[] = Array.from(watch("picturesNEW"));
 
   const router = useRouter();
@@ -149,7 +141,6 @@ export default function AddProperty() {
   };
 
   const add = async (data: IFormInput) => {
-    //TODO mora da ima manje od 10 propertija
     uploadPictures(data).then(async (urlArr) => {
       console.log("LLLLLLLLLLLLLLL", urlArr.length);
 
@@ -176,27 +167,32 @@ export default function AddProperty() {
         isSuperhost: false,
         loc: loc ?? ",",
         dateAddedProperty: new Date().toDateString(),
-        created: Timestamp.now(),
+        createdAt: Timestamp.now(),
       });
       console.log("lllll");
       //if state doesnt exist add
       const docSnap1 = await getDoc(doc(db, "locations", state));
       if (docSnap1.exists()) {
         //if city doesnt exist add
-        const docSnap2 = await getDoc(doc(db, "locations", city + "," + state));
+        const docSnap2 = await getDoc(
+          doc(db, "locations", city + ", " + state)
+        );
         if (!docSnap2.exists()) {
-          await setDoc(doc(db, "locations", city + "," + state), {});
+          await setDoc(doc(db, "locations", city + ", " + state), {});
         }
       } else {
         await setDoc(doc(db, "locations", state), {});
         //add city
-        await setDoc(doc(db, "locations", city + "," + state), {});
+        await setDoc(doc(db, "locations", city + ", " + state), {});
       }
+    });
+    await updateDoc(doc(db, "users", user.uid), {
+      numberOfProperties: increment(1),
     });
   };
   return (
     <>
-      {user ? (
+      {user && myUser.numberOfProperties < 10 ? (
         <>
           <Layout>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -583,20 +579,25 @@ export default function AddProperty() {
                 <div className="pt-7 pb-5 text-center text-sm font-thin">
                   {error}
                 </div>
-                <Button
+                {/* <Button
                   action={() => {
-                    // console.log("OOOOOOOOO");
                   }}
                   text="Add"
                   type="submit"
-                />
-              </div>{" "}
+                /> */}
+                <button className="btn mx-auto text-center" type="submit">
+                  Add
+                </button>
+              </div>
             </form>
           </Layout>
         </>
       ) : (
         <>
           <ErrorPage />
+          {myUser.numberOfProperties >= 10 && (
+            <div>Maximum number of properties is 10</div>
+          )}
         </>
       )}
     </>

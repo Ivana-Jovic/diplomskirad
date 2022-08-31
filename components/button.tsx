@@ -21,7 +21,7 @@ export default function Button({
          text-lg sm:text-2xl font-semibold rounded-lg bg-background border"
       >
         {/* bg-grey-100  */}
-        <h2>{text}</h2>
+        OVAJ TIP NE POSTOJI VISE<h2>{text}</h2>
       </button>
     </div>
   );

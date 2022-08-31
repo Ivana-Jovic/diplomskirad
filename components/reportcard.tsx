@@ -16,22 +16,17 @@ import { useRef, useState } from "react";
 import { db } from "../firebase";
 import Button from "./button";
 
-export default function ReportCard({
-  report,
-}: {
-  report: QueryDocumentSnapshot<DocumentData>;
-}) {
-  const [processed, setProcessed] = useState<boolean>(report.data().processed);
-  const reportedUser = useRef<string>(report.data().hostId); //TODO: promeni u zavisnosti ko koga reportuje
+export default function ReportCard({ report }: { report: DocumentData }) {
+  const [processed, setProcessed] = useState<boolean>(report.processed);
+  const reportedUser = useRef<string>(report.hostId); //TODO: promeni u zavisnosti ko koga reportuje
 
-  const [arr, setArr] = useState<any[]>([]);
   const processReport = async () => {
     await updateDoc(doc(db, "reports", report.id), {
       processed: true,
     }).then(() => setProcessed(true));
   };
   const deleteUser = async () => {
-    if (report.data().guestIsReporting) {
+    if (report.guestIsReporting) {
       //meaning host is beeing reported -> delete his properties
       //TODO proveri da li ovo brisanje negde remeti rezervacije,reportove
       const q = query(
@@ -60,9 +55,7 @@ export default function ReportCard({
     processReport();
   };
   const deleteComment = async () => {
-    const docSnap = await getDoc(
-      doc(db, "reservations", report.data().reservationId)
-    );
+    const docSnap = await getDoc(doc(db, "reservations", report.reservationId));
 
     if (docSnap.exists()) {
       console.log(docSnap.data().propertyId, report.id);
@@ -72,7 +65,7 @@ export default function ReportCard({
           "property",
           docSnap.data().propertyId,
           "comments",
-          report.data().commentId
+          report.commentId
         ),
         {
           comment: "* removed because of  inappropriate vocabulary *",
@@ -84,43 +77,54 @@ export default function ReportCard({
     <div className="card w-96 bg-base-100 shadow-xl">
       <div className="card-body">
         <h2 className="card-title">
-          {report.data().guestIsReporting
-            ? "Guest " + report.data().guestFirstName + " is reporting a host"
+          {report.guestIsReporting
+            ? "Guest " + report.guestId + " is reporting a host"
             : //+ item.data().hostId
               "Host " +
               // item.data().hostId +
-              " nis reporting guest" +
-              report.data().guestFirstName}
+              " is reporting guest" +
+              report.guestId}
         </h2>
         <div>
+          <div>{new Date(report.createdAt.seconds * 1000).toDateString()}</div>
           <div className="">
-            Guest -{report.data().guestFirstName}-{report.data().guestLastName}-
-            {report.data().guestId}
+            Guest -{report.guestId}
+            {/* -{report.guestLastName}- */}
+            {/* {report.guestId} */}
           </div>
-          <div className="">{report.data().reportText}</div>
+          <div className="">{report.reportText}</div>
           <div className="">
             guest is Reporting:
-            {report.data().guestIsReporting ? "yes" : "no"}
+            {report.guestIsReporting ? "yes" : "no"}
           </div>
-          <div className="">Host {report.data().hostId}</div>
-          <div className="">Reservation Id {report.data().reservationId}</div>
+          <div className="">Host {report.hostId}</div>
+          <div className="">Reservation Id {report.reservationId}</div>
           {!processed && (
             <div>
-              {report.data().reportText != "comment" && (
-                <Button
-                  action={deleteUser}
-                  text="Report processed - delete this user and his properties"
-                  type=""
-                />
+              {report.reportText != "comment" && (
+                // <Button
+                //   action={deleteUser}
+                //   text="Report processed - delete this user and his properties"
+                //   type=""
+                // />
+                <button className="btn mt-3" onClick={deleteUser}>
+                  Report processed - delete this user and his properties{" "}
+                </button>
               )}
-              {report.data().reportText == "comment" && (
-                <Button action={deleteComment} text="Delete comment" type="" />
+              {report.reportText == "comment" && (
+                // <Button action={deleteComment} text="Delete comment" type="" />
+                <button className="btn mt-3" onClick={deleteComment}>
+                  Delete comment
+                </button>
               )}
-              <Button
+              {/* <Button
                 action={processReport}
                 text="Report processed - false report"
                 type=""
-              />
+              /> */}
+              <button className="btn mt-3" onClick={processReport}>
+                Report processed - false report
+              </button>
             </div>
           )}
           {processed && <div>** PROCESSED **</div>}

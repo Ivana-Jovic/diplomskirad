@@ -9,9 +9,9 @@ import {
   onSnapshot,
   QueryDocumentSnapshot,
   DocumentData,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import ReservationCard from "../components/reservationcard";
 import dynamic from "next/dynamic";
@@ -26,10 +26,13 @@ export default function HostsReservations({
   uid: string;
   reservations: string;
 }) {
-  const { user, myUser } = useContext(AuthContext);
+  // const { user, myUser } = useContext(AuthContext);
 
-  const bljuc = useRef<string[]>([]);
-  const q = query(collection(db, "reservations"), where("hostId", "==", uid));
+  const q = query(
+    collection(db, "reservations"),
+    where("hostId", "==", uid),
+    orderBy("createdAt")
+  );
   const [realtimeReservations] = useCollectionData(q);
 
   const reserv: DocumentData[] =
@@ -48,11 +51,14 @@ export default function HostsReservations({
             {Array.from(reserv).map((item, index) => {
               return (
                 <div key={index}>
-                  <ReservationCard
-                    {...(item as any)}
-                    reservationId={item.id}
-                    isHost={true}
-                  />
+                  <div>
+                    <ReservationCard
+                      {...(item as any)}
+                      reservationId={item.id}
+                      isHost={true}
+                    />
+                  </div>{" "}
+                  {/* {new DAteitem.createdAt} */}
                 </div>
               );
             })}
@@ -73,11 +79,16 @@ export async function getServerSideProps(context) {
     const { uid, email } = token;
     ///
     const arrData: DocumentData[] = []; //TODO promeni tipove na drugimmestima
-    const q = query(collection(db, "reservations"), where("hostId", "==", uid));
+    const q = query(
+      collection(db, "reservations"),
+      where("hostId", "==", uid)
+      // orderBy("createdAt")//TODO  svuda poredjaj sve podatke
+    );
     const querySnapshot = await getDocs(q);
     // setArr([]);
     querySnapshot.forEach((doc) => {
       arrData.push(doc.data());
+      arrData.push({});
       // arrData.push({ data: doc.data(), id: doc.id });
       // setArr((prev) => {
       //   return [...prev, doc];

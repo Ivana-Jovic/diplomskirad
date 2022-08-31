@@ -171,7 +171,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
           data.timeTo.getMinutes(),
         specialReq: data.specialReq,
         leftFeedback: false,
-        // timestamp
+        createdAt: Timestamp.now(),
       });
 
       await updateDoc(doc(db, "reservations", docRef.id), {
@@ -232,29 +232,15 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
   };
   return (
     <>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        {/* h-[300px] sm:h-[400px] lg:h-[500px] 
-    xl:h-[600px] 2xl:h-[600px] */}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div
-            className="relative max-w-md h-[600px] sm:h-[600px] lg:h-[600px] 
-    xl:h-[600px] 2xl:h-[700px]  grid place-items-center "
-          >
-            {/* {!rese && (
-          <Image
-            src="/images/banner.jpg"
-            alt=""
-            layout="fill"
-            objectFit="cover"
-          ></Image>
-        )} */}
-
+      <div
+        className="relative w-80 sm:w-96 h-[600px] sm:h-[600px] lg:h-[600px] 
+    xl:h-[600px] 2xl:h-[700px]  "
+      >
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          {/* grid place-items-center max-w-md  */}{" "}
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div
-              className={
-                `absolute flex  flex-col  items-center rounded-3xl border-2 border-solid py-5  text-xl justify-around bg-background opacity-95 pr-7 pl-7 `
-                // +
-                // `${rese === false ? " lg:flex-row lg:rounded-full lg:pl-0 " : ""}`
-              }
+              className={`absolute flex  flex-col  items-center rounded-3xl border-2 border-solid py-5  text-xl justify-around bg-background opacity-95 pr-7 pl-7 `}
             >
               <div className="w-full flex justify-between px-10 py-2 mb-5 text-sm">
                 <div>{property.pricePerNight}e night</div>
@@ -266,7 +252,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                     readOnly
                     size="small"
                     max={1}
-                  />{" "}
+                  />
                   - {property.numberOfReviews} reviews
                 </div>
               </div>
@@ -279,11 +265,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 <a onClick={(e) => e.preventDefault()}>
                   <Space>
                     <div className="flex lg:flex-col xl:flex-row">
-                      <div>
-                        {guests} guests
-                        {/* {!rese && <p>|&nbsp;</p>} */}
-                      </div>
-                      {/* {!rese && <div>{rooms} rooms</div>} */}
+                      <div>{guests} guests</div>
                     </div>
                     <ExpandMoreRoundedIcon />
                   </Space>
@@ -482,14 +464,17 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 <hr />
                 <hr />
               </div>
-              <div className="">
+              {/* <div className="">
                 <Button action={() => {}} text="Reserve" type="submit" />
-              </div>
+              </div> */}
+              <button className="btn mt-5" type="submit">
+                Reserve
+              </button>
               {error}
             </div>
-          </div>
-        </form>
-      </LocalizationProvider>
+          </form>
+        </LocalizationProvider>
+      </div>
     </>
   );
 }

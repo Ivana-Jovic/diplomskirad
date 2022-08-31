@@ -16,7 +16,7 @@ import {
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useEffect, useState, useCallback, useRef, MouseEvent } from "react";
+import { useEffect, useState, useRef, MouseEvent } from "react";
 import CardSearch from "../components/cardsearch";
 import Layout from "../components/layout";
 import { db } from "../firebase";

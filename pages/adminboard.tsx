@@ -11,6 +11,7 @@ import {
   DocumentData,
   QueryDocumentSnapshot,
   updateDoc,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -19,26 +20,40 @@ import ReservationCard from "../components/reservationcard";
 import CardSearch from "../components/cardsearch";
 import Button from "../components/button";
 import ReportCard from "../components/reportcard";
+import nookies from "nookies";
+import { verifyIdToken } from "../firebaseadmin";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 
-export default function AdminBoard() {
-  const { user, myUser } = useContext(AuthContext);
-  const [arr, setArr] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
+export default function AdminBoard({
+  uid,
+  reports,
+}: {
+  uid: string;
+  reports: string;
+}) {
+  // const { user, myUser } = useContext(AuthContext);
 
-  //TODO: mozda treba da osluskuje a ne da cita
-  const getReports = async () => {
-    const q = query(collection(db, "reports"));
-    const querySnapshot = await getDocs(q);
-    setArr([]);
-    querySnapshot.forEach((doc) => {
-      setArr((prev) => {
-        return [...prev, doc];
-      });
-    });
-  };
+  const q = query(collection(db, "reports"), orderBy("createdAt"));
+  const [realtimeReservations] = useCollectionData(q);
 
-  useEffect(() => {
-    getReports();
-  }, []);
+  const rep: DocumentData[] = realtimeReservations || JSON.parse(reports);
+
+  // const { user, myUser } = useContext(AuthContext);
+  // const [arr, setArr] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
+
+  // const getReports = async () => {
+  //   const querySnapshot = await getDocs(query(collection(db, "reports")));
+  //   setArr([]);
+  //   querySnapshot.forEach((doc) => {
+  //     setArr((prev) => {
+  //       return [...prev, doc];
+  //     });
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   getReports();
+  // }, []);
 
   return (
     <Layout>
@@ -50,7 +65,7 @@ export default function AdminBoard() {
             Reports
           </div>
           <div className="flex flex-col ">
-            {arr.map((item) => {
+            {rep.map((item) => {
               return (
                 <div
                   key={item.id}
@@ -65,4 +80,30 @@ export default function AdminBoard() {
       </div>
     </Layout>
   );
+}
+
+export async function getServerSideProps(context) {
+  try {
+    const cookies = nookies.get(context);
+    const token = await verifyIdToken(cookies.token);
+    const { uid } = token;
+
+    const arrData: DocumentData[] = [];
+    const querySnapshot = await getDocs(
+      query(collection(db, "reports"), orderBy("createdAt"))
+    );
+    querySnapshot.forEach((doc) => {
+      arrData.push(doc.data());
+    });
+    return {
+      props: {
+        uid: uid,
+        reports: JSON.stringify(arrData),
+      },
+    };
+  } catch (err) {
+    context.res.writeHead(302, { location: "/" });
+    context.res.end();
+    return { props: [] };
+  }
 }

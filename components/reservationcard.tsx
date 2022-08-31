@@ -8,8 +8,10 @@ import {
   query,
   updateDoc,
   where,
+  Timestamp,
+  setDoc,
 } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./button";
 import { db } from "../firebase";
 import Rating from "@mui/material/Rating";
@@ -91,9 +93,29 @@ export default function ReservationCard({
   const [stars, setStars] = useState<number | null>(1);
   const [reportOpen, setReportOpen] = useState<boolean>(isHost ? true : false);
   const [reportReason, setReportReason] = useState<string>("");
-
+  //todo pri reportu se ne brise  nista vec blikira prisup - yasivi se
   const leaveFeedback = async () => {
     const propertiesRef = collection(db, "property");
+    // const docRef = await setDoc(
+    //   doc(
+    //     collection(
+    //       db,
+    //       "property/" + propertiesRef + "/" + propertyId + "/" + "comments"
+    //     )
+    //     // Timestamp.now().seconds
+    //   ),
+
+    //   {
+    //     comment: comment,
+    //     stars: stars ? stars : 1,
+    //     userId: userId,
+    //     firstName: firstName,
+    //     lastName: lastName,
+    //     date: to,
+    //     reservationId: reservationId,
+    //     createdAt: Timestamp.now(),
+    //   }
+    // );//TODO komentari hronoloski
     const docRef = await addDoc(
       collection(propertiesRef, propertyId, "comments"),
       {
@@ -104,9 +126,10 @@ export default function ReservationCard({
         lastName: lastName,
         date: to,
         reservationId: reservationId,
+        createdAt: Timestamp.now(),
       }
     );
-
+    // item.data().createdAt.seconds
     await updateDoc(doc(db, "property", propertyId), {
       numberOfReviews: increment(1),
       totalStars: increment(stars ? stars : 1),
@@ -159,20 +182,22 @@ export default function ReservationCard({
   const report = async () => {
     const docRef = await addDoc(collection(db, "reports"), {
       guestId: userId,
-      guestFirstName: firstName,
-      guestLastName: lastName,
+      // guestFirstName: firstName,
+      // guestLastName: lastName,
       reservationId: reservationId,
       hostId: hostId,
-      // reportedFirstName: myUser.firstName,//TODO Put in db in reserv and in rep
+      // reportedFirstName: myUser.firstName,
       // reportedLastName: myUser.lastName,
-      guestIsReporting: true, //TODO change to !isHost
+      guestIsReporting: !isHost,
       reportText: reportReason,
       processed: false,
-      // timestamp
+      createdAt: Timestamp.now(),
+    });
+    await updateDoc(doc(db, "reports", docRef.id), {
+      id: docRef.id,
     });
   };
 
-  //TODO kad se doda feedback da se osvezi stranica
   return (
     <div
       className={
@@ -196,8 +221,9 @@ export default function ReservationCard({
             <div className="text-xs">-{userId}</div>
           </div>
           <div className="text-center text-xs">
-            Reservation number:{reservationId}
+            Reservation number: {reservationId}
           </div>
+          <div className="text-center text-xs">Propertyid:{propertyId}</div>
           <div className="text-lg font-semibold text-center mb-5">
             {from} -{to}
           </div>
@@ -236,7 +262,7 @@ export default function ReservationCard({
                   <>
                     <label
                       htmlFor="my-modal-3"
-                      className="btn btn-active bg-background hover:bg-background text-text border-none
+                      className="btn btn-active border-none
                       
                       shadow-md 
                       hover:shadow-lg active:scale-90 transition duration-150"
@@ -280,65 +306,80 @@ export default function ReservationCard({
                               />
                             </>
                           )}
-                          {!isHost && (
-                            <Button
-                              action={() => setReportOpen(!reportOpen)}
-                              text="Do you want to report?"
-                              type=""
-                            />
-                          )}
-                          {reportOpen && (
-                            <div>
-                              <FormControl>
-                                <FormLabel
-                                  id="demo-radio-buttons-group-label"
-                                  className="text-text "
-                                >
-                                  Please tell us the reason for filing a report
-                                </FormLabel>
-                                <RadioGroup
-                                  aria-labelledby="demo-radio-buttons-group-label"
-                                  defaultValue="behavior"
-                                  name="radio-buttons-group"
-                                  onChange={(e) => {
-                                    setReportReason(e.target.value);
-                                  }}
-                                >
-                                  <FormControlLabel
-                                    value="behavior"
-                                    control={<Radio />}
-                                    label="Inappropriate behavior"
-                                    // checked
-                                  />
-                                  {isHost && (
-                                    <FormControlLabel
-                                      value="destruction"
-                                      control={<Radio />}
-                                      label="Destruction of property"
-                                    />
-                                  )}
-                                  {!isHost && (
-                                    <FormControlLabel
-                                      value="description"
-                                      control={<Radio />}
-                                      label="Property does not match description"
-                                    />
-                                  )}
-                                  <FormControlLabel
-                                    value="other"
-                                    control={<Radio />}
-                                    label="Other"
-                                  />
-                                </RadioGroup>
-                              </FormControl>
-                              {/* <Button action={report} text="Report" type="" /> */}
-                            </div>
-                          )}
-                          <Button //ako je vlasnik onda ne ostavlja feedback vec samo reportuje
+                          <div className="flex flex-col">
+                            {!isHost && (
+                              // <Button
+                              //   action={() => setReportOpen(!reportOpen)}
+                              //   text="Do you want to report?"
+                              //   type=""
+                              // />
+                              <button
+                                className="btn mt-3"
+                                onClick={() => setReportOpen(!reportOpen)}
+                              >
+                                Do you want to report?
+                              </button>
+                            )}
+                            {/* <Button //ako je vlasnik onda ne ostavlja feedback vec samo reportuje
                             action={leaveFeedback}
                             text={isHost ? "Report" : "Leave feedback"}
                             type=""
-                          />
+                          /> */}
+                            {reportOpen && (
+                              <div className="mt-3">
+                                <FormControl>
+                                  <FormLabel
+                                    id="demo-radio-buttons-group-label"
+                                    className="text-text "
+                                  >
+                                    Please tell us the reason for filing a
+                                    report
+                                  </FormLabel>
+                                  <RadioGroup
+                                    aria-labelledby="demo-radio-buttons-group-label"
+                                    defaultValue="behavior"
+                                    name="radio-buttons-group"
+                                    onChange={(e) => {
+                                      setReportReason(e.target.value);
+                                    }}
+                                  >
+                                    <FormControlLabel
+                                      value="behavior"
+                                      control={<Radio />}
+                                      label="Inappropriate behavior"
+                                      // checked
+                                    />
+                                    {isHost && (
+                                      <FormControlLabel
+                                        value="destruction"
+                                        control={<Radio />}
+                                        label="Destruction of property"
+                                      />
+                                    )}
+                                    {!isHost && (
+                                      <FormControlLabel
+                                        value="description"
+                                        control={<Radio />}
+                                        label="Property does not match description"
+                                      />
+                                    )}
+                                    <FormControlLabel
+                                      value="other"
+                                      control={<Radio />}
+                                      label="Other"
+                                    />
+                                  </RadioGroup>
+                                </FormControl>
+                                {/* <Button action={report} text="Report" type="" /> */}
+                              </div>
+                            )}
+                            <button
+                              className="btn mt-3"
+                              onClick={leaveFeedback}
+                            >
+                              {isHost ? "Report" : "Leave feedback"}
+                            </button>
+                          </div>
                         </div>
                       </label>
                     </label>
