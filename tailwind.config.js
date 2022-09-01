@@ -1,3 +1,5 @@
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -28,6 +30,10 @@ module.exports = {
     },
     fontFamily: {
       logo: ["Montserrat"],
+    },
+    screens: {
+      xs: "550px",
+      ...defaultTheme.screens,
     },
     // fontSize: {
     //   xs: ".75rem",

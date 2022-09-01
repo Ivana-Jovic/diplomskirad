@@ -24,19 +24,16 @@ export default function HostsBoard() {
   const [showProgress, setShowProgress] = useState<boolean>(true);
   const { user, myUser } = useContext(AuthContext);
   const [arr, setArr] = useState<any[]>([]);
-  const [arrLocation, setArrLocation] = useState<
-    QueryDocumentSnapshot<DocumentData>[]
-  >([]);
+  const [arrLocation, setArrLocation] = useState<DocumentData[]>([]);
 
   const bljuc = useRef<string[]>([]);
   const getHostProperties = useCallback(async () => {
-    // TODO when to use callback here and on other places
     bljuc.current = [];
     const arrData: any[] = [];
     const q = query(
       collection(db, "property"),
-      where("ownerId", "==", user?.uid),
-      orderBy("createdAt")
+      where("ownerId", "==", user?.uid)
+      // orderBy("createdAt")
       //?????????????
     );
     console.log("--------------");
@@ -52,7 +49,7 @@ export default function HostsBoard() {
       // setArr(arrData);
 
       setArr((prev) => [...prev, doc]);
-      setArrLocation((prev) => [...prev, doc]);
+      setArrLocation((prev) => [...prev, doc.data()]);
     });
   }, [user?.uid]);
 

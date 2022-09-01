@@ -5,14 +5,12 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import CardSearch from "../components/cardsearch";
 import Loader from "../components/loader";
-//TODO pomeri secrets file
+
 export default function Wishlist() {
   const { user, myUser } = useContext(AuthContext);
   const [faves, setFaves] = useState<any[]>([]);
   const [showProgress, setShowProgress] = useState<boolean>(true);
   const getFaves = async () => {
-    //TODO potencijalnbo da postoji subkolekcija fave poperty
-    console.log("\\\\\\\\\\\\\\\n");
     const arrData: any[] = [];
     myUser.faves.forEach(async (item: any) => {
       const docSnap = await getDoc(doc(db, "property", item));

@@ -1,7 +1,6 @@
 import { doc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useContext, useEffect, useState } from "react";
-import Button from "../components/button";
 import ImageForm from "../components/imageform";
 import Layout from "../components/layout";
 import { db, storage } from "../firebase";
@@ -14,7 +13,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 type IFormInput = {
   title: string;
   email: string;
-  password: string;
+  passwordNew: string;
+  passwordOld: string;
   firstName: string;
   lastName: string;
   profilePicture: string;
@@ -36,7 +36,8 @@ export default function ProfileSettings() {
   } = useForm<IFormInput>({
     defaultValues: {
       email: user?.email ?? "",
-      password: myUser?.passwordState,
+      passwordNew: "",
+      passwordOld: myUser?.passwordState,
       firstName: myUser?.firstName,
       lastName: myUser?.lastName,
       profilePictureNEW: [],
@@ -64,23 +65,31 @@ export default function ProfileSettings() {
 
   const [error, setError] = useState<any>("");
   const [url, setUrl] = useState<string>("");
+  const [wantToChangePass, setWantToChangePass] = useState<boolean>(false);
 
-  useEffect(() => {
-    reset({
-      email: user?.email ?? "",
-      password: myUser?.passwordState,
-      firstName: myUser?.firstName,
-      lastName: myUser?.lastName,
-    });
-  }, [user, myUser, reset]); //TODO VIDI DA LI OVOR Radi
+  // ------------------NE BRISI-----------------!!!!!!!!!!!!!!
+  // useEffect(() => {
+  //   reset({
+  //     email: user?.email ?? "",
+  //     passwordNew: "",
+  //     passwordOld: myUser?.passwordState,
+  //     firstName: myUser?.firstName,
+  //     lastName: myUser?.lastName,
+  //   });
+  // }, [user, myUser, reset]);
+  // ------------------NE BRISI-----------------!!!!!!!!!!!!!!
 
   const changeProfile = async (data: IFormInput) => {
     const fileArr = data.profilePictureNEW ?? null;
     const file = fileArr.length > 0 ? fileArr[0] : null;
 
-    if (user && myUser.profilePicture != data.profilePictureNEW) {
+    if (
+      user &&
+      myUser.profilePicture != data.profilePictureNEW &&
+      data.profilePictureNEW &&
+      file
+    ) {
       const extension = file.type.split("/")[1];
-      // const nn: string = "ppp-" + file?.name;
       const nnNEW: string = `uploads/${
         user.uid
       }/profile/${Date.now()}.${extension}`;
@@ -144,26 +153,26 @@ export default function ProfileSettings() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-8 sm:px-16  ">
+      <div className="max-w-7xl px-8 sm:px-16 text-center   ">
         <div>hello {user?.email}</div>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="mx-3">
           <div className="flex flex-col">
             <TextField
               disabled={true}
               {...register("email")}
-              className="mx-3 mb-2"
+              className=" mb-2"
               id="outlined-required3"
               label="email"
               type="email"
               InputLabelProps={getValues("email") ? { shrink: true } : {}}
               helperText=" "
             />
-            <div className="grid sm:grid-cols-2 grid-cols-1 ">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-2 ">
               <TextField
                 {...register("firstName", {
                   required: "Please enter your first name",
                 })}
-                className="mx-3 mb-2"
+                className=" "
                 id="outlined-required1"
                 label="first name"
                 InputLabelProps={getValues("firstName") ? { shrink: true } : {}}
@@ -174,49 +183,76 @@ export default function ProfileSettings() {
                 {...register("lastName", {
                   required: "Please enter your last name",
                 })}
-                className="mx-3 mb-2"
+                className=" mb-2"
                 id="outlined-required2"
                 label="last name"
                 InputLabelProps={getValues("lastName") ? { shrink: true } : {}}
                 helperText={errors.lastName ? errors.lastName.message : " "}
               />
             </div>
-
-            <TextField
-              {...register("password")}
-              className="mx-3 mb-2"
-              id="outlined-required3"
-              label="enter new password"
-              type="password"
-              InputLabelProps={getValues("password") ? { shrink: true } : {}}
-              helperText={errors.password ? errors.password.message : " "}
-            />
-          </div>
-          <div className=" text-center">
-            <label className="btn ">
-              Select profile picture
-              <input
-                {...register("profilePictureNEW")}
-                type="file"
-                // onChange={changeHandler}
-                className="hidden"
-                accept="image/png, image/jpeg, image/jpg"
-              />
-            </label>
-            <div className="grid justify-items-center  mx-auto">
-              <div>New:</div>
-              {((myUser && myUser?.photoURL) ||
-                (imgNew && imgNew.length > 0)) && (
-                <ImageForm
-                  url={
-                    imgNew && imgNew.length > 0
-                      ? URL.createObjectURL(imgNew[0])
-                      : myUser?.photoURL
+            <button
+              className="btn mb-3 "
+              onClick={() => {
+                setWantToChangePass(!wantToChangePass);
+              }}
+            >
+              Change password
+            </button>
+            {wantToChangePass && (
+              <>
+                <TextField
+                  {...register("passwordNew")}
+                  className="mb-2"
+                  id="outlined-required3"
+                  label="enter new password"
+                  type="password"
+                  InputLabelProps={
+                    getValues("passwordNew") ? { shrink: true } : {}
+                  }
+                  helperText={
+                    errors.passwordNew ? errors.passwordNew.message : " "
                   }
                 />
-              )}
-            </div>
+                <TextField
+                  {...register("passwordOld")}
+                  className="mb-2"
+                  id="outlined-required3"
+                  label="enter new password"
+                  type="password"
+                  InputLabelProps={
+                    getValues("passwordOld") ? { shrink: true } : {}
+                  }
+                  helperText={
+                    errors.passwordOld ? errors.passwordOld.message : " "
+                  }
+                />
+              </>
+            )}
           </div>
+          {/* <div className="mx-3"> */}
+          <label className="btn w-full">
+            Select profile picture
+            <input
+              {...register("profilePictureNEW")}
+              type="file"
+              // onChange={changeHandler}
+              className="hidden"
+              accept="image/png, image/jpeg, image/jpg"
+            />
+          </label>
+          <div className="grid justify-items-center  mx-auto">
+            {((myUser && myUser?.photoURL) ||
+              (imgNew && imgNew.length > 0)) && (
+              <ImageForm
+                url={
+                  imgNew && imgNew.length > 0
+                    ? URL.createObjectURL(imgNew[0])
+                    : myUser?.photoURL
+                }
+              />
+            )}
+          </div>
+          {/* </div> */}
 
           {error && (
             <div className="pt-7 pb-5 text-center text-sm font-thin">
@@ -224,8 +260,7 @@ export default function ProfileSettings() {
             </div>
           )}
 
-          {/* <Button action={() => {}} text="Update" type="submit" /> */}
-          <button className="btn" type="submit">
+          <button className="btn w-full mt-10" type="submit">
             Update
           </button>
         </form>

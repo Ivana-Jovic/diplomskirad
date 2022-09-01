@@ -43,7 +43,6 @@ const Home: NextPage = () => {
         <section className="pt-10">
           <div className="mb-10">
             <h2 className="pb-4">Get inspiration for your next trip </h2>
-            {/* <h3>Here are a few interesting accomodations</h3> */}
             <h3>Here are the most popular accomodations around the world</h3>
           </div>
 

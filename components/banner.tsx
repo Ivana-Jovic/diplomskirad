@@ -1,14 +1,10 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Button from "./button";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import type {} from "@mui/x-date-pickers/themeAugmentation";
 import TextField from "@mui/material/TextField";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { Dropdown, Menu, Space } from "antd";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
@@ -28,8 +24,9 @@ import { db } from "../firebase";
 //     },
 //   },
 // });
-
-//TODO svudagde su dugmici proveriti d ali je sve popunjeno plus ok formati
+//TODO promeni tipove na drugimmestima
+//TODO proveriti sve useeffect nizove
+//TODO pomeri secrets file
 export default function Banner() {
   const [location, setLocation] = useState<string>("");
   const [guests, setGuests] = useState<number>(1);
@@ -40,8 +37,8 @@ export default function Banner() {
   );
   const [error, setError] = useState<string>("");
   const router = useRouter();
-  ///
   const [locations, setLocations] = useState<any[]>([]);
+
   const getLocations = async () => {
     const querySnapshot = await getDocs(collection(db, "locations"));
     setLocations([]);
@@ -49,10 +46,11 @@ export default function Banner() {
       setLocations((prev) => [...prev, doc.id]);
     });
   };
+
   useEffect(() => {
     getLocations();
   }, []);
-  ///
+
   const search = () => {
     if (location == null || location == "") {
       setError("Please choose a location");
@@ -83,26 +81,26 @@ export default function Banner() {
                 <label className="mx-5">guests</label>
                 <button
                   className={
-                    `roundButton ` + `${guests == 1 ? "  bg-red-600" : ""}`
+                    ` ` +
+                    `${guests == 1 ? " roundButtonDisabled " : "roundButton"}`
                   }
                   onClick={() => {
                     if (guests - 1 > 0) setGuests(guests - 1);
                   }}
                 >
-                  <RemoveIcon fontSize="small" />
+                  {guests > 1 && <RemoveIcon fontSize="small" />}
                 </button>
                 <div className="mx-3">{guests}</div>
                 <button
                   className={
-                    `roundButton ` + `${guests == 20 ? "  bg-red-600" : ""}`
+                    ` ` +
+                    `${guests == 20 ? " roundButtonDisabled " : "roundButton"}`
                   }
                   onClick={() => {
-                    if (guests + 1 <= 20)
-                      //TODO check if this matches other min and maxs
-                      setGuests(guests + 1);
+                    if (guests + 1 <= 20) setGuests(guests + 1);
                   }}
                 >
-                  <AddIcon fontSize="small" />
+                  {guests < 20 && <AddIcon fontSize="small" />}
                 </button>
               </div>
             </>
@@ -115,23 +113,25 @@ export default function Banner() {
               <div className="flex xl:mr-7  items-center">
                 <label className="mx-5">rooms</label>
                 <button
-                  className="roundButton"
+                  className={`${
+                    rooms == 1 ? " roundButtonDisabled " : "roundButton"
+                  }`}
                   onClick={() => {
                     if (rooms - 1 > 0) setRooms(rooms - 1);
                   }}
                 >
-                  <RemoveIcon fontSize="small" />
+                  {rooms > 1 && <RemoveIcon fontSize="small" />}
                 </button>
                 <div className="mx-3">{rooms}</div>
                 <button
-                  className="roundButton"
+                  className={`${
+                    rooms == 20 ? " roundButtonDisabled " : "roundButton"
+                  }`}
                   onClick={() => {
-                    if (rooms + 1 <= 20)
-                      //TODO check if this matches other min and maxs
-                      setRooms(rooms + 1);
+                    if (rooms + 1 <= 20) setRooms(rooms + 1);
                   }}
                 >
-                  <AddIcon fontSize="small" />
+                  {rooms < 20 && <AddIcon fontSize="small" />}
                 </button>
               </div>
             </>
@@ -166,30 +166,16 @@ export default function Banner() {
          justify-around bg-background opacity-95 pr-5 mx-5 pl-5 xl:pl-0
        "
           >
-            {/* <input
-              value={location}
-              onChange={(e) => {
-                setLocation(e.target.value);
-              }}
-              type="text"
-              placeholder="Where do you want to go?"
-              className="outline-0  bg-transparent 
-              placeholder:text-text p-3 items-center text-center
-              w-80   mb-3 lg:mb-0"
-            /> */}
             <div className=" mb-5 xl:mb-0 xl:mr-7 xl:ml-7 mr-2">
               <Autocomplete
                 disablePortal
                 id="combo-box-demo"
                 options={locations}
                 sx={{ width: 300 }}
-                // value={location}
-                // onChange={(e) => {
-                //   setLocation(e.target.value);
-                // }}
                 inputValue={location}
                 onInputChange={(event, newInputValue) => {
                   setLocation(newInputValue);
+                  setError("");
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -209,7 +195,6 @@ export default function Banner() {
                   disablePast
                   label="Check in"
                   inputFormat="dd/MM/yyyy"
-                  // views={["year", "month", "day"]}
                   value={dateFrom}
                   onChange={(newValue) => {
                     setDateFrom(newValue);
@@ -248,7 +233,6 @@ export default function Banner() {
               <a onClick={(e) => e.preventDefault()}>
                 <Space>
                   <div className="flex">
-                    {/* xl:flex-col xl:flex-row */}
                     <div> {guests} guests |&nbsp;</div>
                     <div>{rooms} rooms</div>
                   </div>
@@ -256,11 +240,14 @@ export default function Banner() {
                 </Space>
               </a>
             </Dropdown>
-            {/* <Button action={search} text="search" type="" /> */}
-            <button className="btn mt-3" onClick={search}>
-              search
-            </button>
-            {error}
+            {!error && (
+              <button className="btn mt-3" onClick={search}>
+                search
+              </button>
+            )}
+            {error && (
+              <button className="btn mt-3 cursor-default ">{error}</button>
+            )}
           </div>
         </div>
       </LocalizationProvider>

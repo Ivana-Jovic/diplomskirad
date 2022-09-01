@@ -25,38 +25,42 @@ import Map2 from "../components/map2";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
+import { isAvailable } from "../lib/hooks";
+import { AnyARecord } from "dns";
+import { GetServerSideProps } from "next";
+import { clearTimeout, setTimeout } from "timers";
 
 const AirbnbSlider = styled(Slider)(({ theme }) => ({
-  color: "#3a8589",
-  height: 3,
-  padding: "13px 0",
-  "& .MuiSlider-thumb": {
-    height: 27,
-    width: 27,
-    backgroundColor: "#fff",
-    border: "1px solid currentColor",
-    "&:hover": {
-      boxShadow: "0 0 0 8px rgba(58, 133, 137, 0.16)",
-    },
-    "& .airbnb-bar": {
-      height: 9,
-      width: 1,
-      backgroundColor: "currentColor",
-      marginLeft: 1,
-      marginRight: 1,
-    },
-  },
-  "& .MuiSlider-track": {
-    height: 3,
-  },
-  "& .MuiSlider-mark": {
-    color: "#f8fafc",
-  },
-  "& .MuiSlider-rail": {
-    color: theme.palette.mode === "dark" ? "#bfbfbf" : "#d8d8d8",
-    opacity: theme.palette.mode === "dark" ? undefined : 1,
-    height: 3,
-  },
+  //   color: "#3a8589",
+  //   height: 3,
+  //   padding: "13px 0",
+  //   "& .MuiSlider-thumb": {
+  //     height: 27,
+  //     width: 27,
+  //     backgroundColor: "#fff",
+  //     border: "1px solid currentColor",
+  //     "&:hover": {
+  //       boxShadow: "0 0 0 8px rgba(58, 133, 137, 0.16)",
+  //     },
+  //     "& .airbnb-bar": {
+  //       height: 9,
+  //       width: 1,
+  //       backgroundColor: "currentColor",
+  //       marginLeft: 1,
+  //       marginRight: 1,
+  //     },
+  //   },
+  //   "& .MuiSlider-track": {
+  //     height: 3,
+  //   },
+  //   "& .MuiSlider-mark": {
+  //     color: "#f8fafc",
+  //   },
+  //   "& .MuiSlider-rail": {
+  //     color: theme.palette.mode === "dark" ? "#bfbfbf" : "#d8d8d8",
+  //     opacity: theme.palette.mode === "dark" ? undefined : 1,
+  //     height: 3,
+  //   },
 }));
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   "& .MuiToggleButtonGroup-grouped": {
@@ -77,33 +81,42 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
 function valuetext(value: number) {
   return `${value}€`;
 }
-//PROMENI KEY!!!
-async function isAvailable(from: Date, to: Date, propertyId: string) {
-  const querySnapshot6 = await getDocs(
-    query(collection(db, "reservations"), where("propertyId", "==", propertyId))
-  );
-  for (let index = 0; index < querySnapshot6.docs.length; index++) {
-    const doc = querySnapshot6.docs[index];
-    //oni koji se potencijalno poklapaju
-    if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
-      //ne poklapaju se
-    } else {
-      //poklapaju se kako god
-      //ako je doc.to izmedju to i from poklapaju se sigurno
-      //ako doc.to vece od to poklapaju se  ako je from iymedju ili pre from
-      //
-      console.log(
-        "ELSE GRANA",
-        propertyId,
-        from.toDateString(),
-        to.toDateString()
-      );
-      return false;
-    }
-  }
-  return true;
-}
-export default function Search() {
+
+// async function isAvailable(from: Date, to: Date, propertyId: string) {
+//   const querySnapshot6 = await getDocs(
+//     query(collection(db, "reservations"), where("propertyId", "==", propertyId))
+//   );
+//   for (let index = 0; index < querySnapshot6.docs.length; index++) {
+//     const doc = querySnapshot6.docs[index];
+//     //oni koji se potencijalno poklapaju
+//     if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
+//       //ne poklapaju se
+//     } else {
+//       //poklapaju se kako god
+//       //ako je doc.to izmedju to i from poklapaju se sigurno
+//       //ako doc.to vece od to poklapaju se  ako je from iymedju ili pre from
+//       //
+//       console.log(
+//         "ELSE GRANA",
+//         propertyId,
+//         from.toDateString(),
+//         to.toDateString()
+//       );
+//       return false;
+//     }
+//   }
+//   return true;
+// }
+export default function Search({
+  uid,
+  ppp,
+}: {
+  uid: string;
+  ppp: DocumentData[]; //OVO JE RADILI SA ANY
+}) {
+  var rangeRef = useRef<NodeJS.Timeout>(null);
+  // const arr: DocumentData[] = JSON.parse(ppp);
+  const arr = ppp;
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [numPropertiesLocation, setNumPropertiesLocation] = useState<number>(0);
   const [sumPricesPropertiesLocation, setSumPricesPropertiesLocation] =
@@ -119,7 +132,7 @@ export default function Search() {
   const toDate = new Date(router.query.to as string);
   const rooms = (router.query.rooms ?? 0) as number;
   const numOfGuests = (router.query.numOfGuests ?? 0) as number;
-  const [arr, setArr] = useState<any[]>([]);
+  // const [arr, setArr] = useState<any[]>([]);
   const [filteredArr, setFilteredArr] = useState<any[]>([]);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [selectedSuperhost, setSelectedSuperhost] = useState<boolean>(false);
@@ -131,49 +144,50 @@ export default function Search() {
   const [priceRange, setPriceRange] = useState<number[]>([0, 100]); //put max when adding property
   const factorPrice = 10;
 
-  const getSearchProperties = async () => {
-    console.log("in search gethostproperty");
-    const qs44: string[] = [];
-    const qs33: string[] = [];
-
-    const querySnapshot1 = await getDocs(
-      query(collection(db, "property"), where("city", "==", location))
-    );
-
-    const querySnapshot2 = await getDocs(
-      query(collection(db, "property"), where("state", "==", location))
-    );
-    setFilteredArr([]);
-    setArr([]);
-    let r: QueryDocumentSnapshot<DocumentData>[] = querySnapshot1.docs.concat(
-      querySnapshot2.docs
-    );
-    //UNIJA
-    setNumPropertiesLocation(0);
-    setSumPricesPropertiesLocation(0);
-    r.forEach(async (doc) => {
-      setNumPropertiesLocation((prev) => prev + 1);
-      setSumPricesPropertiesLocation((prev) => prev + doc.data().pricePerNight);
-      if (
-        rooms &&
-        numOfGuests &&
-        doc.data().numOfPersons >= numOfGuests &&
-        doc.data().numOfRooms >= rooms
-      ) {
-        console.log("MAIN", fromDate, toDate);
-        isAvailable(fromDate, toDate, doc.id).then((isAv) => {
-          if (isAv) {
-            setArr((prev) => {
-              return [...prev, doc];
-            });
-            setFilteredArr((prev) => {
-              return [...prev, doc];
-            });
-          }
-        });
-      }
-    });
-  };
+  // const getSearchProperties = async () => {
+  // console.log("in search gethostproperty");
+  // const qs44: string[] = [];
+  // const qs33: string[] = [];
+  // const querySnapshot1 = await getDocs(
+  //   query(collection(db, "property"), where("city", "==", location))
+  // );
+  // const querySnapshot2 = await getDocs(
+  //   query(collection(db, "property"), where("state", "==", location))
+  // );
+  // // setFilteredArr([]);ks
+  // // setArr([]);
+  // let r: QueryDocumentSnapshot<DocumentData>[] = querySnapshot1.docs.concat(
+  //   querySnapshot2.docs
+  // );
+  // setArr([]);
+  // setFilteredArr([]);
+  // //UNIJA
+  // setNumPropertiesLocation(0);
+  // setSumPricesPropertiesLocation(0);
+  // // r
+  // r.forEach(async (doc) => {
+  //   setNumPropertiesLocation((prev) => prev + 1);
+  //   setSumPricesPropertiesLocation((prev) => prev + doc.data().pricePerNight);
+  //   if (
+  //     rooms &&
+  //     numOfGuests &&
+  //     doc.data().numOfPersons >= numOfGuests &&
+  //     doc.data().numOfRooms >= rooms
+  //   ) {
+  //     console.log("MAIN", fromDate, toDate);
+  //     isAvailable(fromDate, toDate, doc.id).then((isAv) => {
+  //       if (isAv) {
+  //         setArr((prev) => {
+  //           return [...prev, doc];
+  //         });
+  //         setFilteredArr((prev) => {
+  //           return [...prev, doc];
+  //         });
+  //       }
+  //     });
+  //   }
+  // });
+  // };
 
   const shouldBeShown = (
     num: number,
@@ -189,8 +203,9 @@ export default function Search() {
       return false;
     }
   };
+
   const filterProperties = (item: any) => {
-    const property = item.data();
+    const property = item;
     const propertyid = item.id;
     //if selectedSuperhost and isSuperhost
     // or !selectedSuperhost   -> SHOULD BE SHOWN
@@ -236,7 +251,7 @@ export default function Search() {
 
   useEffect(() => {
     if (firstLoad) {
-      setArr([]);
+      // setArr([]);
       setFilteredArr([]);
     }
     if (
@@ -255,20 +270,14 @@ export default function Search() {
         setFilteredArr((prev) =>
           [...prev]
             .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
-            .sort(
-              (a: any, b: any) =>
-                a.data().pricePerNight - b.data().pricePerNight
-            )
+            .sort((a: any, b: any) => a.pricePerNight - b.pricePerNight)
         );
       } else if (sortPrice == "desc") {
         console.log("DESC");
         setFilteredArr((prev) =>
           [...prev]
             .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
-            .sort(
-              (a: any, b: any) =>
-                b.data().pricePerNight - a.data().pricePerNight
-            )
+            .sort((a: any, b: any) => b.pricePerNight - a.pricePerNight)
         );
       } else {
         console.log("NIJE NI RASTUCE NI OP");
@@ -287,29 +296,29 @@ export default function Search() {
     priceRange[0],
     priceRange[1],
     sortPrice,
-  ]); //TODO proveriti sve useeffect nizove
+  ]);
 
-  useEffect(() => {
-    setArr([]);
-    setFilteredArr([]);
-    if (
-      location != undefined &&
-      rooms != undefined &&
-      numOfGuests != undefined &&
-      fromDate != undefined &&
-      toDate != undefined &&
-      rooms &&
-      location &&
-      numOfGuests &&
-      fromDate &&
-      toDate
-    ) {
-      setFirstLoad(false);
-      setArr([]);
-      setFilteredArr([]);
-      getSearchProperties();
-    }
-  }, [location, rooms, numOfGuests]);
+  // useEffect(() => {
+  //   setArr([]);
+  //   setFilteredArr([]);
+  //   if (
+  //     location != undefined &&
+  //     rooms != undefined &&
+  //     numOfGuests != undefined &&
+  //     fromDate != undefined &&
+  //     toDate != undefined &&
+  //     rooms &&
+  //     location &&
+  //     numOfGuests &&
+  //     fromDate &&
+  //     toDate
+  //   ) {
+  //     setFirstLoad(false);
+  //     setArr([]);
+  //     setFilteredArr([]);
+  //     getSearchProperties();
+  //   }
+  // }, [location, rooms, numOfGuests]);
 
   return (
     <Layout
@@ -341,20 +350,26 @@ export default function Search() {
                 </div>
                 <ul
                   tabIndex={0}
-                  className="border dropdown-content menu p-2 shadow 
-                  bg-base-100 rounded-box w-64 sm:w-96 
+                  className="border dropdown-content menu p-2 shadow
+                  bg-base-100 rounded-box w-64 sm:w-96
                  flex items-center
                   "
                 >
                   <li>
-                    <div className="mt-10 flex flex-col w-52 hover:bg-inherit">
+                    {/* hover:bg-inherit*/}
+                    <div className="mt-10 flex flex-col w-52   !bg-transparent">
                       <Box sx={{ width: 300 }} className="w-52 sm:w-80">
                         <AirbnbSlider
                           getAriaLabel={() => "Price range"}
                           value={priceRange}
                           onChange={(e: Event, newValue: number | number[]) => {
-                            setPriceRange(newValue as number[]);
-                            setSelectedPrice(true);
+                            if (rangeRef != null) {
+                              clearTimeout(rangeRef.current);
+                            }
+                            rangeRef.current = setTimeout(() => {
+                              setPriceRange(newValue as number[]);
+                              setSelectedPrice(true);
+                            }, 100); //500
                           }}
                           getAriaValueText={valuetext}
                           marks={[
@@ -429,7 +444,7 @@ export default function Search() {
           </div>
           <div className="flex flex-col ">
             {filteredArr.map((item) => {
-              const property = item.data();
+              const property = item;
               const propertyid = item.id;
               return (
                 <CardSearch
@@ -456,10 +471,77 @@ export default function Search() {
         </section>
 
         <div className="flex flex-col items-center justify-center">
-          {filteredArr.length > 0 && <Map2 setLoc={""} arrLoc={filteredArr} />}
+          {filteredArr && filteredArr.length > 0 && (
+            <Map2 setLoc={""} arrLoc={filteredArr} />
+          )}
           {filteredArr.length}
         </div>
       </div>
     </Layout>
   );
 }
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    const queryUrl = context.query;
+    const cookies = nookies.get(context);
+    const token = await verifyIdToken(cookies.token);
+    const { uid, email } = token;
+
+    const { location: locationQuery, from, to } = queryUrl;
+    const location: string = locationQuery
+      ? locationQuery.includes(", ")
+        ? (locationQuery as string).split(", ")[0]
+        : (locationQuery as string)
+      : "";
+    const fromDate = new Date(queryUrl.from as string);
+    const toDate = new Date(queryUrl.to as string);
+    const rooms = (queryUrl.rooms ?? 0) as number;
+    const numOfGuests = (queryUrl.numOfGuests ?? 0) as number;
+    const qs44: string[] = [];
+    const qs33: string[] = [];
+
+    const querySnapshot1 = await getDocs(
+      query(collection(db, "property"), where("city", "==", location))
+    );
+
+    const querySnapshot2 = await getDocs(
+      query(collection(db, "property"), where("state", "==", location))
+    );
+    let r: QueryDocumentSnapshot<DocumentData>[] = querySnapshot1.docs.concat(
+      querySnapshot2.docs
+    );
+
+    var arr: DocumentData[] = [];
+
+    var NumPropertiesLocation = 0;
+    var SumPricesPropertiesLocation = 0;
+    for (let index = 0; index < r.length; index++) {
+      var doc = r[index];
+      NumPropertiesLocation = 1 + NumPropertiesLocation;
+      SumPricesPropertiesLocation =
+        SumPricesPropertiesLocation + doc.data().pricePerNight;
+      if (
+        rooms &&
+        numOfGuests &&
+        doc.data().numOfPersons >= numOfGuests &&
+        doc.data().numOfRooms >= rooms
+      ) {
+        const isAv = await isAvailable(fromDate, toDate, doc.id);
+        if (isAv) {
+          arr.push(doc.data());
+        }
+      }
+    }
+
+    return {
+      props: {
+        uid: uid,
+        ppp: arr, //mozda json stringify
+      },
+    };
+  } catch (err) {
+    context.res.writeHead(302, { location: "/" }); //on ga tera na login
+    context.res.end();
+    return { props: [] };
+  }
+};

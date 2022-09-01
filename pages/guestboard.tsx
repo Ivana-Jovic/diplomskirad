@@ -20,9 +20,12 @@ export default function GuestBoard({
 }: {
   uid: string;
   reservations: string;
+  // DocumentData[]; //RADILO SA string
 }) {
-  const reserv: DocumentData[] = JSON.parse(reservations);
-  console.log(reserv);
+  const reserv: DocumentData[] =
+    // reservations;
+    JSON.parse(reservations);
+  // console.log(reserv);
 
   return (
     <Layout>
@@ -59,19 +62,25 @@ export async function getServerSideProps(context) {
     const arrData: DocumentData[] = [];
     const q = query(
       collection(db, "reservations"),
-      where("userId", "==", uid)
-      // orderBy("createdAt")// TODO zasto ovo pokrsi sve
+      where("userId", "==", uid),
+      orderBy("createdAt")
     );
 
     const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      arrData.push(doc.data());
-    });
+    // querySnapshot.forEach((doc) => {
+    //   arrData.push(doc.data());
+    // });
+
+    for (let index = 0; index < querySnapshot.docs.length; index++) {
+      arrData.push(querySnapshot.docs[index].data());
+    }
     return {
       props: {
         uid: uid,
         // reservations: { ...{ ...arrData } },
-        reservations: JSON.stringify(arrData),
+        reservations:
+          // arrData,
+          JSON.stringify(arrData),
         // reservations: { ...{ ...querySnapshot.docs } },
         // session: "Your email is ${email} and your UID is ${uid}",
       },

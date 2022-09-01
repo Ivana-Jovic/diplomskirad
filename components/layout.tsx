@@ -2,6 +2,7 @@ import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import Head from "next/head";
 export const siteTitle = "Airbnb";
+import { Toaster } from "react-hot-toast";
 
 export default function Layout({
   children,
@@ -33,6 +34,7 @@ export default function Layout({
         <meta name="twitter:card" content="summary_large_image" /> */}
       </Head>
       <Navbar placeholder={placeholder} />
+      <Toaster />
       <main className="bg-background pb-7 w-full ">{children}</main>
       <Footer />
     </div>

@@ -9,7 +9,7 @@ import CardPopup from "./cardpopup";
 interface props {
   setLoc: any;
   popup?: React.ReactNode;
-  arrLoc: QueryDocumentSnapshot<DocumentData>[];
+  arrLoc: DocumentData[];
 }
 
 const Map2 = (props: props) => {
@@ -159,19 +159,19 @@ const Map2 = (props: props) => {
       ivaninaMapa.on("load", (param) => {
         console.log("BBBBBBBBBBBB", arrLoc.length);
         arrLoc.forEach((element, index) => {
-          console.log("UUUUUUUUU", element.data().title);
+          console.log("UUUUUUUUU", element.title);
           createMarker(
             "accident.colors-white.jpg",
             [
-              element.data().loc && element.data().loc != ","
-                ? JSON.parse(element.data().loc.split("-")[0])
+              element.loc && element.loc != ","
+                ? JSON.parse(element.loc.split("-")[0])
                 : 20.447,
-              element.data().loc && element.data().loc != ","
-                ? JSON.parse(element.data().loc.split("-")[1])
+              element.loc && element.loc != ","
+                ? JSON.parse(element.loc.split("-")[1])
                 : 44.81,
             ],
             "#c31a26",
-            element.data().title,
+            element.title,
             element,
             divs[index]
           );

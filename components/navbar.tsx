@@ -1,4 +1,4 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/dist/client/router";
 import Image from "next/image";
 import { useContext, useState } from "react";
@@ -23,22 +23,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
     setSearchInput("");
   };
 
-  // ovaj dole nacinje oristan jer ovako mozemo da sharujemo nekom link da vidi nase reyultate
-  // const search = () => {
-  //   router.push({
-  //     pathname: "/search",
-  //     query: {
-  //       location: searchInput,
-  //       // startdate i end... 1;31 day3
-  //       numOfGuests,
-  //     },
-  //   });
-  // };
-
   const becomeAHost = async () => {
-    const docRef = await addDoc(collection(db, "users"), {
-      //TODO ovdetreba update a ne add
-      // userId: session?.user?.name,<-GOOGLE
+    await updateDoc(doc(db, "users", user?.uid), {
       userId: user?.uid,
       host: true,
     });

@@ -28,45 +28,47 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { AuthContext } from "../firebase-authProvider";
 import { db } from "../firebase";
 import { Dropdown, Menu, Space } from "antd";
-
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import Button from "./button";
+import { isAvailable } from "../lib/hooks";
 type IFormInput = {
   garage: boolean;
   specialReq: string;
   timeFrom: Date;
   timeTo: Date;
 };
-//TODO PAZI OVO JE COPY PASE FJA IZ SEARCHA
-async function isAvailable(from: Date, to: Date, propertyId: string) {
-  const querySnapshot6 = await getDocs(
-    query(collection(db, "reservations"), where("propertyId", "==", propertyId))
-  );
-  for (let index = 0; index < querySnapshot6.docs.length; index++) {
-    const doc = querySnapshot6.docs[index];
-    console.log("KK ", propertyId, index, doc.id);
+//PAZI OVO JE COPY PASE FJA IZ SEARCHA
+// async function isAvailable(from: Date, to: Date, propertyId: string) {
+//   const querySnapshot6 = await getDocs(
+//     query(collection(db, "reservations"), where("propertyId", "==", propertyId))
+//   );
+//   for (let index = 0; index < querySnapshot6.docs.length; index++) {
+//     const doc = querySnapshot6.docs[index];
+//     console.log("KK ", propertyId, index, doc.id);
 
-    //oni koji se potencijalno poklapaju
-    if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
-      //ne poklapaju se
-    } else {
-      //poklapaju se kako god
-      //ako je doc.to izmedju to i from poklapaju se sigurno
-      //ako doc.to vece od to poklapaju se  ako je from iymedju ili pre from
-      //
-      console.log(
-        "ELSE GRANA",
-        propertyId,
-        from.toDateString(),
-        to.toDateString()
-      );
-      console.log("IS AVAILABLE JE FALSE", doc.id);
-      return false;
-    }
-  }
-  console.log("IS AVAILABLE JE TRUE");
-  return true;
-}
+//     //oni koji se potencijalno poklapaju
+//     if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
+//       //ne poklapaju se
+//     } else {
+//       //poklapaju se kako god
+//       //ako je doc.to izmedju to i from poklapaju se sigurno
+//       //ako doc.to vece od to poklapaju se  ako je from iymedju ili pre from
+//       //
+//       console.log(
+//         "ELSE GRANA",
+//         propertyId,
+//         from.toDateString(),
+//         to.toDateString()
+//       );
+//       console.log("IS AVAILABLE JE FALSE", doc.id);
+//       return false;
+//     }
+//   }
+//   console.log("IS AVAILABLE JE TRUE");
+//   return true;
+// }
 export default function Extrawierd({ property }: { property: DocumentData }) {
   const {
     control,
@@ -97,7 +99,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
       : new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
   const numOfGuests = router.query.numOfGuests
     ? parseInt(router.query.numOfGuests as string)
-    : 0;
+    : 1;
 
   const [guests, setGuests] = useState<number>(numOfGuests);
   const [dateFrom, setDateFrom] = useState<Date | null>(from ?? new Date());
@@ -171,7 +173,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
           data.timeTo.getMinutes(),
         specialReq: data.specialReq,
         leftFeedback: false,
-        createdAt: Timestamp.now(),
+        createdAt: Timestamp.now().toMillis(),
       });
 
       await updateDoc(doc(db, "reservations", docRef.id), {
@@ -191,32 +193,31 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 <label className="mx-5">guests</label>
                 <button
                   className={
-                    `roundButton ` + `${guests == 1 ? "  bg-red-600" : ""}`
+                    ` ` +
+                    `${guests == 1 ? " roundButtonDisabled " : "roundButton"}`
                   }
                   onClick={() => {
                     if (guests - 1 > 0) setGuests(guests - 1);
                   }}
                 >
-                  -
+                  {guests > 1 && <RemoveIcon fontSize="small" />}
                 </button>
                 <div className="mx-3">{guests}</div>
                 <button
                   className={
-                    `roundButton ` +
+                    ` ` +
                     `${
                       guests == 20 || guests == property.numOfPersons
-                        ? "  bg-red-600"
-                        : ""
+                        ? " roundButtonDisabled"
+                        : "roundButton"
                     }`
                   }
                   onClick={() => {
                     if (guests + 1 <= 20 && guests + 1 <= property.numOfPersons)
-                      //
-                      //TODO check if this matches other min and maxs
                       setGuests(guests + 1);
                   }}
                 >
-                  +
+                  {guests < 20 && <AddIcon fontSize="small" />}
                 </button>
               </div>
             </>
@@ -233,7 +234,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
   return (
     <>
       <div
-        className="relative w-80 sm:w-96 h-[600px] sm:h-[600px] lg:h-[600px] 
+        className="relative w-80 xs:w-96 h-[600px] sm:h-[600px] lg:h-[600px] 
     xl:h-[600px] 2xl:h-[700px]  "
       >
         <LocalizationProvider dateAdapter={AdapterDateFns}>

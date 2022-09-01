@@ -103,24 +103,26 @@ export default function AddProperty() {
     ) {
       setError("You must upload 3 to 10 picures at most");
     } else {
-      add(data);
-      router.push({
-        pathname: "/",
+      add(data).then((ret) => {
+        console.log(ret);
+        if (ret) {
+          router.push({
+            pathname: "/",
+          });
+        } else console.log("RETURNED FALSE subm");
       });
     }
   };
 
   const uploadPictures = async (data: IFormInput) => {
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
     var urlArr: string[] = [];
     const fileArr = data.picturesNEW ?? null;
     setUrlArr([]);
 
     for (let index = 0; index < fileArr.length; index++) {
       const selected: File = fileArr[index];
-      if (
-        selected
-        // && allowedTypes.includes(selected.type)
-      ) {
+      if (selected && allowedTypes.includes(selected.type)) {
         const extension = selected.type.split("/")[1];
         const nnNEW: string = `uploads/${
           user.uid
@@ -134,69 +136,79 @@ export default function AddProperty() {
         urlArr.push(url);
         // setError("");
       } else {
-        // setError("Please select an image file (png or jpeg)");
+        setError("Image must be png, jpeg or jpg");
+        return null;
       }
     }
     return urlArr;
   };
 
-  const add = async (data: IFormInput) => {
-    uploadPictures(data).then(async (urlArr) => {
-      console.log("LLLLLLLLLLLLLLL", urlArr.length);
+  const add = async (data: IFormInput): Promise<boolean> => {
+    const urlArr: string[] = await uploadPictures(data);
+    // uploadPictures(data).then(async (urlArr) => {
+    if (urlArr == null) {
+      console.log("RETURNED FALSE add");
+      return false;
+    }
+    console.log("LLLLLLLLLLLLLLL", urlArr.length);
 
-      const docRef = await addDoc(collection(db, "property"), {
-        title: data.title,
-        description: data.desc,
-        state: state,
-        city: city,
-        street: streetName,
-        streetNum: streetNum,
-        type: data.type,
-        numOfRooms: data.numRoooms,
-        numOfPersons: data.numPers,
-        image: "image",
-        galery: "galery",
-        pricePerNight: data.priceN,
-        additionalPerPerson: data.addPers,
-        additionalCosts: data.addCosts,
-        garage: data.garage == "Yes" ? true : false,
-        ownerId: user?.uid,
-        images: urlArr,
-        totalStars: 0,
-        numberOfReview: 0,
-        isSuperhost: false,
-        loc: loc ?? ",",
-        dateAddedProperty: new Date().toDateString(),
-        createdAt: Timestamp.now(),
-      });
-      console.log("lllll");
-      //if state doesnt exist add
-      const docSnap1 = await getDoc(doc(db, "locations", state));
-      if (docSnap1.exists()) {
-        //if city doesnt exist add
-        const docSnap2 = await getDoc(
-          doc(db, "locations", city + ", " + state)
-        );
-        if (!docSnap2.exists()) {
-          await setDoc(doc(db, "locations", city + ", " + state), {});
-        }
-      } else {
-        await setDoc(doc(db, "locations", state), {});
-        //add city
+    const docRef = await addDoc(collection(db, "property"), {
+      title: data.title,
+      description: data.desc,
+      state: state,
+      city: city,
+      street: streetName,
+      streetNum: streetNum,
+      type: data.type,
+      numOfRooms: data.numRoooms,
+      numOfPersons: data.numPers,
+      image: "image",
+      galery: "galery",
+      pricePerNight: data.priceN,
+      additionalPerPerson: data.addPers,
+      additionalCosts: data.addCosts,
+      garage: data.garage == "Yes" ? true : false,
+      ownerId: user?.uid,
+      images: urlArr,
+      totalStars: 0,
+      numberOfReviews: 0,
+      isSuperhost: false,
+      loc: loc ?? ",",
+      dateAddedProperty: new Date().toDateString(),
+      createdAt: Timestamp.now().toMillis(),
+      removedByAdmin: false,
+    });
+    await updateDoc(doc(db, "property", docRef.id), {
+      id: docRef.id,
+    });
+    console.log("lllll");
+    //if state doesnt exist add
+    const docSnap1 = await getDoc(doc(db, "locations", state));
+    if (docSnap1.exists()) {
+      //if city doesnt exist add
+      const docSnap2 = await getDoc(doc(db, "locations", city + ", " + state));
+      if (!docSnap2.exists()) {
         await setDoc(doc(db, "locations", city + ", " + state), {});
       }
-    });
+    } else {
+      await setDoc(doc(db, "locations", state), {});
+      //add city
+      await setDoc(doc(db, "locations", city + ", " + state), {});
+    }
     await updateDoc(doc(db, "users", user.uid), {
       numberOfProperties: increment(1),
     });
+    // });
+
+    return true;
   };
   return (
     <>
-      {user && myUser.numberOfProperties < 10 ? (
+      {user && myUser && myUser.numberOfProperties < 10 ? (
         <>
           <Layout>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="max-w-7xl px-5 mx-auto">
+              <div className="max-w-7xl px-5 mx-auto text-center">
                 <div className="pt-7 pb-5 text-center text-3xl font-bold">
                   New property
                 </div>
@@ -466,7 +478,7 @@ export default function AddProperty() {
                     Please enter street name and number
                   </div>
                 )}
-                <div className="flex flex-col items-center justify-center mx-3">
+                <div className="flex flex-col items-center justify-center">
                   <Map
                     setLoc={setLoc}
                     setState={setState}
@@ -475,12 +487,12 @@ export default function AddProperty() {
                     setStreetNum={setStreetNum}
                     setSelectedStreet={setSelectedStreet}
                   />
-                  {loc && (
+                  {/* {loc && (
                     <div>
                       {JSON.parse(loc.split("-")[0])}-
                       {JSON.parse(loc.split("-")[1])}
                     </div>
-                  )}
+                  )} */}
                 </div>
                 <div className="grid sm:grid-cols-2 grid-cols-1 mt-14">
                   <TextField
@@ -489,7 +501,7 @@ export default function AddProperty() {
                     // })}
                     disabled
                     InputLabelProps={{ shrink: true }}
-                    className="mx-3 mb-2"
+                    className="mb-2"
                     id="outlined-required"
                     label="State"
                     value={state}
@@ -502,7 +514,7 @@ export default function AddProperty() {
                     // })}
                     disabled
                     InputLabelProps={{ shrink: true }}
-                    className="mx-3 mb-2"
+                    className="mb-2"
                     id="outlined-required"
                     label="City"
                     value={city}
@@ -518,7 +530,7 @@ export default function AddProperty() {
                     //   required: "Please enter a street name",
                     // })}
                     InputLabelProps={{ shrink: true }}
-                    className="mx-3 mb-2"
+                    className=" mb-2"
                     id="outlined-required"
                     label="Street"
                     value={streetName}
@@ -531,7 +543,7 @@ export default function AddProperty() {
                     //   required: "Please entera value",
                     // })}
                     InputLabelProps={{ shrink: true }}
-                    className="mx-3 mb-2"
+                    className=" mb-2"
                     id="outlined-required"
                     label="StreetNum"
                     value={streetNum}
@@ -544,7 +556,7 @@ export default function AddProperty() {
                   />
                 </div>
                 <div>
-                  <label className="btn ">
+                  <label className="btn w-full mt-5">
                     Select property pictures
                     <input
                       {...register("picturesNEW")}
@@ -585,7 +597,10 @@ export default function AddProperty() {
                   text="Add"
                   type="submit"
                 /> */}
-                <button className="btn mx-auto text-center" type="submit">
+                <button
+                  className="btn mx-auto text-center w-full"
+                  type="submit"
+                >
                   Add
                 </button>
               </div>
@@ -595,7 +610,7 @@ export default function AddProperty() {
       ) : (
         <>
           <ErrorPage />
-          {myUser.numberOfProperties >= 10 && (
+          {user && myUser && myUser.numberOfProperties >= 10 && (
             <div>Maximum number of properties is 10</div>
           )}
         </>

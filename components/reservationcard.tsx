@@ -46,7 +46,6 @@ import {
 //   },
 // });
 
-//TODO vidi svuda za srce klik u fav
 export default function ReservationCard({
   userId,
   firstName,
@@ -67,6 +66,7 @@ export default function ReservationCard({
   leftFeedback,
   reservationId,
   isHost,
+  createdAt,
 }: {
   userId: string;
   firstName: string;
@@ -87,14 +87,21 @@ export default function ReservationCard({
   leftFeedback: boolean;
   reservationId: string;
   isHost: boolean;
+  createdAt: number;
 }) {
   const [leftFB, setLeftFB] = useState<boolean>(leftFeedback);
   const [comment, setComment] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const [stars, setStars] = useState<number | null>(1);
   const [reportOpen, setReportOpen] = useState<boolean>(isHost ? true : false);
   const [reportReason, setReportReason] = useState<string>("");
-  //todo pri reportu se ne brise  nista vec blikira prisup - yasivi se
+
   const leaveFeedback = async () => {
+    if (comment == "") {
+      setError("Please enter a comment.");
+      return;
+    }
+    console.log("OH NOOOOO");
     const propertiesRef = collection(db, "property");
     // const docRef = await setDoc(
     //   doc(
@@ -115,7 +122,7 @@ export default function ReservationCard({
     //     reservationId: reservationId,
     //     createdAt: Timestamp.now(),
     //   }
-    // );//TODO komentari hronoloski
+    // )
     const docRef = await addDoc(
       collection(propertiesRef, propertyId, "comments"),
       {
@@ -126,10 +133,11 @@ export default function ReservationCard({
         lastName: lastName,
         date: to,
         reservationId: reservationId,
-        createdAt: Timestamp.now(),
+        createdAt: Timestamp.now().toMillis(),
+        propertyId: propertyId,
+        reported: false,
       }
     );
-    // item.data().createdAt.seconds
     await updateDoc(doc(db, "property", propertyId), {
       numberOfReviews: increment(1),
       totalStars: increment(stars ? stars : 1),
@@ -191,7 +199,7 @@ export default function ReservationCard({
       guestIsReporting: !isHost,
       reportText: reportReason,
       processed: false,
-      createdAt: Timestamp.now(),
+      createdAt: Timestamp.now().toMillis(),
     });
     await updateDoc(doc(db, "reports", docRef.id), {
       id: docRef.id,
@@ -216,9 +224,13 @@ export default function ReservationCard({
           </div>
           <div className="text-xl font-semibold text-center  mb-3">{title}</div>
           {/* <div>{item.data().propertyId}</div> */}
-          <div className="flex text-lg font-semibold justify-center text-center items-center mb-2">
+          <div className="flex text-lg font-semibold justify-center text-center items-center">
             <div>{user}</div>
             <div className="text-xs">-{userId}</div>
+          </div>
+          <div className="text-center text-xs">
+            Created at: {new Date(createdAt).toDateString()}
+            {/* // toLocaleString()} ne moye ovo */}
           </div>
           <div className="text-center text-xs">
             Reservation number: {reservationId}
@@ -301,6 +313,7 @@ export default function ReservationCard({
                                 value={comment}
                                 onChange={(e) => {
                                   setComment(e.target.value);
+                                  setError("");
                                 }}
                                 className="outline-0 border bg-transparent text-lg text-gray-600 w-full"
                               />
@@ -379,6 +392,7 @@ export default function ReservationCard({
                             >
                               {isHost ? "Report" : "Leave feedback"}
                             </button>
+                            <div className="text-center mt-2">{error}</div>
                           </div>
                         </div>
                       </label>

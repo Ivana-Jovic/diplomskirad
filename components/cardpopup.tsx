@@ -27,7 +27,7 @@ export default function CardPopup({
   //   totalStars: number;
   //   numberOfReviews: number;
   //   numberOfNights: number;
-  property: QueryDocumentSnapshot<DocumentData>;
+  property: DocumentData;
 }) {
   const router = useRouter();
 
@@ -55,7 +55,7 @@ export default function CardPopup({
     <div className="card card-side  p-2 rounded-md  cursor-pointer bg-base-100 shadow-md hover:opacity-90 hover:shadow-lg">
       <figure className="relative h-auto w-1/3  flex-shrink-0">
         <Image
-          src={property.data().images[0]}
+          src={property.images[0]}
           alt={property.id}
           layout="fill"
           objectFit="cover"
@@ -66,23 +66,19 @@ export default function CardPopup({
         <div className="flex justify-between items-center ">
           <div className="flex">
             <p className="text-sm ">
-              {(
-                property.data().totalStars / property.data().numberOfReviews
-              ).toFixed(1)}
+              {(property.totalStars / property.numberOfReviews).toFixed(1)}
             </p>
             <Rating name="read-only" value={1} readOnly size="small" max={1} />
           </div>
           {/* <Heart propertyid={property.id} /> */}
         </div>
         <p className="">
-          {property.data().title.length < 20
-            ? property.data().title
-            : property
-                .data()
-                .title.slice(0, property.data().title.indexOf(" ", 20)) + "..."}
+          {property.title.length < 20
+            ? property.title
+            : property.title.slice(0, property.title.indexOf(" ", 20)) + "..."}
         </p>
         <div className=" flex items-center ">
-          {property.data().price}€/
+          {property.price}€/
           <p className="text-md text-gray-500 ">night</p>
         </div>
       </div>

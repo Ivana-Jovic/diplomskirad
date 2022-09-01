@@ -5,7 +5,6 @@ import {
   DocumentSnapshot,
   getDoc,
   getDocs,
-  orderBy,
   query,
   where,
   QueryDocumentSnapshot,
@@ -15,10 +14,15 @@ import {
 import { useRef, useState } from "react";
 import { db } from "../firebase";
 import Button from "./button";
-
+//TODO become a host by adding property
+//TODO
+//if the user is removed by admin he cannot See any content
+// make reservations
+//  add new properties (and become a host)
+//  report comments, users
+// if a property is rremoved it can no longer be reserved
 export default function ReportCard({ report }: { report: DocumentData }) {
   const [processed, setProcessed] = useState<boolean>(report.processed);
-  const reportedUser = useRef<string>(report.hostId); //TODO: promeni u zavisnosti ko koga reportuje
 
   const processReport = async () => {
     await updateDoc(doc(db, "reports", report.id), {
@@ -28,22 +32,41 @@ export default function ReportCard({ report }: { report: DocumentData }) {
   const deleteUser = async () => {
     if (report.guestIsReporting) {
       //meaning host is beeing reported -> delete his properties
-      //TODO proveri da li ovo brisanje negde remeti rezervacije,reportove
+
       const q = query(
         collection(db, "property"),
-        where("ownerId", "==", "YSX0mxwY9CsRy4IJd8ft") // reportedUser.current //TODO VRATI OVO
+        where("ownerId", "==", report.hostId)
       );
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach(async (doc1) => {
-        // setArr((prev)=>[...prev,doc]);
-        await deleteDoc(doc(db, "property", doc1.id));
+        await updateDoc(doc(db, "property", doc1.id), {
+          removedByAdmin: true,
+        });
+      });
+      await updateDoc(doc(db, "users", report.hostId), {
+        removedByAdmin: true,
+      });
+      // //meaning host is beeing reported -> delete his properties
+      // // proveri da li ovo brisanje negde remeti rezervacije,reportove
+      // const q = query(
+      //   collection(db, "property"),
+      //   where("ownerId", "==", "YSX0mxwY9CsRy4IJd8ft") // reportedUser.current  VRATI OVO
+      // );
+      // const querySnapshot = await getDocs(q);
+      // querySnapshot.forEach(async (doc1) => {
+      //   await deleteDoc(doc(db, "property", doc1.id));
+      // });
+    } else {
+      await updateDoc(doc(db, "users", report.guestId), {
+        removedByAdmin: true,
       });
     }
-    // reportedUser.current //TODO VRATI OVO
-    await deleteDoc(doc(db, "users", "YSX0mxwY9CsRy4IJd8ft")); //Warning: Deleting a document does not delete its subcollections!
-    //TODO obrisi usera u auth tj disable
+    // proveri da li ovo brisanje negde remeti rezervacije,reportove
+    // reportedUser.current // VRATI OVO
+    // await deleteDoc(doc(db, "users", "YSX0mxwY9CsRy4IJd8ft")); //Warning: Deleting a document does not delete its subcollections!
+    // obrisi usera u auth tj disable
 
-    // deleteUser(user)// TODO dodaj brisanje
+    // deleteUser(user)//  dodaj brisanje
     //   .then(() => {
     //     // User deleted.
     //   })
@@ -74,7 +97,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
     }
   };
   return (
-    <div className="card w-96 bg-base-100 shadow-xl">
+    <div className="card w-full bg-base-100 shadow-xl">
       <div className="card-body">
         <h2 className="card-title">
           {report.guestIsReporting
@@ -85,8 +108,12 @@ export default function ReportCard({ report }: { report: DocumentData }) {
               " is reporting guest" +
               report.guestId}
         </h2>
+        <div className="">
+          Created at {new Date(report.createdAt).toDateString()}
+        </div>
+        <div className="">reportId {report.id}</div>
         <div>
-          <div>{new Date(report.createdAt.seconds * 1000).toDateString()}</div>
+          {/* <div>{report.id}</div> */}
           <div className="">
             Guest -{report.guestId}
             {/* -{report.guestLastName}- */}
@@ -98,6 +125,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
             {report.guestIsReporting ? "yes" : "no"}
           </div>
           <div className="">Host {report.hostId}</div>
+          {/* <div className="">Reservation Id {report.reservationId}</div> */}
           <div className="">Reservation Id {report.reservationId}</div>
           {!processed && (
             <div>
@@ -107,24 +135,26 @@ export default function ReportCard({ report }: { report: DocumentData }) {
                 //   text="Report processed - delete this user and his properties"
                 //   type=""
                 // />
-                <button className="btn mt-3" onClick={deleteUser}>
+                <button className="btn mt-3 w-full" onClick={deleteUser}>
                   Report processed - delete this user and his properties{" "}
                 </button>
               )}
-              {report.reportText == "comment" && (
-                // <Button action={deleteComment} text="Delete comment" type="" />
-                <button className="btn mt-3" onClick={deleteComment}>
-                  Delete comment
-                </button>
-              )}
-              {/* <Button
+              <div className="flex flex-col">
+                {report.reportText == "comment" && (
+                  // <Button action={deleteComment} text="Delete comment" type="" />
+                  <button className="btn mt-3" onClick={deleteComment}>
+                    Delete comment
+                  </button>
+                )}
+                {/* <Button
                 action={processReport}
                 text="Report processed - false report"
                 type=""
               /> */}
-              <button className="btn mt-3" onClick={processReport}>
-                Report processed - false report
-              </button>
+                <button className="btn mt-3" onClick={processReport}>
+                  Report processed - false report
+                </button>
+              </div>
             </div>
           )}
           {processed && <div>** PROCESSED **</div>}

@@ -11,6 +11,7 @@ import {
   query,
   QueryDocumentSnapshot,
   Timestamp,
+  where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -24,6 +25,7 @@ import { Rating } from "@mui/material";
 import Button from "../components/button";
 import Map2 from "../components/map2";
 import ImageGallery from "react-image-gallery";
+import CommentCard from "../components/commentcard";
 
 type imgGalleryType = {
   original: string;
@@ -31,31 +33,15 @@ type imgGalleryType = {
 };
 
 export default function PropertyPage() {
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
   const [more, setMore] = useState<boolean>(false);
   const { user, myUser } = useContext(AuthContext);
   const router = useRouter();
   const { property: propertyid, from, to, numOfGuests } = router.query;
   const [property, setProperty] = useState<DocumentData>();
-  const [comments, setComments] = useState<DocumentData[]>();
+  const [comments, setComments] =
+    useState<QueryDocumentSnapshot<DocumentData>[]>();
   const pid: string = propertyid ? propertyid.toString() : "";
-  const [arrLocation, setArrLocation] = useState<
-    QueryDocumentSnapshot<DocumentData>[]
-  >([]);
+  const [arrLocation, setArrLocation] = useState<DocumentData[]>([]);
   const [galleryImages, setGalleryImages] = useState<imgGalleryType[]>([]);
 
   const getProperty = async () => {
@@ -76,14 +62,15 @@ export default function PropertyPage() {
           ];
         });
       });
-      // setArrLocation((prev) => [...prev, docSnap]);
-      // const subColl = query(
-      //   collectionGroup(db, "property", pid, "comments"),
-      //   orderBy("createdAt")
-      // );
+      setArrLocation((prev) => [...prev, docSnap.data()]);
+      const subColl = query(
+        collectionGroup(db, "comments"),
+        where("propertyId", "==", pid),
+        orderBy("createdAt")
+      );
 
       // const subDocSnap = await getDocs(subColl);
-      const subColl = collection(db, "property", pid, "comments");
+      // const subColl = collection(db, "property", pid, "comments");
       const subDocSnap = await getDocs(subColl);
       subDocSnap.forEach((doc) => {
         comm.push(doc);
@@ -98,23 +85,6 @@ export default function PropertyPage() {
     if (propertyid) getProperty();
   }, [propertyid]); //probaj i property ako ne radi
 
-  const report = async (comment: DocumentData) => {
-    //report comment
-    const docRef = await addDoc(collection(db, "reports"), {
-      guestId: comment.data().userId, //ko je komentarisao
-      // guestFirstName: comment.data().firstName,
-      // guestLastName: comment.data().lastName,
-      reservationId: comment.data().reservationId,
-      hostId: user?.uid ?? "",
-      // reportedFirstName: myUser.firstName,
-      // reportedLastName: myUser.lastName,
-      guestIsReporting: false,
-      reportText: "comment",
-      processed: false,
-      commentId: comment.id,
-      createdAt: Timestamp.now(),
-    });
-  };
   return (
     <Layout>
       {property && (
@@ -241,46 +211,10 @@ export default function PropertyPage() {
             <div className="pt-7 pb-5 text-center text-3xl font-bold">
               Reviews
             </div>
-            {comments?.map((item: DocumentData) => {
+            {comments?.map((item: QueryDocumentSnapshot<DocumentData>) => {
               return (
-                <div key={item.id} className="my-5 p-2 border">
-                  <div>
-                    {item.data().firstName}-{item.data().lastName}
-                  </div>
-                  <div>
-                    {new Date(
-                      item.data().createdAt.seconds * 1000
-                    ).toDateString()}
-                  </div>
-                  <div className="text-xs">
-                    {months[new Date(item.data().date).getMonth()]}
-                    &nbsp;
-                    {new Date(item.data().date).getFullYear()}
-                  </div>
-                  <div>
-                    <Rating
-                      name="read-only"
-                      value={item.data().stars}
-                      readOnly
-                      size="small"
-                    />
-                  </div>
-                  <div className="font-normal">{item.data().comment}</div>
-                  {/* //TODO TIMESTAMPOVI - poredjaj */}
-                  <div className="mt-3">
-                    {myUser.host && (
-                      //TODO: ako je reportovano makni dugme
-                      //ovo sam pre radila tako sto odvojim u komponentu zasebnu
-                      <button
-                        className="btn"
-                        onClick={() => {
-                          report(item);
-                        }}
-                      >
-                        Do you want to report?
-                      </button>
-                    )}
-                  </div>
+                <div key={item.id} className="">
+                  <CommentCard comment={item} />
                 </div>
               );
             })}

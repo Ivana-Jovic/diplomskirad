@@ -47,6 +47,8 @@ export default function SignInRegisterPopup() {
           host: false,
           isSuperhost: false,
           numberOfProperties: 0,
+          faves: [],
+          removedByAdmin: false,
         });
         router.push({
           pathname: "/profilesettings",

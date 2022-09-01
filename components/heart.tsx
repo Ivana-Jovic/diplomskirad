@@ -10,25 +10,15 @@ import { db } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { yellow, red } from "@mui/material/colors";
+import toast from "react-hot-toast";
 
-export default function Heart({
-  propertyid,
-}: // inFavess,
-{
-  propertyid: string;
-  // inFavess: boolean;
-}) {
+export default function Heart({ propertyid }: { propertyid: string }) {
   const { user, myUser } = useContext(AuthContext);
   const [inFaves, setInFaves] = useState<boolean>(false);
 
   const checkIfInFaves = useCallback(() => {
-    console.log("in heart checkifinfaves");
-    //PROMENA POSLE PREKORACENJA FIREBASA//TODO PROVERI
     const pid: string = propertyid ? propertyid.toString() : "";
-    // const docSnap = await getDoc(doc(db, "users", user?.uid)); //PROMENA POSLE PREKORACENJA FIREBASA
-
     if (myUser && myUser.faves) {
-      //PROMENA POSLE PREKORACENJA FIREBASA
       if (myUser.faves.includes(pid)) {
         setInFaves(true);
       } else {
@@ -40,13 +30,15 @@ export default function Heart({
   }, [myUser, propertyid]);
 
   const onHeart = async () => {
-    console.log("in heart onHeart", propertyid);
     if (!inFaves) {
-      //TODO: put in faves orr delete from SVUDA GDE JE SRCE
-      await updateDoc(doc(db, "users", user?.uid), {
-        faves: arrayUnion(propertyid),
-      });
-      setInFaves(true);
+      if (myUser.faves.length < 10) {
+        await updateDoc(doc(db, "users", user?.uid), {
+          faves: arrayUnion(propertyid),
+        });
+        setInFaves(true);
+      } else {
+        toast.error("Maximum for adding to favourites is is 10!");
+      }
     } else {
       await updateDoc(doc(db, "users", user?.uid), {
         faves: arrayRemove(propertyid),
@@ -56,10 +48,8 @@ export default function Heart({
   };
 
   useEffect(() => {
-    //TODO proveri uslove
-    console.log("useEffect in heart");
     if (user && myUser != undefined) checkIfInFaves();
-  }, [user, myUser, checkIfInFaves]); //myUser probaj zbog  //PROMENA POSLE PREKORACENJA FIREBASA//TODO PROVERI
+  }, [user, myUser, checkIfInFaves]);
 
   return (
     <>
@@ -69,7 +59,6 @@ export default function Heart({
             e.stopPropagation();
             onHeart();
           }}
-          // className="mr-10"
         >
           {inFaves && (
             <FavoriteRoundedIcon

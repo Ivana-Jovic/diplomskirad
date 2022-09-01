@@ -29,14 +29,18 @@ export default function AdminBoard({
   reports,
 }: {
   uid: string;
-  reports: string;
+  reports: // DocumentData[];
+  string;
 }) {
   // const { user, myUser } = useContext(AuthContext);
 
   const q = query(collection(db, "reports"), orderBy("createdAt"));
   const [realtimeReservations] = useCollectionData(q);
 
-  const rep: DocumentData[] = realtimeReservations || JSON.parse(reports);
+  const rep: DocumentData[] =
+    realtimeReservations ||
+    // reports;
+    JSON.parse(reports);
 
   // const { user, myUser } = useContext(AuthContext);
   // const [arr, setArr] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
@@ -64,13 +68,10 @@ export default function AdminBoard({
           <div className="pt-7 pb-5 text-center text-3xl font-bold">
             Reports
           </div>
-          <div className="flex flex-col ">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 place-items-center">
             {rep.map((item) => {
               return (
-                <div
-                  key={item.id}
-                  className="my-3 grid grid-cols-1 lg:grid-cols-2"
-                >
+                <div key={item.id} className="my-3 ">
                   <ReportCard report={item} />
                 </div>
               );
@@ -92,13 +93,22 @@ export async function getServerSideProps(context) {
     const querySnapshot = await getDocs(
       query(collection(db, "reports"), orderBy("createdAt"))
     );
-    querySnapshot.forEach((doc) => {
-      arrData.push(doc.data());
-    });
+    // querySnapshot.forEach((doc) => {
+    //   //??KAO RADI
+    //   arrData.push(doc.data());
+    // });
+    // querySnapshot.docs.sort((a,b)=>{
+    //  return  a.data().createdAt-b.data().createdAt
+    // })
+    for (let index = 0; index < querySnapshot.docs.length; index++) {
+      arrData.push(querySnapshot.docs[index].data());
+    }
     return {
       props: {
         uid: uid,
-        reports: JSON.stringify(arrData),
+        reports:
+          // arrData,
+          JSON.stringify(arrData),
       },
     };
   } catch (err) {
