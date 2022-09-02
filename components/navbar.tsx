@@ -12,6 +12,7 @@ import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
 import Link from "next/link";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 //proveri upitnik kod placeholder
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const { user, myUser } = useContext(AuthContext);
@@ -25,11 +26,22 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
 
   const becomeAHost = async () => {
     await updateDoc(doc(db, "users", user?.uid), {
-      userId: user?.uid,
       host: true,
     });
   };
 
+  const changeMod = async () => {
+    if (myUser && myUser.modeIsHosting) {
+      await updateDoc(doc(db, "users", user?.uid), {
+        modeIsHosting: false,
+      });
+    }
+    if (myUser && !myUser.modeIsHosting) {
+      await updateDoc(doc(db, "users", user?.uid), {
+        modeIsHosting: true,
+      });
+    }
+  };
   const menu = (
     <Menu
       items={[
@@ -66,16 +78,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         {
           key: "3",
           label: (
-            <div
-              onClick={becomeAHost}
-              className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
-
-              // className="hover:bg-slate-50 py-1 pl-1 transition duration-200 ease-out hover:shadow-lg"
-            >
-              Become a host
-            </div>
+            <Link href="/addproperty">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                Become a host
+              </a>
+            </Link>
           ),
-          // disabled: true,
         },
         {
           key: "4",
@@ -148,6 +156,17 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             </Link>
           ),
         },
+        {
+          key: "11",
+          label: (
+            <div
+              className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1"
+              onClick={changeMod}
+            >
+              Change mod
+            </div>
+          ),
+        },
       ]}
     />
   );
@@ -182,13 +201,16 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
                 <Dropdown overlay={menu}>
                   <a onClick={(e) => e.preventDefault()}>
                     <Space>
-                      <Image
-                        src={myUser?.photoURL}
-                        height="25"
-                        width="25"
-                        alt=""
-                        className="rounded-md"
-                      />
+                      {myUser && myUser.photoURL && (
+                        <Image
+                          src={myUser?.photoURL}
+                          height="25"
+                          width="25"
+                          alt=""
+                          className="rounded-md"
+                        />
+                      )}
+                      {(!myUser || !myUser.photoURL) && <AccountCircleIcon />}
                       <ExpandMoreRoundedIcon />
                     </Space>
                   </a>

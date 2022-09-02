@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import * as ReactDOM from "react-dom/client";
 
 interface props {
-  setLoc: any;
+  //ovde je svuda bio any
+  setLoc: Dispatch<SetStateAction<string>>;
   popup?: React.ReactNode;
-  setState: any;
-  setCity: any;
-  setStreetName: any;
-  setStreetNum: any;
-  setSelectedStreet: any;
+  setState: Dispatch<SetStateAction<string>>;
+  setCity: Dispatch<SetStateAction<string>>;
+  setStreetName: Dispatch<SetStateAction<string>>;
+  setStreetNum: Dispatch<SetStateAction<string>>;
+  setSelectedStreet: Dispatch<SetStateAction<boolean>>;
 }
 const Map = (props: props) => {
   const {

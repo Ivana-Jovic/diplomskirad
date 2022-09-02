@@ -25,10 +25,17 @@ import Map2 from "../components/map2";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { isAvailable } from "../lib/hooks";
+import {
+  isAvailable,
+  isHostModeTravel,
+  isLoggedUser,
+  isUnloggedUser,
+} from "../lib/hooks";
 import { AnyARecord } from "dns";
 import { GetServerSideProps } from "next";
 import { clearTimeout, setTimeout } from "timers";
+import ErrorPage from "./errorpage";
+import { AuthContext } from "../firebase-authProvider";
 
 const AirbnbSlider = styled(Slider)(({ theme }) => ({
   //   color: "#3a8589",
@@ -109,31 +116,55 @@ function valuetext(value: number) {
 // }
 export default function Search({
   uid,
+  location,
+  // fromDateJSON,
+  // toDateJSON,
+  fromStr,
+  toStr,
+  rooms,
+  numOfGuests,
+  numPropertiesLocation,
+  sumPricesPropertiesLocation,
   ppp,
 }: {
   uid: string;
-  ppp: DocumentData[]; //OVO JE RADILI SA ANY
+  location: string;
+  // fromDateJSON: string;
+  // toDateJSON: string;
+  fromStr: string;
+  toStr: string;
+  rooms: number;
+  numOfGuests: number;
+  numPropertiesLocation: number;
+  sumPricesPropertiesLocation: number;
+  ppp: string;
+  //  DocumentData[]; //OVO JE RADILI SA ANY
 }) {
+  // const fromDate: Date = JSON.parse(fromDateJSON);
+  // const toDate: Date = JSON.parse(toDateJSON);
+  const fromDate = new Date(fromStr);
+  const toDate = new Date(toStr);
   var rangeRef = useRef<NodeJS.Timeout>(null);
-  // const arr: DocumentData[] = JSON.parse(ppp);
-  const arr = ppp;
+  const arr: DocumentData[] = JSON.parse(ppp);
+  // const arr = ppp;
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [numPropertiesLocation, setNumPropertiesLocation] = useState<number>(0);
-  const [sumPricesPropertiesLocation, setSumPricesPropertiesLocation] =
-    useState<number>(0);
-  const router = useRouter();
-  const { location: locationQuery, from, to } = router.query;
-  const location: string = locationQuery
-    ? locationQuery.includes(", ")
-      ? (locationQuery as string).split(", ")[0]
-      : (locationQuery as string)
-    : "";
-  const fromDate = new Date(router.query.from as string);
-  const toDate = new Date(router.query.to as string);
-  const rooms = (router.query.rooms ?? 0) as number;
-  const numOfGuests = (router.query.numOfGuests ?? 0) as number;
-  // const [arr, setArr] = useState<any[]>([]);
-  const [filteredArr, setFilteredArr] = useState<any[]>([]);
+  //U GSP su ove
+  // const [numPropertiesLocation, setNumPropertiesLocation] = useState<number>(0);
+  // const [sumPricesPropertiesLocation, setSumPricesPropertiesLocation] =
+  //   useState<number>(0);
+  // const router = useRouter();
+  // const { location: locationQuery, from, to } = router.query;
+  // const location: string = locationQuery
+  //   ? locationQuery.includes(", ")
+  //     ? (locationQuery as string).split(", ")[0]
+  //     : (locationQuery as string)
+  //   : "";
+  // const fromDate = new Date(router.query.from as string);
+  // const toDate = new Date(router.query.to as string);
+  // const rooms = (router.query.rooms ?? 0) as number;
+  // const numOfGuests = (router.query.numOfGuests ?? 0) as number;
+  // //const [arr, setArr] = useState<any[]>([]);
+  const [filteredArr, setFilteredArr] = useState<DocumentData[]>(arr); //any
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [selectedSuperhost, setSelectedSuperhost] = useState<boolean>(false);
   const [selectedRatingFourAndUp, setSelectedRatingFourAndUp] =
@@ -204,7 +235,8 @@ export default function Search({
     }
   };
 
-  const filterProperties = (item: any) => {
+  const filterProperties = (item: DocumentData) => {
+    //any
     const property = item;
     const propertyid = item.id;
     //if selectedSuperhost and isSuperhost
@@ -250,10 +282,10 @@ export default function Search({
   };
 
   useEffect(() => {
-    if (firstLoad) {
-      // setArr([]);
-      setFilteredArr([]);
-    }
+    // if (firstLoad) {
+    //   // setArr([]);
+    //   setFilteredArr([]);
+    // }
     if (
       selectedSuperhost ||
       selectedRatingFourAndUp ||
@@ -270,15 +302,21 @@ export default function Search({
         setFilteredArr((prev) =>
           [...prev]
             .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
-            .sort((a: any, b: any) => a.pricePerNight - b.pricePerNight)
-        );
+            .sort(
+              (a: DocumentData, b: DocumentData) =>
+                a.pricePerNight - b.pricePerNight
+            )
+        ); // a i b any
       } else if (sortPrice == "desc") {
         console.log("DESC");
         setFilteredArr((prev) =>
           [...prev]
             .slice() //Shallow copy :https://stackoverflow.com/questions/67122915/sort-method-is-not-working-with-usestate-in-react
-            .sort((a: any, b: any) => b.pricePerNight - a.pricePerNight)
-        );
+            .sort(
+              (a: DocumentData, b: DocumentData) =>
+                b.pricePerNight - a.pricePerNight
+            )
+        ); // a i b any
       } else {
         console.log("NIJE NI RASTUCE NI OP");
       }
@@ -320,165 +358,187 @@ export default function Search({
   //   }
   // }, [location, rooms, numOfGuests]);
 
-  return (
-    <Layout
-      placeholder={
-        location + " | " + numOfGuests + " guests" + " | " + rooms + " rooms"
-      }
-    >
-      <div className=" flex  flex-col max-w-7xl mx-auto px-8 sm:px-16">
-        <section className="  px-10 py-10 w-full ">
-          <div className="text-sm pb-5">
-            Stay in {location} <br />
-            from {from} to {to} <br />
-            {numOfGuests} guests - {rooms} rooms <br />
-            Average price per night in {location} is{" "}
-            {sumPricesPropertiesLocation / numPropertiesLocation}e
-          </div>
-          <div className="text-4xl mb-6">Stays in {location}</div>
-          <div className="flex flex-col sm:flex-row mb-5 space-y-3 sm:space-y-0 sm:space-x-3 text-gray-800">
-            <div className="flex space-x-3">
-              <div className="dropdown ">
-                <div tabIndex={0} className=" ">
-                  <Chip
-                    label="Price"
-                    variant={selectedPrice ? "filled" : "outlined"}
-                    onClick={(event: any) => {
-                      setAnchorEl(event.currentTarget);
-                    }}
-                  />
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="border dropdown-content menu p-2 shadow
+  const { user, myUser } = React.useContext(AuthContext);
+  if (
+    isUnloggedUser(user, myUser) ||
+    isLoggedUser(user, myUser) ||
+    isHostModeTravel(user, myUser)
+  )
+    return (
+      <Layout
+        placeholder={
+          location + " | " + numOfGuests + " guests" + " | " + rooms + " rooms"
+        }
+      >
+        <div className=" flex  flex-col max-w-7xl mx-auto px-8 sm:px-16">
+          <section className="  px-10 py-10 w-full ">
+            <div className="text-sm pb-5">
+              Stay in {location} <br />
+              from {fromStr} to {toStr} <br />
+              {numOfGuests} guests - {rooms} rooms <br />
+              Average price per night in {location} is{" "}
+              {(sumPricesPropertiesLocation / numPropertiesLocation).toFixed(1)}
+              e
+            </div>
+            <div className="text-4xl mb-6">Stays in {location}</div>
+            <div className="flex flex-col sm:flex-row mb-5 space-y-3 sm:space-y-0 sm:space-x-3 text-gray-800">
+              <div className="flex space-x-3">
+                <div className="dropdown ">
+                  <div tabIndex={0} className=" ">
+                    <Chip
+                      label="Price"
+                      variant={selectedPrice ? "filled" : "outlined"}
+                      onClick={(event: any) => {
+                        setAnchorEl(event.currentTarget);
+                      }}
+                    />
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="border dropdown-content menu p-2 shadow
                   bg-base-100 rounded-box w-64 sm:w-96
                  flex items-center
                   "
-                >
-                  <li>
-                    {/* hover:bg-inherit*/}
-                    <div className="mt-10 flex flex-col w-52   !bg-transparent">
-                      <Box sx={{ width: 300 }} className="w-52 sm:w-80">
-                        <AirbnbSlider
-                          getAriaLabel={() => "Price range"}
-                          value={priceRange}
-                          onChange={(e: Event, newValue: number | number[]) => {
-                            if (rangeRef != null) {
-                              clearTimeout(rangeRef.current);
-                            }
-                            rangeRef.current = setTimeout(() => {
-                              setPriceRange(newValue as number[]);
-                              setSelectedPrice(true);
-                            }, 100); //500
+                  >
+                    <li>
+                      {/* hover:bg-inherit*/}
+                      <div className="mt-10 flex flex-col w-52   !bg-transparent">
+                        <Box sx={{ width: 300 }} className="w-52 sm:w-80">
+                          <AirbnbSlider
+                            getAriaLabel={() => "Price range"}
+                            value={priceRange}
+                            onChange={(
+                              e: Event,
+                              newValue: number | number[]
+                            ) => {
+                              if (rangeRef != null) {
+                                clearTimeout(rangeRef.current);
+                              }
+                              rangeRef.current = setTimeout(() => {
+                                setPriceRange(newValue as number[]);
+                                setSelectedPrice(true);
+                              }, 100); //500
+                            }}
+                            getAriaValueText={valuetext}
+                            marks={[
+                              {
+                                value: 0,
+                                label: "0e",
+                              },
+                              {
+                                value: 100,
+                                label: "1000e",
+                              },
+                            ]}
+                          />
+                        </Box>
+                        <div className="mb-4  flex">
+                          Price from&nbsp;
+                          <p className="font-medium">
+                            {priceRange[0] * factorPrice}e
+                          </p>
+                          &nbsp;to&nbsp;
+                          <p className="font-medium">
+                            {priceRange[1] * factorPrice}e
+                          </p>
+                        </div>
+                        <StyledToggleButtonGroup
+                          value={sortPrice}
+                          exclusive
+                          onChange={(e: MouseEvent, val: string | null) => {
+                            setSortPrice(val);
+                            setSelectedPrice(true);
                           }}
-                          getAriaValueText={valuetext}
-                          marks={[
-                            {
-                              value: 0,
-                              label: "0e",
-                            },
-                            {
-                              value: 100,
-                              label: "1000e",
-                            },
-                          ]}
-                        />
-                      </Box>
-                      <div className="mb-4  flex">
-                        Price from&nbsp;
-                        <p className="font-medium">
-                          {priceRange[0] * factorPrice}e
-                        </p>
-                        &nbsp;to&nbsp;
-                        <p className="font-medium">
-                          {priceRange[1] * factorPrice}e
-                        </p>
+                          aria-label="sortPrice"
+                        >
+                          <ToggleButton value="asc" aria-label="asc">
+                            Sort ascending
+                          </ToggleButton>
+                          <ToggleButton value="desc" aria-label="desc">
+                            Sort descending
+                          </ToggleButton>
+                        </StyledToggleButtonGroup>
                       </div>
-                      <StyledToggleButtonGroup
-                        value={sortPrice}
-                        exclusive
-                        onChange={(e: MouseEvent, val: string | null) => {
-                          setSortPrice(val);
-                          setSelectedPrice(true);
-                        }}
-                        aria-label="sortPrice"
-                      >
-                        <ToggleButton value="asc" aria-label="asc">
-                          Sort ascending
-                        </ToggleButton>
-                        <ToggleButton value="desc" aria-label="desc">
-                          Sort descending
-                        </ToggleButton>
-                      </StyledToggleButtonGroup>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              <Chip
-                icon={
-                  <Rating name="read-only" value={4} readOnly size="small" />
-                }
-                label="& up"
-                variant={selectedRatingFourAndUp ? "filled" : "outlined"}
-                onClick={() => {
-                  setSelectedRatingFourAndUp(!selectedRatingFourAndUp);
-                }}
-              />
-            </div>
-            <div className="flex space-x-3">
-              <Chip
-                label="Garage"
-                variant={selectedGarage ? "filled" : "outlined"}
-                onClick={() => {
-                  setSelectedGarage(!selectedGarage);
-                }}
-              />
-              <Chip
-                label="Superhost"
-                variant={selectedSuperhost ? "filled" : "outlined"}
-                onClick={() => {
-                  setSelectedSuperhost(!selectedSuperhost);
-                }}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col ">
-            {filteredArr.map((item) => {
-              const property = item;
-              const propertyid = item.id;
-              return (
-                <CardSearch
-                  key={propertyid}
-                  propertyid={propertyid}
-                  name={property.title}
-                  description={property.description}
-                  image={property.images[0]}
-                  price={property.pricePerNight}
-                  totalStars={property.totalStars}
-                  numberOfReviews={property.numberOfReviews}
-                  numberOfNights={
-                    fromDate && toDate
-                      ? Math.round(
-                          (toDate.getTime() - fromDate.getTime()) /
-                            (1000 * 60 * 60 * 24)
-                        )
-                      : 0
+                    </li>
+                  </ul>
+                </div>
+                <Chip
+                  icon={
+                    <Rating name="read-only" value={4} readOnly size="small" />
                   }
+                  label="& up"
+                  variant={selectedRatingFourAndUp ? "filled" : "outlined"}
+                  onClick={() => {
+                    setSelectedRatingFourAndUp(!selectedRatingFourAndUp);
+                  }}
                 />
-              );
-            })}
-          </div>
-        </section>
+              </div>
+              <div className="flex space-x-3">
+                <Chip
+                  label="Garage"
+                  variant={selectedGarage ? "filled" : "outlined"}
+                  onClick={() => {
+                    setSelectedGarage(!selectedGarage);
+                  }}
+                />
+                <Chip
+                  label="Superhost"
+                  variant={selectedSuperhost ? "filled" : "outlined"}
+                  onClick={() => {
+                    setSelectedSuperhost(!selectedSuperhost);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col ">
+              {filteredArr.map((item) => {
+                const property = item;
+                const propertyid = item.id;
+                return (
+                  <CardSearch
+                    key={propertyid}
+                    propertyid={propertyid}
+                    name={property.title}
+                    description={property.description}
+                    image={property.images[0]}
+                    price={property.pricePerNight}
+                    totalStars={property.totalStars}
+                    numberOfReviews={property.numberOfReviews}
+                    numberOfNights={
+                      fromDate && toDate
+                        ? Math.round(
+                            (toDate.getTime() - fromDate.getTime()) /
+                              (1000 * 60 * 60 * 24)
+                          )
+                        : 0
+                    }
+                    avgPricePerNight={
+                      sumPricesPropertiesLocation / numPropertiesLocation
+                    }
+                  />
+                );
+              })}
+            </div>
+          </section>
 
-        <div className="flex flex-col items-center justify-center">
-          {filteredArr && filteredArr.length > 0 && (
-            <Map2 setLoc={""} arrLoc={filteredArr} />
+          <div className="flex flex-col items-center justify-center">
+            {filteredArr && filteredArr.length > 0 && (
+              <Map2 arrLoc={filteredArr} />
+            )}
+            {filteredArr.length}
+          </div>
+          {filteredArr && filteredArr.length == 0 && (
+            <div className="text-center">**No search results**</div>
           )}
-          {filteredArr.length}
         </div>
-      </div>
-    </Layout>
-  );
+      </Layout>
+    );
+  else
+    return (
+      <>
+        <ErrorPage />
+      </>
+    );
 }
 export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
@@ -497,8 +557,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const toDate = new Date(queryUrl.to as string);
     const rooms = (queryUrl.rooms ?? 0) as number;
     const numOfGuests = (queryUrl.numOfGuests ?? 0) as number;
-    const qs44: string[] = [];
-    const qs33: string[] = [];
+    // const qs44: string[] = [];
+    // const qs33: string[] = [];
 
     const querySnapshot1 = await getDocs(
       query(collection(db, "property"), where("city", "==", location))
@@ -513,13 +573,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     var arr: DocumentData[] = [];
 
-    var NumPropertiesLocation = 0;
-    var SumPricesPropertiesLocation = 0;
+    var numPropertiesLocation = 0;
+    var sumPricesPropertiesLocation = 0;
     for (let index = 0; index < r.length; index++) {
       var doc = r[index];
-      NumPropertiesLocation = 1 + NumPropertiesLocation;
-      SumPricesPropertiesLocation =
-        SumPricesPropertiesLocation + doc.data().pricePerNight;
+      numPropertiesLocation = 1 + numPropertiesLocation;
+      sumPricesPropertiesLocation =
+        sumPricesPropertiesLocation + doc.data().pricePerNight;
       if (
         rooms &&
         numOfGuests &&
@@ -536,12 +596,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       props: {
         uid: uid,
-        ppp: arr, //mozda json stringify
+        location,
+        // fromDateJSON: JSON.stringify(fromDate),
+        // toDateJSON: JSON.stringify(toDate),
+        fromStr: from,
+        toStr: to,
+        rooms,
+        numOfGuests,
+        numPropertiesLocation,
+        sumPricesPropertiesLocation,
+        ppp: JSON.stringify(arr), //mozda json stringify JSON.stringify(arr),
       },
     };
   } catch (err) {
-    context.res.writeHead(302, { location: "/" }); //on ga tera na login
-    context.res.end();
-    return { props: [] };
+    return {
+      redirect: {
+        destination: "/",
+      },
+      props: [],
+    };
+    // context.res.writeHead(302, { location: "/" });
+    // context.res.end();
+    // return { props: [] };
   }
 };

@@ -10,17 +10,12 @@ import {
   QueryDocumentSnapshot,
   updateDoc,
   deleteDoc,
+  increment,
 } from "firebase/firestore";
 import { useRef, useState } from "react";
 import { db } from "../firebase";
 import Button from "./button";
-//TODO become a host by adding property
-//TODO
-//if the user is removed by admin he cannot See any content
-// make reservations
-//  add new properties (and become a host)
-//  report comments, users
-// if a property is rremoved it can no longer be reserved
+
 export default function ReportCard({ report }: { report: DocumentData }) {
   const [processed, setProcessed] = useState<boolean>(report.processed);
 
@@ -78,88 +73,151 @@ export default function ReportCard({ report }: { report: DocumentData }) {
     processReport();
   };
   const deleteComment = async () => {
-    const docSnap = await getDoc(doc(db, "reservations", report.reservationId));
+    // const docSnap = await getDoc(doc(db, "reservations", report.reservationId));
 
-    if (docSnap.exists()) {
-      console.log(docSnap.data().propertyId, report.id);
-      await updateDoc(
-        doc(
-          db,
-          "property",
-          docSnap.data().propertyId,
-          "comments",
-          report.commentId
-        ),
-        {
-          comment: "* removed because of  inappropriate vocabulary *",
-        }
-      ).then(() => setProcessed(true));
+    // if (docSnap.exists()) {
+    // console.log(docSnap.data().propertyId, report.id);
+    await updateDoc(
+      doc(
+        db,
+        "property",
+        report.propertyId,
+        // docSnap.data().propertyId,
+        "comments",
+        report.commentId
+      ),
+      {
+        comment: "* removed because of  inappropriate vocabulary *",
+      }
+    );
+    processReport();
+    // .then(() => setProcessed(true));
+    // processReport  ZATSO NIJE UBACENO
+    // }
+  };
+
+  const deleteProperty = async () => {
+    await deleteDoc(doc(db, "property", report.propertyId));
+    processReport();
+  };
+
+  const approveProperty = async () => {
+    await updateDoc(doc(db, "property", report.propertyId), {
+      adminApproved: true,
+    });
+    if (report.firstProperty) {
+      await updateDoc(doc(db, "users", report.hostId), {
+        numberOfProperties: increment(1),
+        host: true,
+      });
+    } else {
+      await updateDoc(doc(db, "users", report.hostId), {
+        numberOfProperties: increment(1),
+      });
     }
+
+    processReport();
   };
   return (
-    <div className="card w-full bg-base-100 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title">
-          {report.guestIsReporting
-            ? "Guest " + report.guestId + " is reporting a host"
-            : //+ item.data().hostId
-              "Host " +
-              // item.data().hostId +
-              " is reporting guest" +
-              report.guestId}
-        </h2>
-        <div className="">
-          Created at {new Date(report.createdAt).toDateString()}
-        </div>
-        <div className="">reportId {report.id}</div>
-        <div>
-          {/* <div>{report.id}</div> */}
-          <div className="">
-            Guest -{report.guestId}
-            {/* -{report.guestLastName}- */}
-            {/* {report.guestId} */}
-          </div>
-          <div className="">{report.reportText}</div>
-          <div className="">
-            guest is Reporting:
-            {report.guestIsReporting ? "yes" : "no"}
-          </div>
-          <div className="">Host {report.hostId}</div>
-          {/* <div className="">Reservation Id {report.reservationId}</div> */}
-          <div className="">Reservation Id {report.reservationId}</div>
-          {!processed && (
+    <>
+      {report.reportText != "wantsToAddProperty" && (
+        <div className="card w-full bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h2 className="card-title">
+              {report.guestIsReporting
+                ? "Guest " + report.guestId + " is reporting a host"
+                : //+ item.data().hostId
+                  "Host " +
+                  // item.data().hostId +
+                  " is reporting guest" +
+                  report.guestId}
+            </h2>
+            <div className="">
+              Created at {new Date(report.createdAt).toDateString()}
+            </div>
+            <div className="">reportId {report.id}</div>
             <div>
-              {report.reportText != "comment" && (
-                // <Button
-                //   action={deleteUser}
-                //   text="Report processed - delete this user and his properties"
-                //   type=""
-                // />
-                <button className="btn mt-3 w-full" onClick={deleteUser}>
-                  Report processed - delete this user and his properties{" "}
-                </button>
-              )}
-              <div className="flex flex-col">
-                {report.reportText == "comment" && (
-                  // <Button action={deleteComment} text="Delete comment" type="" />
-                  <button className="btn mt-3" onClick={deleteComment}>
-                    Delete comment
-                  </button>
-                )}
-                {/* <Button
+              {/* <div>{report.id}</div> */}
+              <div className="">
+                Guest -{report.guestId}
+                {/* -{report.guestLastName}- */}
+                {/* {report.guestId} */}
+              </div>
+              <div className="">{report.reportText}</div>
+              <div className="">
+                guest is Reporting:
+                {report.guestIsReporting ? "yes" : "no"}
+              </div>
+              <div className="">Host {report.hostId}</div>
+              {/* <div className="">Reservation Id {report.reservationId}</div> */}
+              <div className="">Reservation Id {report.reservationId}</div>
+              {!processed && (
+                <div>
+                  {report.reportText != "comment" && (
+                    // <Button
+                    //   action={deleteUser}
+                    //   text="Report processed - delete this user and his properties"
+                    //   type=""
+                    // />
+                    <button className="btn mt-3 w-full" onClick={deleteUser}>
+                      Report processed - delete this user and his properties{" "}
+                    </button>
+                  )}
+                  <div className="flex flex-col">
+                    {report.reportText == "comment" && (
+                      // <Button action={deleteComment} text="Delete comment" type="" />
+                      <button className="btn mt-3" onClick={deleteComment}>
+                        Delete comment
+                      </button>
+                    )}
+                    {/* <Button
                 action={processReport}
                 text="Report processed - false report"
                 type=""
               /> */}
-                <button className="btn mt-3" onClick={processReport}>
-                  Report processed - false report
-                </button>
-              </div>
+                    <button className="btn mt-3" onClick={processReport}>
+                      Report processed - false report
+                    </button>
+                  </div>
+                </div>
+              )}
+              {processed && <div>** PROCESSED **</div>}
             </div>
-          )}
-          {processed && <div>** PROCESSED **</div>}
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+      {report.reportText == "wantsToAddProperty" && (
+        <div className="card w-full bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h2 className="card-title">
+              {report.hostId} wants to add a property
+            </h2>
+            <div className="">
+              Created at {new Date(report.createdAt).toDateString()}
+            </div>
+            <div className="">reportId {report.id}</div>
+            <div>
+              <div className="">{report.reportText}</div>
+              <div className="">Host {report.hostId}</div>
+              {!processed && (
+                <div>
+                  <button className="btn mt-3 w-full" onClick={deleteProperty}>
+                    Report processed - delete property
+                  </button>
+
+                  <button
+                    className="btn mt-3  w-full"
+                    onClick={approveProperty}
+                  >
+                    Report processed - approve property
+                  </button>
+                </div>
+              )}
+              {processed && <div>** PROCESSED **</div>}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

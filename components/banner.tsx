@@ -24,9 +24,32 @@ import { db } from "../firebase";
 //     },
 //   },
 // });
-//TODO promeni tipove na drugimmestima
-//TODO proveriti sve useeffect nizove
-//TODO pomeri secrets file
+//TODOp na firebasu uslovi
+//TODOp pomeri secrets file
+//TODOp kad se registruje zabrani sve dok ne popuni formu
+
+//TODO spineri svuda
+//TODO pristup svuda
+//TODO Podesiti gde moze da radi search - moze svudaosimako je host u host modu
+//TODOp da li je okej ovako direkt na straniicama posesavati
+//tamo gde je moguce menjenje modova moyda nije ok get serv side, obzirom da ce putanje dotle biti nepostojece
+//a retko ce iko rucno kucati url
+
+//TODO mozda dovuci user i myuser u gsp svuda pa obrisi ovo preko konteksta
+//TODO sta se desava ako u gsp dodjes a nisi logovan
+//TODO ove 1/2 na stranicama (tabela iy sveske)
+//TODO Običan korisnik ima opcije kao gost sistema sa tim što ima pravo da pošalje upit za rezervaciju.
+//TODO Može da pređe na režim običnog korisnika i tada ima sve opcije kao i običan korisnik, a potom može da se vrati na režim vlasnika.
+//TODO
+//if the user is removed by admin he cannot See any content
+// make reservations
+//  add new properties (and become a host)
+//  report comments, users
+// if a property is rremoved it can no longer be reserved
+
+//TODO provere
+//- za dugacke titlove i descriptione svuda da li izgleda ok
+//- na raznim velicinama ekrana
 export default function Banner() {
   const [location, setLocation] = useState<string>("");
   const [guests, setGuests] = useState<number>(1);
@@ -37,7 +60,7 @@ export default function Banner() {
   );
   const [error, setError] = useState<string>("");
   const router = useRouter();
-  const [locations, setLocations] = useState<any[]>([]);
+  const [locations, setLocations] = useState<string[]>([]); //any
 
   const getLocations = async () => {
     const querySnapshot = await getDocs(collection(db, "locations"));

@@ -11,20 +11,20 @@ export default function CardSearch({
   description,
   price,
   image,
-  // stars,
   totalStars,
   numberOfReviews,
   numberOfNights,
+  avgPricePerNight,
 }: {
   propertyid: string;
   name: string;
   description: string;
   price: string;
   image: string;
-  // stars: string;
   totalStars: number;
   numberOfReviews: number;
   numberOfNights: number;
+  avgPricePerNight: number;
 }) {
   const router = useRouter();
 
@@ -55,27 +55,39 @@ export default function CardSearch({
 transition duration-200 ease-out
 cursor-pointer"
     >
-      <figure className="relative h-48 lg:h-auto lg:w-1/3 flex-shrink-0">
-        {/* className="relative h-48 lg:h-fit lg:w-1/3" */}
-        {/* <img src={"https://placeimg.com/200/280/arch"} alt="Movie" /> */}
-        {/* <div className="relative "> */}
-        {/* flex shrink 0???? */}
-        {/* <div className="relative h-48 w-full lg:h-fit lg:w-36"> */}
-        <Image
-          src={image}
-          alt={name}
-          layout="fill"
-          objectFit="cover"
-          // objectPosition="bottom"
-        />
-        {/* </div> */}
+      <div className="flex flex-col h-48 lg:h-auto lg:w-1/3">
+        {avgPricePerNight > parseFloat(price) && (
+          <div className="text-center lg:hidden">**Great deal**</div>
+        )}
+        <figure className="relative h-48 lg:h-full  flex-shrink-0">
+          {/* h-48 lg:h-auto lg:w-1/3 flex-shrink-0 */}
+          {/* className="relative h-48 lg:h-fit lg:w-1/3" */}
+          {/* <img src={"https://placeimg.com/200/280/arch"} alt="Movie" /> */}
+          {/* <div className="relative "> */}
+          {/* flex shrink 0???? */}
+          {/* <div className="relative h-48 w-full lg:h-fit lg:w-36"> */}
 
-        {/* </div> */}
-      </figure>
+          <Image
+            src={image}
+            alt={name}
+            layout="fill"
+            objectFit="cover"
+            // objectPosition="bottom"
+          />
+          {/* </div> */}
+          {/* </div> */}
+        </figure>
+      </div>
+
       <div className="card-body">
         <div>
           <div className="flex justify-between items-center mb-2">
             <p className="text-xl font-semibold">{name}</p>
+            {avgPricePerNight > parseFloat(price) && (
+              <div className="text-center hidden lg:inline-block mr-3">
+                **Great deal**
+              </div>
+            )}
             <Heart propertyid={propertyid} />
           </div>
           <p

@@ -53,7 +53,6 @@ export default function ReservationCard({
   to,
   from,
   propertyId,
-
   hostId,
   garage,
   guests,
@@ -74,7 +73,6 @@ export default function ReservationCard({
   to: string;
   from: string;
   propertyId: string;
-
   hostId: string;
   garage: boolean;
   guests: number;
@@ -193,6 +191,7 @@ export default function ReservationCard({
       // guestFirstName: firstName,
       // guestLastName: lastName,
       reservationId: reservationId,
+      propertyId: propertyId,
       hostId: hostId,
       // reportedFirstName: myUser.firstName,
       // reportedLastName: myUser.lastName,

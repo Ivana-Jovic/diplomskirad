@@ -69,6 +69,7 @@ export default function Calendar({
             user: doc.data().user,
             leftFeedback: doc.data().leftFeedback,
             reservationId: doc.data().reservationId,
+            createdAt: doc.data().createdAt,
           },
           color: arrColour[propertyId.indexOf(doc.data().propertyId)],
         });
@@ -165,29 +166,10 @@ export default function Calendar({
                 leftFeedback={eventInfo?.event.extendedProps.leftFeedback}
                 reservationId={eventInfo?.event.extendedProps.reservationId}
                 isHost={true}
+                createdAt={eventInfo?.event.extendedProps.createdAt}
               />
             </div>
           </div>
-
-          {/* <div
-            className={
-              // "bg-[" + arrColour2[1] + "]"
-              // "bg-" + arrColour2[1]
-              arrColour3[
-                propertyId.indexOf(eventInfo?.event.extendedProps.propertyId)
-              ]
-            }
-          >
-            aaaaa {eventInfo?.event.title}
-          </div>
-          <div> From:{eventInfo?.event.start.toDateString()}</div>
-          <div> To:{eventInfo?.event.end.toDateString()}</div>
-          <div>Total:{eventInfo?.event.extendedProps.total}</div>
-          <div>Time check in:{eventInfo?.event.extendedProps.timeCheckIn}</div>
-
-          <div>
-            Time check out:{eventInfo?.event.extendedProps.timeCheckOut}
-          </div>*/}
         </div>
       )}
     </>

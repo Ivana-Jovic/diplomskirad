@@ -12,6 +12,10 @@ import ReservationCard from "../components/reservationcard";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
+import ErrorPage from "./errorpage";
+import { isHostModeHost } from "../lib/hooks";
+import { useContext } from "react";
+import { AuthContext } from "../firebase-authProvider";
 
 export default function HostsReservations({
   uid,
@@ -33,34 +37,40 @@ export default function HostsReservations({
     //  reservations;
     JSON.parse(reservations);
 
-  return (
-    <Layout>
-      {/* THIS IS HOSTS BOARD */}
-
-      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16 ">
-        <div className="pt-7 pb-5 text-center text-3xl font-bold">
-          Reservations
-        </div>
-        <div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {Array.from(reserv).map((item, index) => {
-              return (
-                <div key={index}>
-                  <div>
-                    <ReservationCard
-                      {...(item as any)}
-                      reservationId={item.id}
-                      isHost={true}
-                    />
+  const { user, myUser } = useContext(AuthContext);
+  if (isHostModeHost(user, myUser))
+    return (
+      <Layout>
+        <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16 ">
+          <div className="pt-7 pb-5 text-center text-3xl font-bold">
+            Reservations
+          </div>
+          <div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {Array.from(reserv).map((item, index) => {
+                return (
+                  <div key={index}>
+                    <div>
+                      <ReservationCard
+                        {...(item as any)}
+                        reservationId={item.id}
+                        isHost={true}
+                      />
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
-    </Layout>
-  );
+      </Layout>
+    );
+  else
+    return (
+      <>
+        <ErrorPage />
+      </>
+    );
 }
 
 export async function getServerSideProps(context) {
@@ -98,8 +108,14 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (err) {
-    context.res.writeHead(302, { location: "/" });
-    context.res.end();
-    return { props: [] };
+    // context.res.writeHead(302, { location: "/" });
+    // context.res.end();
+    // return { props: [] };
+    return {
+      redirect: {
+        destination: "/",
+      },
+      props: [],
+    };
   }
 }

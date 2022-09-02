@@ -7,7 +7,6 @@ import * as ReactDOM from "react-dom/client";
 import CardPopup from "./cardpopup";
 
 interface props {
-  setLoc: any;
   popup?: React.ReactNode;
   arrLoc: DocumentData[];
 }

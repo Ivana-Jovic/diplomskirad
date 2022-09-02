@@ -1,4 +1,12 @@
-export default function Popup(props: any) {
+import CloseIcon from "@mui/icons-material/Close";
+export default function Popup({
+  content,
+  handleClose,
+}: {
+  content: JSX.Element;
+  handleClose: any;
+}) {
+  //props:any
   return (
     <div className="grid place-items-center fixed bg-slate-200  bg-opacity-60 w-full h-screen top-0 left-0">
       <div
@@ -10,13 +18,15 @@ export default function Popup(props: any) {
       >
         {/*//mx-auto */}
         <div
-          onClick={props.handleClose}
+          onClick={handleClose}
+          // onClick={props.handleClose}
           className="self-end cursor-pointer bg-footer text-header rounded-3xl
            w-8 h-8 text-center mb-3"
         >
-          X
+          <CloseIcon />
         </div>
-        {props.content}
+        {/* {props.content} */}
+        {content}
       </div>
     </div>
   );

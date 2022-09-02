@@ -9,6 +9,8 @@ import { useRouter } from "next/router";
 import { TextField } from "@mui/material";
 
 import { useForm, SubmitHandler } from "react-hook-form";
+import ErrorPage from "./errorpage";
+import { isAdmin, isHost, isLoggedUser } from "../lib/hooks";
 
 type IFormInput = {
   title: string;
@@ -63,7 +65,7 @@ export default function ProfileSettings() {
 
   const router = useRouter();
 
-  const [error, setError] = useState<any>("");
+  const [error, setError] = useState<string>(""); //any
   const [url, setUrl] = useState<string>("");
   const [wantToChangePass, setWantToChangePass] = useState<boolean>(false);
 
@@ -109,7 +111,7 @@ export default function ProfileSettings() {
           },
           (err) => {
             console.log("ovo je greska");
-            setError(err);
+            setError(err + "");
           },
           () => {
             getDownloadURL(uploadTask.snapshot.ref).then(
@@ -129,7 +131,7 @@ export default function ProfileSettings() {
         );
       }
     }
-    //TODO promena sifre
+    //TODOp promena sifre plus da i spojiti updatove
 
     // update first name
     if (user && myUser.firstName != data.firstName) {
@@ -151,120 +153,136 @@ export default function ProfileSettings() {
     return true;
   };
 
-  return (
-    <Layout>
-      <div className="max-w-7xl px-8 sm:px-16 text-center   ">
-        <div>hello {user?.email}</div>
-        <form onSubmit={handleSubmit(onSubmit)} className="mx-3">
-          <div className="flex flex-col">
-            <TextField
-              disabled={true}
-              {...register("email")}
-              className=" mb-2"
-              id="outlined-required3"
-              label="email"
-              type="email"
-              InputLabelProps={getValues("email") ? { shrink: true } : {}}
-              helperText=" "
-            />
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-2 ">
+  // const { user, myUser } = useContext(AuthContext);
+  if (
+    isLoggedUser(user, myUser) ||
+    isHost(user, myUser) ||
+    isAdmin(user, myUser)
+  )
+    return (
+      <Layout>
+        <div className="max-w-7xl px-8 sm:px-16 text-center   ">
+          <div>hello {user?.email}</div>
+          <form onSubmit={handleSubmit(onSubmit)} className="mx-3">
+            <div className="flex flex-col">
               <TextField
-                {...register("firstName", {
-                  required: "Please enter your first name",
-                })}
-                className=" "
-                id="outlined-required1"
-                label="first name"
-                InputLabelProps={getValues("firstName") ? { shrink: true } : {}}
-                helperText={errors.firstName ? errors.firstName.message : " "}
-              />
-
-              <TextField
-                {...register("lastName", {
-                  required: "Please enter your last name",
-                })}
+                disabled={true}
+                {...register("email")}
                 className=" mb-2"
-                id="outlined-required2"
-                label="last name"
-                InputLabelProps={getValues("lastName") ? { shrink: true } : {}}
-                helperText={errors.lastName ? errors.lastName.message : " "}
+                id="outlined-required3"
+                label="email"
+                type="email"
+                InputLabelProps={getValues("email") ? { shrink: true } : {}}
+                helperText=" "
               />
+              <div className="grid sm:grid-cols-2 grid-cols-1 gap-2 ">
+                <TextField
+                  {...register("firstName", {
+                    required: "Please enter your first name",
+                  })}
+                  className=" "
+                  id="outlined-required1"
+                  label="first name"
+                  InputLabelProps={
+                    getValues("firstName") ? { shrink: true } : {}
+                  }
+                  helperText={errors.firstName ? errors.firstName.message : " "}
+                />
+
+                <TextField
+                  {...register("lastName", {
+                    required: "Please enter your last name",
+                  })}
+                  className=" mb-2"
+                  id="outlined-required2"
+                  label="last name"
+                  InputLabelProps={
+                    getValues("lastName") ? { shrink: true } : {}
+                  }
+                  helperText={errors.lastName ? errors.lastName.message : " "}
+                />
+              </div>
+              <button
+                className="btn mb-3 "
+                onClick={() => {
+                  setWantToChangePass(!wantToChangePass);
+                }}
+              >
+                Change password
+              </button>
+              {wantToChangePass && (
+                <>
+                  <TextField
+                    {...register("passwordNew")}
+                    className="mb-2"
+                    id="outlined-required3"
+                    label="enter new password"
+                    type="password"
+                    InputLabelProps={
+                      getValues("passwordNew") ? { shrink: true } : {}
+                    }
+                    helperText={
+                      errors.passwordNew ? errors.passwordNew.message : " "
+                    }
+                  />
+                  <TextField
+                    {...register("passwordOld")}
+                    className="mb-2"
+                    id="outlined-required3"
+                    label="enter new password"
+                    type="password"
+                    InputLabelProps={
+                      getValues("passwordOld") ? { shrink: true } : {}
+                    }
+                    helperText={
+                      errors.passwordOld ? errors.passwordOld.message : " "
+                    }
+                  />
+                </>
+              )}
             </div>
-            <button
-              className="btn mb-3 "
-              onClick={() => {
-                setWantToChangePass(!wantToChangePass);
-              }}
-            >
-              Change password
+            {/* <div className="mx-3"> */}
+            <label className="btn w-full">
+              Select profile picture
+              <input
+                {...register("profilePictureNEW")}
+                type="file"
+                // onChange={changeHandler}
+                className="hidden"
+                accept="image/png, image/jpeg, image/jpg"
+              />
+            </label>
+            <div className="grid justify-items-center  mx-auto">
+              {((myUser && myUser?.photoURL) ||
+                (imgNew && imgNew.length > 0)) && (
+                <ImageForm
+                  url={
+                    imgNew && imgNew.length > 0
+                      ? URL.createObjectURL(imgNew[0])
+                      : myUser?.photoURL
+                  }
+                />
+              )}
+            </div>
+            {/* </div> */}
+
+            {error && (
+              <div className="pt-7 pb-5 text-center text-sm font-thin">
+                {error}
+              </div>
+            )}
+
+            <button className="btn w-full mt-10" type="submit">
+              Update
             </button>
-            {wantToChangePass && (
-              <>
-                <TextField
-                  {...register("passwordNew")}
-                  className="mb-2"
-                  id="outlined-required3"
-                  label="enter new password"
-                  type="password"
-                  InputLabelProps={
-                    getValues("passwordNew") ? { shrink: true } : {}
-                  }
-                  helperText={
-                    errors.passwordNew ? errors.passwordNew.message : " "
-                  }
-                />
-                <TextField
-                  {...register("passwordOld")}
-                  className="mb-2"
-                  id="outlined-required3"
-                  label="enter new password"
-                  type="password"
-                  InputLabelProps={
-                    getValues("passwordOld") ? { shrink: true } : {}
-                  }
-                  helperText={
-                    errors.passwordOld ? errors.passwordOld.message : " "
-                  }
-                />
-              </>
-            )}
-          </div>
-          {/* <div className="mx-3"> */}
-          <label className="btn w-full">
-            Select profile picture
-            <input
-              {...register("profilePictureNEW")}
-              type="file"
-              // onChange={changeHandler}
-              className="hidden"
-              accept="image/png, image/jpeg, image/jpg"
-            />
-          </label>
-          <div className="grid justify-items-center  mx-auto">
-            {((myUser && myUser?.photoURL) ||
-              (imgNew && imgNew.length > 0)) && (
-              <ImageForm
-                url={
-                  imgNew && imgNew.length > 0
-                    ? URL.createObjectURL(imgNew[0])
-                    : myUser?.photoURL
-                }
-              />
-            )}
-          </div>
-          {/* </div> */}
-
-          {error && (
-            <div className="pt-7 pb-5 text-center text-sm font-thin">
-              {error}
-            </div>
-          )}
-
-          <button className="btn w-full mt-10" type="submit">
-            Update
-          </button>
-        </form>
-      </div>
-    </Layout>
-  );
+          </form>
+        </div>
+      </Layout>
+    );
+  else
+    return (
+      <>
+        <ErrorPage />
+      </>
+    );
 }

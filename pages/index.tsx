@@ -3,31 +3,50 @@ import Head from "next/head";
 import Banner from "../components/banner";
 import Card from "../components/card";
 import Layout from "../components/layout";
-import { collection, query, getDocs, orderBy, limit } from "firebase/firestore";
+import {
+  collection,
+  query,
+  getDocs,
+  orderBy,
+  limit,
+  DocumentData,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { useEffect, useState } from "react";
+import nookies from "nookies";
+import { verifyIdToken } from "../firebaseadmin";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 
-const Home: NextPage = () => {
-  const [arr, setArr] = useState<any[]>([]);
+export default function Index({
+  // uid,
+  propertiesJSON,
+}: {
+  // uid: string;
+  propertiesJSON: string;
+}) {
+  const arr: DocumentData[] = JSON.parse(propertiesJSON);
 
-  const getRanodomProperties = async () => {
-    const q = query(
-      collection(db, "property"),
-      orderBy("numberOfReviews", "desc"),
-      orderBy("totalStars", "desc"),
-      limit(8)
-    );
-    console.log("--------------");
-    const querySnapshot = await getDocs(q);
-    setArr([]);
-    querySnapshot.forEach((doc) => {
-      setArr((prev) => [...prev, doc]);
-    });
-  };
+  // const [arr, setArr] = useState<DocumentData[]>([]);
 
-  useEffect(() => {
-    getRanodomProperties();
-  }, []);
+  // const getRanodomProperties = async () => {
+  //   const q = query(
+  //     collection(db, "property"),
+  //     orderBy("numberOfReviews", "desc"),
+  //     orderBy("totalStars", "desc"),
+  //     limit(8)
+  //   );
+  //   console.log("--------------");
+  //   const querySnapshot = await getDocs(q);
+  //   setArr([]);
+  //   querySnapshot.forEach((doc) => {
+  //     setArr((prev) => [...prev, doc.data()]);
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   getRanodomProperties();
+  // }, []);
+
   return (
     <Layout>
       <Head>
@@ -46,20 +65,21 @@ const Home: NextPage = () => {
             <h3>Here are the most popular accomodations around the world</h3>
           </div>
 
-          <div className="flex gap-4 flex-wrap">
-            {arr.map((item) => {
-              const property = item.data();
+          <div className="flex gap-4 flex-wrap ">
+            {arr.map((item: DocumentData) => {
+              const property: DocumentData = item;
               const propertyid = item.id;
               return (
+                // <div key={propertyid}> a{property.images[0]}</div>
                 <Card
                   key={propertyid}
                   propertyid={propertyid}
-                  name={property.title}
+                  name={property.title ?? ""}
                   description={""}
-                  image={property.images[0]}
-                  price={property.pricePerNight}
-                  totalStars={property.totalStars}
-                  numberOfReviews={property.numberOfReviews}
+                  image={property.images[0] ?? ""}
+                  price={property.pricePerNight ?? ""}
+                  totalStars={property.totalStars ?? ""}
+                  numberOfReviews={property.numberOfReviews ?? ""}
                   numberOfNights={0}
                 />
               );
@@ -69,6 +89,41 @@ const Home: NextPage = () => {
       </div>
     </Layout>
   );
-};
+}
 
-export default Home;
+export async function getServerSideProps(context) {
+  try {
+    // const cookies = nookies.get(context);
+    // const token = await verifyIdToken(cookies.token);
+    // const { uid } = token;
+
+    var properties: DocumentData[] = [];
+    const q = query(
+      collection(db, "property"),
+      orderBy("numberOfReviews", "desc"),
+      orderBy("totalStars", "desc"),
+      limit(8)
+    );
+    const querySnapshot = await getDocs(q);
+    for (let index = 0; index < querySnapshot.docs.length; index++) {
+      properties.push(querySnapshot.docs[index].data());
+    }
+
+    return {
+      props: {
+        // uid: uid,
+        propertiesJSON: JSON.stringify(properties),
+      },
+    };
+  } catch (err) {
+    // context.res.writeHead(302, { location: "/" });
+    // context.res.end();
+    // return { props: [] };
+    return {
+      redirect: {
+        destination: "/",
+      },
+      props: [],
+    };
+  }
+}

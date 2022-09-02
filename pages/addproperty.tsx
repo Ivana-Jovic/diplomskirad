@@ -20,6 +20,7 @@ import Map from "../components/map";
 import ImageForm from "../components/imageform";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useRouter } from "next/router";
+import { isHostModeHost, isLoggedUser } from "../lib/hooks";
 type IFormInput = {
   title: string;
   desc: string;
@@ -127,7 +128,6 @@ export default function AddProperty() {
         const nnNEW: string = `uploads/${
           user.uid
         }/properties/${Date.now()}.${extension}`;
-        // const nn: string = "ppp-" + selected.name;
         const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
         //when we upload using this ref this file should have that name
         const uploadTask = await uploadBytesResumable(storageRef, selected);
@@ -162,10 +162,7 @@ export default function AddProperty() {
       type: data.type,
       numOfRooms: data.numRoooms,
       numOfPersons: data.numPers,
-      image: "image",
-      galery: "galery",
       pricePerNight: data.priceN,
-      additionalPerPerson: data.addPers,
       additionalCosts: data.addCosts,
       garage: data.garage == "Yes" ? true : false,
       ownerId: user?.uid,
@@ -173,10 +170,10 @@ export default function AddProperty() {
       totalStars: 0,
       numberOfReviews: 0,
       isSuperhost: false,
-      loc: loc ?? ",",
-      dateAddedProperty: new Date().toDateString(),
+      loc: loc,
+      // dateAddedProperty: new Date().toDateString(),
       createdAt: Timestamp.now().toMillis(),
-      removedByAdmin: false,
+      adminApproved: false,
     });
     await updateDoc(doc(db, "property", docRef.id), {
       id: docRef.id,
@@ -195,180 +192,196 @@ export default function AddProperty() {
       //add city
       await setDoc(doc(db, "locations", city + ", " + state), {});
     }
-    await updateDoc(doc(db, "users", user.uid), {
-      numberOfProperties: increment(1),
+    //incrementing numberOfProperties is done in admin
+
+    const docRef2 = await addDoc(collection(db, "reports"), {
+      hostId: user?.uid,
+      reportText: "wantsToAddProperty",
+      processed: false,
+      createdAt: Timestamp.now().toMillis(),
+      propertyId: docRef.id,
+      firstProperty: myUser.numberOfProperties == 0,
     });
-    // });
+    await updateDoc(doc(db, "reports", docRef2.id), {
+      id: docRef2.id,
+    });
 
     return true;
   };
-  return (
-    <>
-      {user && myUser && myUser.numberOfProperties < 10 ? (
-        <>
-          <Layout>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="max-w-7xl px-5 mx-auto text-center">
-                <div className="pt-7 pb-5 text-center text-3xl font-bold">
-                  New property
-                </div>
 
-                <TextField
-                  {...register("title", {
-                    required: "Please enter your last name",
-                  })}
-                  className="w-full mb-2"
-                  id="outlined-required"
-                  label="Title"
-                  helperText={errors.title ? errors.title.message : " "}
-                />
+  if (isHostModeHost(user, myUser) || isLoggedUser(user, myUser))
+    //TODO mozda dovuci user i myuser u gsp
+    return (
+      <>
+        {user && myUser && myUser.numberOfProperties < 10 ? (
+          <>
+            <Layout>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="max-w-7xl px-5 mx-auto text-center">
+                  <div className="pt-7 pb-5 text-center text-3xl font-bold">
+                    New property
+                  </div>
 
-                <TextField
-                  {...register("desc", {
-                    required: "Please enter  a description",
-                    // maxLength: 2,
-                  })}
-                  className="w-full mb-2 "
-                  id="outlined-required"
-                  label="Description"
-                  multiline
-                  maxRows={15}
-                  helperText={errors.desc ? errors.desc.message : " "}
-                />
+                  <TextField
+                    {...register("title", {
+                      required: "Please enter your last name",
+                    })}
+                    className="w-full mb-2"
+                    id="outlined-required"
+                    label="Title"
+                    helperText={errors.title ? errors.title.message : " "}
+                  />
 
-                <div className="grid grid-cols-3 ">
-                  <div className="mr-3  mb-2">
+                  <TextField
+                    {...register("desc", {
+                      required: "Please enter  a description",
+                      // maxLength: 2,
+                    })}
+                    className="w-full mb-2 "
+                    id="outlined-required"
+                    label="Description"
+                    multiline
+                    maxRows={15}
+                    helperText={errors.desc ? errors.desc.message : " "}
+                  />
+
+                  <div className="grid grid-cols-3 ">
+                    <div className="mr-3  mb-2">
+                      <Controller
+                        name="type"
+                        control={control}
+                        rules={{ required: "Please enter a value" }}
+                        render={({ field: { onChange, value } }) => (
+                          <>
+                            <TextField
+                              // {...register("type", {
+                              //   required: "Please enter a value",
+                              // })}
+                              className="w-full"
+                              id="outlined-select-currency"
+                              select
+                              label="Select a type"
+                              value={value}
+                              onChange={(e) => {
+                                onChange(e.target.value);
+                              }}
+                              helperText={
+                                errors.type ? errors.type.message : " "
+                              }
+                            >
+                              {["apartment", "house"].map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {option}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          </>
+                        )}
+                      />
+                    </div>
+
                     <Controller
-                      name="type"
+                      name="numRoooms"
                       control={control}
                       rules={{ required: "Please enter a value" }}
                       render={({ field: { onChange, value } }) => (
                         <>
                           <TextField
-                            // {...register("type", {
-                            //   required: "Please enter a value",
+                            // {...register("numRoooms", {
+                            //   required: "Please enter your last name",
                             // })}
-                            className="w-full"
-                            id="outlined-select-currency"
-                            select
-                            label="Select a type"
+                            className="mx-3 mb-2"
+                            id="outlined-required"
+                            label="Number of Rooms"
                             value={value}
-                            onChange={(e) => {
-                              onChange(e.target.value);
+                            // type="number"
+                            inputProps={{
+                              inputMode: "numeric",
+                              pattern: "[0-9]*",
                             }}
-                            helperText={errors.type ? errors.type.message : " "}
-                          >
-                            {["apartment", "house"].map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
-                              </MenuItem>
-                            ))}
-                          </TextField>
+                            onChange={(e) => {
+                              onChange(
+                                e.target.value ? parseInt(e.target.value) : 0
+                              );
+                            }}
+                            helperText={
+                              errors.numRoooms ? errors.numRoooms.message : " "
+                            }
+                          />
+                        </>
+                      )}
+                    />
+                    <Controller
+                      name="numPers"
+                      control={control}
+                      rules={{ required: "Please enter a value" }}
+                      render={({ field: { onChange, value } }) => (
+                        <>
+                          <TextField
+                            //  {...register("lastName", {
+                            //   required: "Please enter your last name",
+                            // })}
+                            className="ml-3  mb-2"
+                            id="outlined-required"
+                            label="Number of Persons"
+                            value={value}
+                            inputProps={{
+                              inputMode: "numeric",
+                              pattern: "[0-9]*",
+                            }}
+                            onChange={(e) => {
+                              onChange(
+                                e.target.value ? parseInt(e.target.value) : 0
+                              );
+                            }}
+                            helperText={
+                              errors.numPers ? errors.numPers.message : " "
+                            }
+                          />
                         </>
                       )}
                     />
                   </div>
+                  <div className="grid grid-cols-3">
+                    <Controller
+                      name="priceN"
+                      control={control}
+                      rules={{ required: "Please enter a value" }}
+                      render={({ field: { onChange, value } }) => (
+                        <>
+                          <TextField
+                            // {...register("lastName", {
+                            //   required: "Please enter your last name",
+                            // })}
 
-                  <Controller
-                    name="numRoooms"
-                    control={control}
-                    rules={{ required: "Please enter a value" }}
-                    render={({ field: { onChange, value } }) => (
-                      <>
-                        <TextField
-                          // {...register("numRoooms", {
-                          //   required: "Please enter your last name",
-                          // })}
-                          className="mx-3 mb-2"
-                          id="outlined-required"
-                          label="Number of Rooms"
-                          value={value}
-                          // type="number"
-                          inputProps={{
-                            inputMode: "numeric",
-                            pattern: "[0-9]*",
-                          }}
-                          onChange={(e) => {
-                            onChange(
-                              e.target.value ? parseInt(e.target.value) : 0
-                            );
-                          }}
-                          helperText={
-                            errors.numRoooms ? errors.numRoooms.message : " "
-                          }
-                        />
-                      </>
-                    )}
-                  />
-                  <Controller
-                    name="numPers"
-                    control={control}
-                    rules={{ required: "Please enter a value" }}
-                    render={({ field: { onChange, value } }) => (
-                      <>
-                        <TextField
-                          //  {...register("lastName", {
-                          //   required: "Please enter your last name",
-                          // })}
-                          className="ml-3  mb-2"
-                          id="outlined-required"
-                          label="Number of Persons"
-                          value={value}
-                          inputProps={{
-                            inputMode: "numeric",
-                            pattern: "[0-9]*",
-                          }}
-                          onChange={(e) => {
-                            onChange(
-                              e.target.value ? parseInt(e.target.value) : 0
-                            );
-                          }}
-                          helperText={
-                            errors.numPers ? errors.numPers.message : " "
-                          }
-                        />
-                      </>
-                    )}
-                  />
-                </div>
-                <div className="grid grid-cols-3">
-                  <Controller
-                    name="priceN"
-                    control={control}
-                    rules={{ required: "Please enter a value" }}
-                    render={({ field: { onChange, value } }) => (
-                      <>
-                        <TextField
-                          // {...register("lastName", {
-                          //   required: "Please enter your last name",
-                          // })}
-
-                          className="mr-3  mb-2"
-                          id="outlined-required"
-                          label="Price per night"
-                          value={value}
-                          inputProps={{
-                            inputMode: "numeric",
-                            pattern: "[0-9]*",
-                          }}
-                          onChange={(e) => {
-                            onChange(
-                              e.target.value ? parseInt(e.target.value) : 0
-                            );
-                          }}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">€</InputAdornment>
-                            ),
-                          }}
-                          helperText={
-                            errors.priceN ? errors.priceN.message : " "
-                          }
-                        />
-                      </>
-                    )}
-                  />
-                  {/* <Controller
+                            className="mr-3  mb-2"
+                            id="outlined-required"
+                            label="Price per night"
+                            value={value}
+                            inputProps={{
+                              inputMode: "numeric",
+                              pattern: "[0-9]*",
+                            }}
+                            onChange={(e) => {
+                              onChange(
+                                e.target.value ? parseInt(e.target.value) : 0
+                              );
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  €
+                                </InputAdornment>
+                              ),
+                            }}
+                            helperText={
+                              errors.priceN ? errors.priceN.message : " "
+                            }
+                          />
+                        </>
+                      )}
+                    />
+                    {/* <Controller
                     name="addPers"
                     control={control}
                     rules={{ required: "Please enter a value" }}
@@ -403,218 +416,226 @@ export default function AddProperty() {
                       </>
                     )}
                   /> */}
-                  <Controller
-                    name="addCosts"
-                    control={control}
-                    rules={{ required: "Please enter a value" }}
-                    render={({ field: { onChange, value } }) => (
-                      <>
-                        <TextField
-                          //  {...register("lastName", {
-                          //   required: "Please enter your last name",
-                          // })}
-                          className="ml-3 mb-2"
-                          id="outlined-required"
-                          label="Additional costs"
-                          value={value}
-                          inputProps={{
-                            inputMode: "numeric",
-                            pattern: "[0-9]*",
-                          }}
-                          onChange={(e) => {
-                            onChange(
-                              e.target.value ? parseInt(e.target.value) : 0
-                            );
-                          }}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">€</InputAdornment>
-                            ),
-                          }}
-                          helperText={
-                            errors.addCosts ? errors.addCosts.message : " "
-                          }
-                        />
-                      </>
-                    )}
-                  />
-                  <Controller
-                    name="garage"
-                    control={control}
-                    rules={{ required: "Please enter a value" }}
-                    render={({ field: { onChange, value } }) => (
-                      <>
-                        <TextField
-                          //  {...register("lastName", {
-                          //   required: "Please enter your last name",
-                          // })}
-                          // className="w-full"
-                          className="ml-3 mb-2"
-                          id="outlined-select-currency"
-                          select
-                          label="Is there any parking spot"
-                          value={value}
-                          onChange={(e) => {
-                            onChange(e.target.value);
-                          }}
-                          helperText={
-                            errors.garage ? errors.garage.message : " "
-                          }
-                        >
-                          {["Yes", "No"].map((option) => (
-                            <MenuItem key={option} value={option}>
-                              {option}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      </>
-                    )}
-                  />
-                </div>
-                {/* <div className="mb-2"></div> */}
-
-                {!selectedStreet && (
-                  <div className="pt-7 pb-5 text-center text-lg font-bold">
-                    Please enter street name and number
+                    <Controller
+                      name="addCosts"
+                      control={control}
+                      rules={{ required: "Please enter a value" }}
+                      render={({ field: { onChange, value } }) => (
+                        <>
+                          <TextField
+                            //  {...register("lastName", {
+                            //   required: "Please enter your last name",
+                            // })}
+                            className="ml-3 mb-2"
+                            id="outlined-required"
+                            label="Additional costs"
+                            value={value}
+                            inputProps={{
+                              inputMode: "numeric",
+                              pattern: "[0-9]*",
+                            }}
+                            onChange={(e) => {
+                              onChange(
+                                e.target.value ? parseInt(e.target.value) : 0
+                              );
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  €
+                                </InputAdornment>
+                              ),
+                            }}
+                            helperText={
+                              errors.addCosts ? errors.addCosts.message : " "
+                            }
+                          />
+                        </>
+                      )}
+                    />
+                    <Controller
+                      name="garage"
+                      control={control}
+                      rules={{ required: "Please enter a value" }}
+                      render={({ field: { onChange, value } }) => (
+                        <>
+                          <TextField
+                            //  {...register("lastName", {
+                            //   required: "Please enter your last name",
+                            // })}
+                            // className="w-full"
+                            className="ml-3 mb-2"
+                            id="outlined-select-currency"
+                            select
+                            label="Is there any parking spot"
+                            value={value}
+                            onChange={(e) => {
+                              onChange(e.target.value);
+                            }}
+                            helperText={
+                              errors.garage ? errors.garage.message : " "
+                            }
+                          >
+                            {["Yes", "No"].map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </>
+                      )}
+                    />
                   </div>
-                )}
-                <div className="flex flex-col items-center justify-center">
-                  <Map
-                    setLoc={setLoc}
-                    setState={setState}
-                    setCity={setCity}
-                    setStreetName={setStreetName}
-                    setStreetNum={setStreetNum}
-                    setSelectedStreet={setSelectedStreet}
-                  />
-                  {/* {loc && (
+                  {/* <div className="mb-2"></div> */}
+
+                  {!selectedStreet && (
+                    <div className="pt-7 pb-5 text-center text-lg font-bold">
+                      Please enter street name and number
+                    </div>
+                  )}
+                  <div className="flex flex-col items-start justify-start text-start">
+                    <Map
+                      setLoc={setLoc}
+                      setState={setState}
+                      setCity={setCity}
+                      setStreetName={setStreetName}
+                      setStreetNum={setStreetNum}
+                      setSelectedStreet={setSelectedStreet}
+                    />
+                    {/* {loc && (
                     <div>
                       {JSON.parse(loc.split("-")[0])}-
                       {JSON.parse(loc.split("-")[1])}
                     </div>
                   )} */}
-                </div>
-                <div className="grid sm:grid-cols-2 grid-cols-1 mt-14">
-                  <TextField
-                    // {...register("state", {
-                    //   required: "Please enter a state name",
-                    // })}
-                    disabled
-                    InputLabelProps={{ shrink: true }}
-                    className="mb-2"
-                    id="outlined-required"
-                    label="State"
-                    value={state}
-                    // helperText={errors.state ? errors.state.message : " "}
-                  />
-
-                  <TextField
-                    // {...register("city", {
-                    //   required: "Please enter a city name",
-                    // })}
-                    disabled
-                    InputLabelProps={{ shrink: true }}
-                    className="mb-2"
-                    id="outlined-required"
-                    label="City"
-                    value={city}
-                    // helperText={errors.city ? errors.city.message : " "}
-                  />
-
-                  <div></div>
-                </div>
-                <div className="grid sm:grid-cols-2 grid-cols-1  ">
-                  <TextField
-                    disabled
-                    // {...register("street", {
-                    //   required: "Please enter a street name",
-                    // })}
-                    InputLabelProps={{ shrink: true }}
-                    className=" mb-2"
-                    id="outlined-required"
-                    label="Street"
-                    value={streetName}
-                    // helperText={errors.street ? errors.street.message : " "}
-                  />
-
-                  <TextField
-                    disabled
-                    // {...register("streetNum", {
-                    //   required: "Please entera value",
-                    // })}
-                    InputLabelProps={{ shrink: true }}
-                    className=" mb-2"
-                    id="outlined-required"
-                    label="StreetNum"
-                    value={streetNum}
-                    // onChange={(e) => {
-                    //   set(e.target.value);
-                    // }}
-                    // helperText={
-                    //   errors.streetNum ? errors.streetNum.message : " "
-                    // }
-                  />
-                </div>
-                <div>
-                  <label className="btn w-full mt-5">
-                    Select property pictures
-                    <input
-                      {...register("picturesNEW")}
-                      type="file"
-                      multiple
-                      className="hidden"
-                      accept="image/png, image/jpeg, image/jpg"
-                    />
-                  </label>
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    {imgNew &&
-                      imgNew.length > 0 &&
-                      imgNew.map((item, index) => {
-                        return (
-                          <div key={item.name}>
-                            <ImageForm
-                              url={URL.createObjectURL(imgNew[index])}
-                            />
-                          </div>
-                        );
-                      })}
                   </div>
+                  <div className="grid sm:grid-cols-2 gap-0 sm:gap-3 grid-cols-1 mt-14">
+                    <TextField
+                      // {...register("state", {
+                      //   required: "Please enter a state name",
+                      // })}
+                      disabled
+                      InputLabelProps={{ shrink: true }}
+                      className="mb-2"
+                      id="outlined-required"
+                      label="State"
+                      value={state}
+                      // helperText={errors.state ? errors.state.message : " "}
+                    />
 
-                  {/* // ((item, index) => { */}
-                  {/* //   return (
+                    <TextField
+                      // {...register("city", {
+                      //   required: "Please enter a city name",
+                      // })}
+                      disabled
+                      InputLabelProps={{ shrink: true }}
+                      className="mb-2"
+                      id="outlined-required"
+                      label="City"
+                      value={city}
+                      // helperText={errors.city ? errors.city.message : " "}
+                    />
+
+                    <div></div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-0 grid-cols-1  sm:gap-3">
+                    <TextField
+                      disabled
+                      // {...register("street", {
+                      //   required: "Please enter a street name",
+                      // })}
+                      InputLabelProps={{ shrink: true }}
+                      className="mb-2"
+                      id="outlined-required"
+                      label="Street"
+                      value={streetName}
+                      // helperText={errors.street ? errors.street.message : " "}
+                    />
+
+                    <TextField
+                      disabled
+                      // {...register("streetNum", {
+                      //   required: "Please entera value",
+                      // })}
+                      InputLabelProps={{ shrink: true }}
+                      className=" mb-2"
+                      id="outlined-required"
+                      label="StreetNum"
+                      value={streetNum}
+                      // onChange={(e) => {
+                      //   set(e.target.value);
+                      // }}
+                      // helperText={
+                      //   errors.streetNum ? errors.streetNum.message : " "
+                      // }
+                    />
+                  </div>
+                  <div>
+                    <label className="btn w-full mt-5">
+                      Select property pictures
+                      <input
+                        {...register("picturesNEW")}
+                        type="file"
+                        multiple
+                        className="hidden"
+                        accept="image/png, image/jpeg, image/jpg"
+                      />
+                    </label>
+                    <div className="flex flex-wrap gap-4 justify-center">
+                      {imgNew &&
+                        imgNew.length > 0 &&
+                        imgNew.map((item, index) => {
+                          return (
+                            <div key={item.name}>
+                              <ImageForm
+                                url={URL.createObjectURL(imgNew[index])}
+                              />
+                            </div>
+                          );
+                        })}
+                    </div>
+
+                    {/* // ((item, index) => { */}
+                    {/* //   return (
                   //     <div key={item.name}>
                   //       <ImageForm url={URL.createObjectURL(imgNew[index])} />
                   //     </div>
                   //   );
                   // })} */}
-                </div>
-                <div className="pt-7 pb-5 text-center text-sm font-thin">
-                  {error}
-                </div>
-                {/* <Button
+                  </div>
+                  <div className="pt-7 pb-5 text-center text-sm font-thin">
+                    {error}
+                  </div>
+                  {/* <Button
                   action={() => {
                   }}
                   text="Add"
                   type="submit"
                 /> */}
-                <button
-                  className="btn mx-auto text-center w-full"
-                  type="submit"
-                >
-                  Add
-                </button>
-              </div>
-            </form>
-          </Layout>
-        </>
-      ) : (
-        <>
-          <ErrorPage />
-          {user && myUser && myUser.numberOfProperties >= 10 && (
-            <div>Maximum number of properties is 10</div>
-          )}
-        </>
-      )}
-    </>
-  );
+                  <button
+                    className="btn mx-auto text-center w-full"
+                    type="submit"
+                  >
+                    Add
+                  </button>
+                </div>
+              </form>
+            </Layout>
+          </>
+        ) : (
+          <>
+            <ErrorPage />
+            {user && myUser && myUser.numberOfProperties >= 10 && (
+              <div>Maximum number of properties is 10</div>
+            )}
+          </>
+        )}
+      </>
+    );
+  else
+    return (
+      <>
+        <ErrorPage />
+      </>
+    );
 }

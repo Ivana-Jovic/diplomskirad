@@ -45,6 +45,7 @@ export default function CommentCard({
       // guestFirstName: comment.data().firstName,
       // guestLastName: comment.data().lastName,
       reservationId: comment.data().reservationId,
+      propertyId: comment.data().propertyId,
       hostId: user?.uid ?? "",
       // reportedFirstName: myUser.firstName,
       // reportedLastName: myUser.lastName,

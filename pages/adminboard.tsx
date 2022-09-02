@@ -23,6 +23,8 @@ import ReportCard from "../components/reportcard";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
+import { isAdmin } from "../lib/hooks";
+import ErrorPage from "./errorpage";
 
 export default function AdminBoard({
   uid,
@@ -59,28 +61,36 @@ export default function AdminBoard({
   //   getReports();
   // }, []);
 
-  return (
-    <Layout>
-      {/* THIS IS Admin BOARD */}
+  const { user, myUser } = useContext(AuthContext);
+  if (isAdmin(user, myUser))
+    //TODO mozda dovuci user i myuser u gsp
 
-      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
-        <div>
-          <div className="pt-7 pb-5 text-center text-3xl font-bold">
-            Reports
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 place-items-center">
-            {rep.map((item) => {
-              return (
-                <div key={item.id} className="my-3 ">
-                  <ReportCard report={item} />
-                </div>
-              );
-            })}
+    return (
+      <Layout>
+        <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
+          <div>
+            <div className="pt-7 pb-5 text-center text-3xl font-bold">
+              Reports
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 place-items-center">
+              {rep.map((item) => {
+                return (
+                  <div key={item.id} className="my-3 w-full">
+                    <ReportCard report={item} />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
-    </Layout>
-  );
+      </Layout>
+    );
+  else
+    return (
+      <>
+        <ErrorPage />
+      </>
+    );
 }
 
 export async function getServerSideProps(context) {
@@ -112,8 +122,14 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (err) {
-    context.res.writeHead(302, { location: "/" });
-    context.res.end();
-    return { props: [] };
+    // context.res.writeHead(302, { location: "/" });
+    // context.res.end();
+    // return { props: [] };
+    return {
+      redirect: {
+        destination: "/",
+      },
+      props: [],
+    };
   }
 }

@@ -13,6 +13,8 @@ import { AuthContext } from "../firebase-authProvider";
 import ReservationCard from "../components/reservationcard";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
+import ErrorPage from "./errorpage";
+import { isHostModeTravel, isLoggedUser } from "../lib/hooks";
 
 export default function GuestBoard({
   uid,
@@ -27,32 +29,40 @@ export default function GuestBoard({
     JSON.parse(reservations);
   // console.log(reserv);
 
-  return (
-    <Layout>
-      {/* THIS IS Guest BOARD */}
-      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
-        <div>
-          <div className="pt-7 pb-5 text-center text-3xl font-bold">
-            My reservations
-          </div>
-          <div className="flex flex-col ">
-            {Array.from(reserv).map((item, index) => {
-              return (
-                <div key={index}>
-                  <ReservationCard
-                    {...(item as any)} //ovde mora any
-                    reservationId={item.id}
-                    // TODO : Kad napravis modove u oba resrvation carda obrati paznju na isHost
-                    isHost={false}
-                  />
-                </div>
-              );
-            })}
+  const { user, myUser } = useContext(AuthContext);
+  if (isLoggedUser(user, myUser) || isHostModeTravel(user, myUser))
+    return (
+      <Layout>
+        {/* THIS IS Guest BOARD */}
+        <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
+          <div>
+            <div className="pt-7 pb-5 text-center text-3xl font-bold">
+              My reservations
+            </div>
+            <div className="flex flex-col ">
+              {Array.from(reserv).map((item, index) => {
+                return (
+                  <div key={index}>
+                    <ReservationCard
+                      {...(item as any)} //ovde mora any
+                      reservationId={item.id}
+                      // TODO : Kad napravis modove u oba resrvation carda obrati paznju na isHost
+                      isHost={false}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
-    </Layout>
-  );
+      </Layout>
+    );
+  else
+    return (
+      <>
+        <ErrorPage />
+      </>
+    );
 }
 export async function getServerSideProps(context) {
   try {
@@ -86,8 +96,14 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (err) {
-    context.res.writeHead(302, { location: "/" });
-    context.res.end();
-    return { props: [] };
+    // context.res.writeHead(302, { location: "/" });
+    // context.res.end();
+    // return { props: [] };
+    return {
+      redirect: {
+        destination: "/",
+      },
+      props: [],
+    };
   }
 }

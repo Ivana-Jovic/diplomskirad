@@ -68,7 +68,7 @@ export default function Card({
       }}
     >
       <a
-        className="card rounded-md mx-auto  w-[20rem] flex-shrink-0 bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
+        className="card rounded-md w-[20rem] flex-shrink-0 bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
     transition duration-200 ease-out
     cursor-pointer"
       >

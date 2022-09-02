@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import { getDocs } from "firebase/firestore";
 import {
   addDoc,
@@ -10,7 +11,10 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { useContext } from "react";
+import { db, storage } from "../firebase";
+import { AuthContext } from "../firebase-authProvider";
 
 export async function isAvailable(from: Date, to: Date, propertyId: string) {
   const querySnapshot6 = await getDocs(
@@ -40,4 +44,31 @@ export async function isAvailable(from: Date, to: Date, propertyId: string) {
   }
   console.log("IS AVAILABLE JE TRUE");
   return true;
+}
+
+export function isUnloggedUser(user: User, myUser: DocumentData) {
+  if (!user) return true;
+  else return false;
+}
+export function isLoggedUser(user: User, myUser: DocumentData) {
+  if (user && myUser && !myUser.host && !myUser.isAdmin) return true;
+  else return false;
+}
+export function isAdmin(user: User, myUser: DocumentData) {
+  if (user && myUser && !myUser.host && myUser.isAdmin) return true;
+  else return false;
+}
+export function isHost(user: User, myUser: DocumentData) {
+  if (user && myUser && myUser.host && !myUser.isAdmin) return true;
+  else return false;
+}
+export function isHostModeHost(user: User, myUser: DocumentData) {
+  if (user && myUser && myUser.host && myUser.modeIsHosting && !myUser.isAdmin)
+    return true;
+  else return false;
+}
+export function isHostModeTravel(user: User, myUser: DocumentData) {
+  if (user && myUser && myUser.host && !myUser.modeIsHosting && !myUser.isAdmin)
+    return true;
+  else return false;
 }

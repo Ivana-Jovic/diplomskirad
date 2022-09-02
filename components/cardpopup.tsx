@@ -6,29 +6,7 @@ import { Rating } from "@mui/material";
 import { useRouter } from "next/router";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
-export default function CardPopup({
-  //   propertyid,
-  //   name,
-  //   description,
-  //   price,
-  //   image,
-  //   // stars,
-  //   totalStars,
-  //   numberOfReviews,
-  //   numberOfNights,
-  property,
-}: {
-  //   propertyid: string;
-  //   name: string;
-  //   description: string;
-  //   price: string;
-  //   image: string;
-  //   // stars: string;
-  //   totalStars: number;
-  //   numberOfReviews: number;
-  //   numberOfNights: number;
-  property: DocumentData;
-}) {
+export default function CardPopup({ property }: { property: DocumentData }) {
   const router = useRouter();
 
   // const goToPropertyPage = () => {
