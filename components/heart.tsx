@@ -48,7 +48,8 @@ export default function Heart({ propertyid }: { propertyid: string }) {
   };
 
   useEffect(() => {
-    if (user && myUser != undefined) checkIfInFaves();
+    if (user && myUser) checkIfInFaves(); //PAZI OVO JE BILO NAJSKORIJE 3.9.2022
+    //ako ne radi vrati myUser!= undefined
   }, [user, myUser, checkIfInFaves]);
 
   return (

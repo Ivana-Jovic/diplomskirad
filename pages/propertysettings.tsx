@@ -13,7 +13,8 @@ import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import Link from "next/link";
-import { isHostModeHost } from "../lib/hooks";
+import { isHostModeHost, removedByAdmin } from "../lib/hooks";
+import RemovedByAdmin from "../components/removedbyadmin";
 
 type IFormInput = {
   title: string;
@@ -27,13 +28,18 @@ type IFormInput = {
 export default function PropertySettings({
   uid,
   propertyJSON,
+  myUserJSON,
+  isRemovedByAdmin,
 }: {
   uid: string;
   propertyJSON: string;
+  myUserJSON: string;
+  isRemovedByAdmin: boolean;
 }) {
   const property: DocumentData = JSON.parse(propertyJSON);
   const [urlArr, setUrlArr] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
+  const router = useRouter();
   const {
     control,
     watch,
@@ -50,9 +56,11 @@ export default function PropertySettings({
       picturesNEW: [],
     },
   });
-  const { user, myUser } = useContext(AuthContext);
+  if (isRemovedByAdmin) return <RemovedByAdmin />;
+
+  const myUser: DocumentData = JSON.parse(myUserJSON);
+  // const { user, myUser } = useContext(AuthContext);
   const imgNew: File[] = Array.from(watch("picturesNEW"));
-  const router = useRouter();
 
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     setError("");
@@ -60,7 +68,7 @@ export default function PropertySettings({
       setError("Title must be shorter than 50 characters");
     } else if (data.desc.length > 500) {
       setError("Description must be shorter than 500 characters");
-    } else if (data.priceN == 0 || data.addCosts == 0) {
+    } else if (data.priceN === 0 || data.addCosts === 0) {
       setError("Numerical fields must be grater than 0");
     } else if (data.priceN > 200 || data.addCosts > 200) {
       setError("Prices must be less then 200");
@@ -95,7 +103,8 @@ export default function PropertySettings({
       if (selected && allowedTypes.includes(selected.type)) {
         const extension = selected.type.split("/")[1];
         const nnNEW: string = `uploads/${
-          user.uid
+          uid
+          // user.uid
         }/properties/${Date.now()}.${extension}`;
         const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
         //when we upload using this ref this file should have that name
@@ -115,7 +124,7 @@ export default function PropertySettings({
   const update = async (data: IFormInput): Promise<boolean> => {
     if (data.picturesNEW.length > 0) {
       const urlArr: string[] = await uploadPictures(data);
-      if (urlArr == null) {
+      if (urlArr === null) {
         console.log("RETURNED FALSE add");
         return false;
       }
@@ -135,11 +144,11 @@ export default function PropertySettings({
     return true;
   };
 
-  // const { user, myUser } = useContext(AuthContext);
-  if (isHostModeHost(user, myUser))
-    return (
-      <>
-        {user && myUser && myUser.numberOfProperties < 10 ? (
+  return (
+    <>
+      {
+        // user &&
+        myUser && myUser.numberOfProperties < 10 ? (
           <>
             <Layout>
               <form onSubmit={handleSubmit(onSubmit)}>
@@ -170,7 +179,7 @@ export default function PropertySettings({
                     helperText={errors.desc ? errors.desc.message : " "}
                   />
 
-                  <div className="grid grid-cols-2">
+                  <div className="grid sm:grid-cols-2 grid-cols-1 gap-0 sm:gap-4">
                     <Controller
                       name="priceN"
                       control={control}
@@ -304,21 +313,39 @@ export default function PropertySettings({
           <>
             <ErrorPage />
           </>
-        )}
-      </>
-    );
-  else
-    return (
-      <>
-        <ErrorPage />
-      </>
-    );
+        )
+      }
+    </>
+  );
 }
 export async function getServerSideProps(context) {
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
     const { uid, email } = token;
+
+    var myUser: DocumentData = null;
+    var hasPermission: boolean = false;
+    var isRemovedByAdmin: boolean = false;
+    const docSnap2 = await getDoc(doc(db, "users", uid));
+
+    if (docSnap2.exists()) {
+      myUser = docSnap2.data();
+      if (isHostModeHost(myUser)) {
+        hasPermission = true;
+        if (removedByAdmin(myUser)) {
+          isRemovedByAdmin = true;
+        }
+      }
+    }
+    if (!hasPermission) {
+      return {
+        redirect: {
+          destination: "/",
+        },
+        props: [],
+      };
+    }
     const queryUrl = context.query;
     var property: DocumentData = null;
     const docSnap = await getDoc(doc(db, "property", queryUrl.property));
@@ -330,6 +357,8 @@ export async function getServerSideProps(context) {
       props: {
         uid: uid,
         propertyJSON: JSON.stringify(property),
+        myUserJSON: JSON.stringify(myUser),
+        isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

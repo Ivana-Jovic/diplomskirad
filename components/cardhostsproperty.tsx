@@ -56,7 +56,7 @@ export default function CardHostsProperty({
               </div>
 
               <div className="flex justify-between items-center">
-                <div className="flex">
+                <div className="flex items-center">
                   <p className="text-sm font-semibold">
                     {(totalStars / numberOfReviews).toFixed(1)}
                   </p>

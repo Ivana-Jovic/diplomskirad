@@ -3,21 +3,27 @@ import { doc, DocumentData, getDoc, onSnapshot } from "firebase/firestore";
 import React, { createContext, useEffect, useRef, useState } from "react";
 import { auth, db } from "./firebase";
 import nookies from "nookies";
+import { useAuthState } from "react-firebase-hooks/auth";
+
 type ContextType = {
-  user: User | null | undefined;
-  myUser: any;
+  user: null | undefined | User;
+  myUser: DocumentData | undefined;
+  // loading: boolean;
 };
+
 type AuthProviderProps = {
   children?: React.ReactNode;
 };
 export const AuthContext = createContext<ContextType>({
-  user: null,
+  user: undefined,
   myUser: null,
+  // loading: false,
 });
-import { useAuthState } from "react-firebase-hooks/auth";
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const [myUser, setMyUser] = useState<DocumentData | undefined>(undefined);
+
   useEffect(() => {
     let unsubscribe;
     async function helper() {
@@ -69,9 +75,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   //   return unsubscribe;
   // }, []);
+  const u: ContextType = {
+    user,
+    myUser,
+    // , loading };
+  };
   return (
-    <AuthContext.Provider value={{ user, myUser }}>
-      {children}
+    <AuthContext.Provider value={u}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

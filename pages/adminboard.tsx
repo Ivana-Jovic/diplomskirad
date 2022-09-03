@@ -23,7 +23,7 @@ import ReportCard from "../components/reportcard";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { isAdmin } from "../lib/hooks";
+import { isAdmin, removedByAdmin } from "../lib/hooks";
 import ErrorPage from "./errorpage";
 
 export default function AdminBoard({
@@ -61,36 +61,26 @@ export default function AdminBoard({
   //   getReports();
   // }, []);
 
-  const { user, myUser } = useContext(AuthContext);
-  if (isAdmin(user, myUser))
-    //TODO mozda dovuci user i myuser u gsp
-
-    return (
-      <Layout>
-        <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
-          <div>
-            <div className="pt-7 pb-5 text-center text-3xl font-bold">
-              Reports
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 place-items-center">
-              {rep.map((item) => {
-                return (
-                  <div key={item.id} className="my-3 w-full">
-                    <ReportCard report={item} />
-                  </div>
-                );
-              })}
-            </div>
+  return (
+    <Layout>
+      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
+        <div>
+          <div className="pt-7 pb-5 text-center text-3xl font-bold">
+            Reports
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 place-items-center">
+            {rep.map((item) => {
+              return (
+                <div key={item.id} className="my-3 w-full">
+                  <ReportCard report={item} />
+                </div>
+              );
+            })}
           </div>
         </div>
-      </Layout>
-    );
-  else
-    return (
-      <>
-        <ErrorPage />
-      </>
-    );
+      </div>
+    </Layout>
+  );
 }
 
 export async function getServerSideProps(context) {
@@ -99,6 +89,23 @@ export async function getServerSideProps(context) {
     const token = await verifyIdToken(cookies.token);
     const { uid } = token;
 
+    var hasPermission: boolean = false;
+    const docSnap = await getDoc(doc(db, "users", uid));
+
+    if (docSnap.exists()) {
+      const myUser: DocumentData = docSnap.data();
+      if (isAdmin(myUser)) {
+        hasPermission = true;
+      }
+    }
+    if (!hasPermission) {
+      return {
+        redirect: {
+          destination: "/",
+        },
+        props: [],
+      };
+    }
     const arrData: DocumentData[] = [];
     const querySnapshot = await getDocs(
       query(collection(db, "reports"), orderBy("createdAt"))

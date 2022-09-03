@@ -223,3 +223,4 @@ h3{
 .stat-value{
   @apply font-semibold text-2xl;
 }
+.menuItem { @apply hover:opacity-80  transition duration-200 ease-out  py-1 pl-1;}

@@ -194,7 +194,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 <button
                   className={
                     ` ` +
-                    `${guests == 1 ? " roundButtonDisabled " : "roundButton"}`
+                    `${guests === 1 ? " roundButtonDisabled " : "roundButton"}`
                   }
                   onClick={() => {
                     if (guests - 1 > 0) setGuests(guests - 1);
@@ -207,7 +207,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                   className={
                     ` ` +
                     `${
-                      guests == 20 || guests == property.numOfPersons
+                      guests === 20 || guests === property.numOfPersons
                         ? " roundButtonDisabled"
                         : "roundButton"
                     }`
@@ -330,7 +330,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                           label="Do you need a garage?"
                           value={value}
                           onChange={(e) => {
-                            onChange(e.target.value == "true" ? true : false);
+                            onChange(e.target.value === "true" ? true : false);
                           }}
                           InputLabelProps={{ shrink: true }}
                           // helperText={
@@ -339,7 +339,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                         >
                           {["true", "false"].map((option) => (
                             <MenuItem key={option} value={option}>
-                              {option == "true" ? "Yes" : "No"}
+                              {option === "true" ? "Yes" : "No"}
                             </MenuItem>
                           ))}
                         </TextField>

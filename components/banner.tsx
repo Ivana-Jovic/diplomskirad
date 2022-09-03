@@ -24,32 +24,24 @@ import { db } from "../firebase";
 //     },
 //   },
 // });
-//TODOp na firebasu uslovi
+//TODOppp na firebasu uslovi
 //TODOp pomeri secrets file
-//TODOp kad se registruje zabrani sve dok ne popuni formu
 
-//TODO spineri svuda
-//TODO pristup svuda
-//TODO Podesiti gde moze da radi search - moze svudaosimako je host u host modu
-//TODOp da li je okej ovako direkt na straniicama posesavati
-//tamo gde je moguce menjenje modova moyda nije ok get serv side, obzirom da ce putanje dotle biti nepostojece
-//a retko ce iko rucno kucati url
-
-//TODO mozda dovuci user i myuser u gsp svuda pa obrisi ovo preko konteksta
-//TODO sta se desava ako u gsp dodjes a nisi logovan
-//TODO ove 1/2 na stranicama (tabela iy sveske)
-//TODO Običan korisnik ima opcije kao gost sistema sa tim što ima pravo da pošalje upit za rezervaciju.
-//TODO Može da pređe na režim običnog korisnika i tada ima sve opcije kao i običan korisnik, a potom može da se vrati na režim vlasnika.
-//TODO
-//if the user is removed by admin he cannot See any content
-// make reservations
-//  add new properties (and become a host)
-//  report comments, users
-// if a property is rremoved it can no longer be reserved
-
+//TODOpp kad se registruje zabrani sve dok ne popuni formu
+//TODOppp search na search stranici zanimljivo se desava
+//TODOppp slicno i npr ako se admin izloguje ostace se na index admin stranici
+//TODO nadji gde se jos desavaju ove stvari
+//TODO vercel
+//TODOpp mozda spineri svuda
+//TODOpp velicina slajdera na mobilnom
+//TODOp da li mi je ok putanja za slike
 //TODO provere
 //- za dugacke titlove i descriptione svuda da li izgleda ok
 //- na raznim velicinama ekrana
+//- provere za sve pristupe plus pri promeni moda
+//- dugme za search
+//- slicno (search na search stranici yanimljivo se desava) i npr ako se admin izloguje ostace se na index admin stranici
+//nadji gde se jos desavaju ove stvari
 export default function Banner() {
   const [location, setLocation] = useState<string>("");
   const [guests, setGuests] = useState<number>(1);
@@ -75,7 +67,7 @@ export default function Banner() {
   }, []);
 
   const search = () => {
-    if (location == null || location == "") {
+    if (location === null || location === "") {
       setError("Please choose a location");
     } else if (dateFrom && dateTo && dateFrom >= dateTo) {
       setError("Check out date must be after check in date");
@@ -105,7 +97,7 @@ export default function Banner() {
                 <button
                   className={
                     ` ` +
-                    `${guests == 1 ? " roundButtonDisabled " : "roundButton"}`
+                    `${guests === 1 ? " roundButtonDisabled " : "roundButton"}`
                   }
                   onClick={() => {
                     if (guests - 1 > 0) setGuests(guests - 1);
@@ -117,7 +109,7 @@ export default function Banner() {
                 <button
                   className={
                     ` ` +
-                    `${guests == 20 ? " roundButtonDisabled " : "roundButton"}`
+                    `${guests === 20 ? " roundButtonDisabled " : "roundButton"}`
                   }
                   onClick={() => {
                     if (guests + 1 <= 20) setGuests(guests + 1);
@@ -137,7 +129,7 @@ export default function Banner() {
                 <label className="mx-5">rooms</label>
                 <button
                   className={`${
-                    rooms == 1 ? " roundButtonDisabled " : "roundButton"
+                    rooms === 1 ? " roundButtonDisabled " : "roundButton"
                   }`}
                   onClick={() => {
                     if (rooms - 1 > 0) setRooms(rooms - 1);
@@ -148,7 +140,7 @@ export default function Banner() {
                 <div className="mx-3">{rooms}</div>
                 <button
                   className={`${
-                    rooms == 20 ? " roundButtonDisabled " : "roundButton"
+                    rooms === 20 ? " roundButtonDisabled " : "roundButton"
                   }`}
                   onClick={() => {
                     if (rooms + 1 <= 20) setRooms(rooms + 1);
@@ -264,12 +256,14 @@ export default function Banner() {
               </a>
             </Dropdown>
             {!error && (
-              <button className="btn mt-3" onClick={search}>
+              <button className="btn xl:ml-5 mt-5 xl:mt-0 " onClick={search}>
                 search
               </button>
             )}
             {error && (
-              <button className="btn mt-3 cursor-default ">{error}</button>
+              <button className="btn xl:ml-5 mt-5 xl:mt-0 cursor-default ">
+                {error}
+              </button>
             )}
           </div>
         </div>

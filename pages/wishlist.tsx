@@ -9,13 +9,19 @@ import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import ErrorPage from "./errorpage";
-import { isHostModeTravel, isLoggedUser } from "../lib/hooks";
+import { isHostModeTravel, isLoggedUser, removedByAdmin } from "../lib/hooks";
+import RemovedByAdmin from "../components/removedbyadmin";
 
 export default function Wishlist({
   propertiesJSON,
-}: {
+  isRemovedByAdmin,
+}: // hasPermission,
+{
   propertiesJSON: string;
+  isRemovedByAdmin: boolean;
+  // hasPermission: boolean;
 }) {
+  if (isRemovedByAdmin) return <RemovedByAdmin />;
   const faves: DocumentData[] = JSON.parse(propertiesJSON);
   // const { user, myUser } = useContext(AuthContext);
   // const [faves, setFaves] = useState<any[]>([]);
@@ -37,49 +43,46 @@ export default function Wishlist({
   //       setShowProgress(false);
   //     });
   // }, [user, myUser]);
-
-  const { user, myUser } = useContext(AuthContext);
-  if (isLoggedUser(user, myUser) || isHostModeTravel(user, myUser))
-    return (
-      <Layout>
-        <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
-          <div>
-            <div className="flex flex-col mt-10 ">
-              {/* {showProgress && <progress className="progress w-full"></progress>} */}
-              <div className="pt-7 pb-5 text-center text-3xl font-bold">
-                Wishlist
-              </div>
-              {faves.map((property: DocumentData) => {
-                return (
-                  <div key={property.id}>
-                    <CardSearch
-                      key={property.id}
-                      propertyid={property.id}
-                      name={property.title}
-                      description={property.description}
-                      image={property.images[0]}
-                      price={property.pricePerNight}
-                      // stars="5"
-                      totalStars={property.totalStars}
-                      numberOfReviews={property.numberOfReviews}
-                      numberOfNights={0}
-                      avgPricePerNight={0}
-                    />
-                  </div>
-                );
-              })}
+  // if (!hasPermission)
+  //   return (
+  //     <>
+  //       <ErrorPage />
+  //     </>
+  //   );
+  return (
+    <Layout>
+      <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
+        <div>
+          <div className="flex flex-col mt-10 ">
+            {/* {showProgress && <progress className="progress w-full"></progress>} */}
+            <div className="pt-7 pb-5 text-center text-3xl font-bold">
+              Wishlist
             </div>
+            {faves.map((property: DocumentData) => {
+              return (
+                <div key={property.id}>
+                  <CardSearch
+                    key={property.id}
+                    propertyid={property.id}
+                    name={property.title}
+                    description={property.description}
+                    image={property.images[0]}
+                    price={property.pricePerNight}
+                    // stars="5"
+                    totalStars={property.totalStars}
+                    numberOfReviews={property.numberOfReviews}
+                    numberOfNights={0}
+                    avgPricePerNight={0}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
-        <div></div>
-      </Layout>
-    );
-  else
-    return (
-      <>
-        <ErrorPage />
-      </>
-    );
+      </div>
+      <div></div>
+    </Layout>
+  );
 }
 export async function getServerSideProps(context) {
   try {
@@ -87,6 +90,27 @@ export async function getServerSideProps(context) {
     const token = await verifyIdToken(cookies.token);
     const { uid } = token;
 
+    var hasPermission: boolean = false;
+    var isRemovedByAdmin: boolean = false;
+    const docSnap = await getDoc(doc(db, "users", uid));
+
+    if (docSnap.exists()) {
+      const myUser: DocumentData = docSnap.data();
+      if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
+        hasPermission = true;
+        if (removedByAdmin(myUser)) {
+          isRemovedByAdmin = true;
+        }
+      }
+    }
+    if (!hasPermission) {
+      return {
+        redirect: {
+          destination: "/",
+        },
+        props: [],
+      };
+    }
     var properties: DocumentData[] = [];
     const docSnap1 = await getDoc(doc(db, "users", uid));
 
@@ -101,10 +125,12 @@ export async function getServerSideProps(context) {
         }
       }
     }
+
     return {
       props: {
         uid: uid,
         propertiesJSON: JSON.stringify(properties),
+        isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

@@ -91,13 +91,13 @@ export default function Card({
               {/* <Heart propertyid={propertyid} /> */}
             </div>
 
-            <div className="flex justify-between items-center">
-              <div className="text-lg flex items-center ">
+            <div className="flex justify-between items-center ">
+              <div className="text-lg flex items-center">
                 {price}€/
                 <p className="text-md text-gray-500 ">night</p>
               </div>
-              <div className="flex">
-                <p className="text-sm font-semibold">
+              <div className="flex items-center ">
+                <p className="text-sm font-semibold mr-1">
                   {(totalStars / numberOfReviews).toFixed(1)}
                 </p>
                 <Rating

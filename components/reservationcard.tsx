@@ -95,7 +95,7 @@ export default function ReservationCard({
   const [reportReason, setReportReason] = useState<string>("");
 
   const leaveFeedback = async () => {
-    if (comment == "") {
+    if (comment === "") {
       setError("Please enter a comment.");
       return;
     }

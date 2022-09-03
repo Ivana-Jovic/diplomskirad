@@ -29,7 +29,7 @@ export default function CardSearch({
   const router = useRouter();
 
   const goToPropertyPage = () => {
-    if (router.pathname == "/search") {
+    if (router.pathname === "/search") {
       router.push({
         pathname: "/propertypage",
         query: {
@@ -51,7 +51,7 @@ export default function CardSearch({
   return (
     <div
       onClick={goToPropertyPage}
-      className="card rounded-md lg:card-side bg-base-100 shadow-md my-3  max-w-5xl hover:opacity-90 hover:shadow-lg
+      className="card rounded-md lg:card-side bg-base-100 shadow-md my-3   hover:opacity-90 hover:shadow-lg
 transition duration-200 ease-out
 cursor-pointer"
     >
@@ -107,7 +107,7 @@ cursor-pointer"
               {parseInt(price) * numberOfNights}€/
               <p className="text-sm text-gray-500 ">total</p>
             </div>
-            <div className="flex">
+            <div className="flex items-center">
               <p className="text-sm font-semibold">
                 {(totalStars / numberOfReviews).toFixed(1)}
               </p>

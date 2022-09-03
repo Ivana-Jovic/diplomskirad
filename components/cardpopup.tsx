@@ -42,7 +42,7 @@ export default function CardPopup({ property }: { property: DocumentData }) {
       </figure>
       <div className="card-body flex flex-col p-2">
         <div className="flex justify-between items-center ">
-          <div className="flex">
+          <div className="flex flex items-center">
             <p className="text-sm ">
               {(property.totalStars / property.numberOfReviews).toFixed(1)}
             </p>

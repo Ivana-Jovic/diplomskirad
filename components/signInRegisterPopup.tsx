@@ -50,9 +50,9 @@ export default function SignInRegisterPopup() {
       password: "",
     });
     setIsPopupOpen(!isPopupOpen);
-    if (RorS == "S") {
+    if (RorS === "S") {
       setIsSignIn(true);
-    } else if (RorS == "R") {
+    } else if (RorS === "R") {
       setIsSignIn(false);
     }
   };
@@ -77,11 +77,11 @@ export default function SignInRegisterPopup() {
         });
       })
       .catch((err) => {
-        if (err.code == "auth/email-already-in-use") {
+        if (err.code === "auth/email-already-in-use") {
           setError("Can't register - email already in use");
-        } else if (err.code == "auth/weak-password") {
+        } else if (err.code === "auth/weak-password") {
           setError("Can't register - weak password");
-        } else if (err.code == "auth/too-many-requests") {
+        } else if (err.code === "auth/too-many-requests") {
           setError("Too many requests - try again later");
         } else {
           setError("Can't register - wrong data");
@@ -94,16 +94,19 @@ export default function SignInRegisterPopup() {
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((cred) => {
         console.log("User signedin:", cred.user);
+        router.push({
+          pathname: "/",
+        });
       })
       .catch((err) => {
-        //TODOp DA li ima jos neka sifra ili bolji nacin,
-        //TODOp sta raditi sa POST ispisom u konzoli crveno
+        //TODOpp DA li ima jos neka sifra ili bolji nacin,
+        //TODOpp sta raditi sa POST ispisom u konzoli crveno
 
-        if (err.code == "auth/user-not-found") {
+        if (err.code === "auth/user-not-found") {
           setError("Can't sign in  - user not found");
-        } else if (err.code == "auth/wrong-password") {
+        } else if (err.code === "auth/wrong-password") {
           setError("Can't sign in  - wrong password");
-        } else if (err.code == "auth/too-many-requests") {
+        } else if (err.code === "auth/too-many-requests") {
           setError("Too many requests - try again later");
         } else {
           setError("Can't sign in  - wrong data ");

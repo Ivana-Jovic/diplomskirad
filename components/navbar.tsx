@@ -13,7 +13,13 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
 import Link from "next/link";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-//proveri upitnik kod placeholder
+import {
+  isAdmin,
+  isHostModeHost,
+  isHostModeTravel,
+  isLoggedUser,
+} from "../lib/hooks";
+
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const { user, myUser } = useContext(AuthContext);
   const [openSearch, setOpenSearch] = useState<boolean>(false);
@@ -41,139 +47,156 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         modeIsHosting: true,
       });
     }
+    router.push({
+      pathname: "/",
+    });
   };
-  const menu = (
-    <Menu
-      items={[
-        {
-          key: "1",
-          label: (
-            <>
-              <div
-                className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 "
 
-                // className="hover:bg-slate-50 transition py-1 pl-1 duration-200 ease-out  hover:shadow-lg"
-              >
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  const menuHostModeHost = (
+    <>
+      <Menu
+        items={[
+          {
+            key: "1",
+            label: (
+              <div className=" menuItem ">
+                menuHostModeHost
                 <LogoutNEW />
               </div>
-              {/* <div<-GOOGLE
-                    onClick={signOut}
-                    className="hover:bg-slate-50 py-1  pl-1 transition duration-200 ease-out  hover:shadow-lg"
-                  >
-                    Sign out
-                  </div> */}
-            </>
-          ),
-        },
-        {
-          key: "2",
-          label: (
-            <Link href="/profilesettings">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                Profile
-              </a>
-            </Link>
-          ),
-        },
-        {
-          key: "3",
-          label: (
-            <Link href="/addproperty">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                Become a host
-              </a>
-            </Link>
-          ),
-        },
-        {
-          key: "4",
-          label: (
-            <Link href="/addproperty">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                Add property
-              </a>
-            </Link>
-          ),
-        },
-        {
-          key: "5",
-          label: (
-            <Link href="/hostsboard">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                Host board
-              </a>
-            </Link>
-          ),
-        },
-        {
-          key: "6",
-          label: (
-            <Link href="/guestboard">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                Guest board
-              </a>
-            </Link>
-          ),
-        },
+            ),
+          },
+          {
+            key: "2",
+            label: (
+              <Link href="/profilesettings">
+                <a className="menuItem">Profile</a>
+              </Link>
+            ),
+          },
 
-        {
-          key: "7",
-          label: (
-            <Link href="/adminboard">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                Admin board
-              </a>
-            </Link>
-          ),
-        },
-        {
-          key: "8",
-          label: (
-            <Link href="/faq">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                FAQ
-              </a>
-            </Link>
-          ),
-        },
-        {
-          key: "9",
-          label: (
-            <Link href="/wishlist">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                Wishlist
-              </a>
-            </Link>
-          ),
-        },
-        {
-          key: "10",
-          label: (
-            <Link href="/hostsreservations">
-              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
-                Host reservations
-              </a>
-            </Link>
-          ),
-        },
-        {
-          key: "11",
-          label: (
-            <div
-              className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1"
-              onClick={changeMod}
-            >
-              Change mod
-            </div>
-          ),
-        },
-      ]}
-    />
+          {
+            key: "4",
+            label: (
+              <Link href="/addproperty">
+                <a className="menuItem">Add property</a>
+              </Link>
+            ),
+          },
+          {
+            key: "5",
+            label: (
+              <Link href="/hostsboard">
+                <a className="menuItem">Host board</a>
+              </Link>
+            ),
+          },
+
+          {
+            key: "8",
+            label: (
+              <Link href="/faq">
+                <a className="menuItem">FAQ</a>
+              </Link>
+            ),
+          },
+
+          {
+            key: "10",
+            label: (
+              <Link href="/hostsreservations">
+                <a className="menuItem">Host reservations</a>
+              </Link>
+            ),
+          },
+          {
+            key: "11",
+            label: (
+              <div className="menuItem" onClick={changeMod}>
+                Change mod
+              </div>
+            ),
+          },
+        ]}
+      />
+    </>
+  );
+
+  const menuHostModeTravel = (
+    <>
+      <Menu
+        items={[
+          {
+            key: "1",
+            label: (
+              <>
+                <div className=" menuItem ">
+                  menuHostModeTravel
+                  <LogoutNEW />
+                </div>
+              </>
+            ),
+          },
+          {
+            key: "2",
+            label: (
+              <Link href="/profilesettings">
+                <a className="menuItem">Profile</a>
+              </Link>
+            ),
+          },
+
+          {
+            key: "6",
+            label: (
+              <Link href="/guestboard">
+                <a className="menuItem">Guest board</a>
+              </Link>
+            ),
+          },
+
+          {
+            key: "8",
+            label: (
+              <Link href="/faq">
+                <a className="menuItem">FAQ</a>
+              </Link>
+            ),
+          },
+          {
+            key: "9",
+            label: (
+              <Link href="/wishlist">
+                <a className="menuItem">Wishlist</a>
+              </Link>
+            ),
+          },
+
+          {
+            key: "11",
+            label: (
+              <div className="menuItem" onClick={changeMod}>
+                Change mod
+              </div>
+            ),
+          },
+        ]}
+      />
+    </>
+  );
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  const menu = (
+    <>
+      {isLoggedUser(myUser) && menuLoggedUser}
+      {isAdmin(myUser) && menuAdmin}
+      {isHostModeHost(myUser) && menuHostModeHost}
+      {isHostModeTravel(myUser) && menuHostModeTravel}
+    </>
   );
 
   return (
     <div
-      className="py-5  shadow-xl bg-header flex flex-col
+      className="py-5 shadow-xl bg-header flex flex-col
        w-full sticky top-0 z-[100]"
     >
       <div className="sm:px-5  md:px-10 grid grid-cols-3">
@@ -186,48 +209,57 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           </a>
         </Link>
 
-        <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
-          <button
-            onClick={() => {
-              setOpenSearch(!openSearch);
-            }}
-          >
-            <SearchRoundedIcon />
-          </button>
-
-          {myUser != undefined && user && myUser ? (
-            <>
-              <div>
-                <Dropdown overlay={menu}>
-                  <a onClick={(e) => e.preventDefault()}>
-                    <Space>
-                      {myUser && myUser.photoURL && (
-                        <Image
-                          src={myUser?.photoURL}
-                          height="25"
-                          width="25"
-                          alt=""
-                          className="rounded-md"
-                        />
-                      )}
-                      {(!myUser || !myUser.photoURL) && <AccountCircleIcon />}
-                      <ExpandMoreRoundedIcon />
-                    </Space>
-                  </a>
-                </Dropdown>
-              </div>
-            </>
-          ) : (
-            <>
-              <SignInRegisterPopup />
-            </>
-          )}
-        </div>
+        {
+          <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
+            {((user && myUser) || user === null) &&
+              router &&
+              router.pathname !== "/" &&
+              (isLoggedUser(myUser) || isHostModeTravel(myUser)) && (
+                <button
+                  onClick={() => {
+                    setOpenSearch(!openSearch);
+                  }}
+                >
+                  <SearchRoundedIcon />
+                </button>
+              )}
+            {user && myUser && (
+              <>
+                <div>
+                  <Dropdown overlay={menu}>
+                    <a onClick={(e) => e.preventDefault()}>
+                      <Space>
+                        {myUser && myUser.photoURL && (
+                          <Image
+                            src={myUser?.photoURL}
+                            height="25"
+                            width="25"
+                            alt=""
+                            className="rounded-md"
+                          />
+                        )}
+                        {(!myUser || !myUser.photoURL) && <AccountCircleIcon />}
+                        <ExpandMoreRoundedIcon />
+                      </Space>
+                    </a>
+                  </Dropdown>
+                </div>
+              </>
+            )}
+            {/* {(!user || !myUser) && ( */}
+            {/* //nije undefined ali jeste null? */}
+            {user === null && (
+              <>
+                <SignInRegisterPopup />
+              </>
+            )}
+          </div>
+        }
       </div>
 
-      {openSearch && router.pathname != "/" && (
+      {openSearch && router.pathname !== "/" && (
         // {searchInput && (
-        <div className="flex flex-col w-screen col-span-2">
+        <div className="flex flex-col w-screen col-span-2  mt-5 -mb-5">
           <Banner />
           {/* <div className="flex">
             <button onClick={resetSearch} className="flex-grow cursor-pointer">
@@ -242,3 +274,226 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
     </div>
   );
 }
+
+const menuLoggedUser = (
+  <>
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: (
+            <>
+              <div className=" menuItem">
+                menuLoggedUser
+                <LogoutNEW />
+              </div>
+            </>
+          ),
+        },
+        {
+          key: "2",
+          label: (
+            <Link href="/profilesettings">
+              <a className="menuItem">Profile</a>
+            </Link>
+          ),
+        },
+        {
+          key: "3",
+          label: (
+            <Link href="/addproperty">
+              <a className="menuItem">Become a host</a>
+            </Link>
+          ),
+        },
+        {
+          key: "4",
+          label: (
+            <Link href="/guestboard">
+              <a className="menuItem">Guest board</a>
+            </Link>
+          ),
+        },
+
+        {
+          key: "5",
+          label: (
+            <Link href="/faq">
+              <a className="menuItem">FAQ</a>
+            </Link>
+          ),
+        },
+        {
+          key: "6",
+          label: (
+            <Link href="/wishlist">
+              <a className="menuItem">Wishlist</a>
+            </Link>
+          ),
+        },
+      ]}
+    />
+  </>
+);
+const menuAdmin = (
+  <>
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: (
+            <>
+              <div className="menuItem">
+                menuAdmin
+                <LogoutNEW />
+              </div>
+            </>
+          ),
+        },
+        {
+          key: "2",
+          label: (
+            <Link href="/profilesettings">
+              <a className="menuItem">Profile</a>
+            </Link>
+          ),
+        },
+
+        {
+          key: "3",
+          label: (
+            <Link href="/adminboard">
+              <a className="menuItem">Admin board</a>
+            </Link>
+          ),
+        },
+        {
+          key: "4",
+          label: (
+            <Link href="/faq">
+              <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+                FAQ
+              </a>
+            </Link>
+          ),
+        },
+      ]}
+    />
+  </>
+);
+/* <Menu
+items={[
+  {
+    key: "1",
+    label: (
+      <>
+        <div className=" hover:opacity-80  transition duration-200 ease-out  py-1 pl-1 ">
+          <LogoutNEW />
+        </div>
+      </>
+    ),
+  },
+  {
+    key: "2",
+    label: (
+      <Link href="/profilesettings">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          Profile
+        </a>
+      </Link>
+    ),
+  },
+  {
+    key: "3",
+    label: (
+      <Link href="/addproperty">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          Become a host
+        </a>
+      </Link>
+    ),
+  },
+  {
+    key: "4",
+    label: (
+      <Link href="/addproperty">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          Add property
+        </a>
+      </Link>
+    ),
+  },
+  {
+    key: "5",
+    label: (
+      <Link href="/hostsboard">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          Host board
+        </a>
+      </Link>
+    ),
+  },
+  {
+    key: "6",
+    label: (
+      <Link href="/guestboard">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          Guest board
+        </a>
+      </Link>
+    ),
+  },
+
+  {
+    key: "7",
+    label: (
+      <Link href="/adminboard">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          Admin board
+        </a>
+      </Link>
+    ),
+  },
+  {
+    key: "8",
+    label: (
+      <Link href="/faq">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          FAQ
+        </a>
+      </Link>
+    ),
+  },
+  {
+    key: "9",
+    label: (
+      <Link href="/wishlist">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          Wishlist
+        </a>
+      </Link>
+    ),
+  },
+  {
+    key: "10",
+    label: (
+      <Link href="/hostsreservations">
+        <a className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1">
+          Host reservations
+        </a>
+      </Link>
+    ),
+  },
+  {
+    key: "11",
+    label: (
+      <div
+        className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1"
+        onClick={changeMod}
+      >
+        Change mod
+      </div>
+    ),
+  },
+]}
+/>*/

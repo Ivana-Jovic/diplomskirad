@@ -35,7 +35,7 @@ const Map2 = (props: props) => {
             //   },
             // })
             {
-              if (router && router.pathname == "/search") {
+              if (router && router.pathname === "/search") {
                 router.push({
                   pathname: "/propertypage",
                   query: {
@@ -162,10 +162,10 @@ const Map2 = (props: props) => {
           createMarker(
             "accident.colors-white.jpg",
             [
-              element.loc && element.loc != ","
+              element.loc && element.loc !== ","
                 ? JSON.parse(element.loc.split("-")[0])
                 : 20.447,
-              element.loc && element.loc != ","
+              element.loc && element.loc !== ","
                 ? JSON.parse(element.loc.split("-")[1])
                 : 44.81,
             ],
@@ -183,7 +183,7 @@ const Map2 = (props: props) => {
     initMap();
     return () => map?.remove();
   }, [arrLoc]);
-  return <div ref={mapElement} className="w-full h-96"></div>;
+  return <div ref={mapElement} className="w-full h-full"></div>; //w-full h-96
 };
 
 export default Map2;

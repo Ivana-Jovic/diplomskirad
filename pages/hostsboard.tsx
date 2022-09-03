@@ -8,6 +8,8 @@ import {
   QueryDocumentSnapshot,
   DocumentData,
   orderBy,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -18,8 +20,9 @@ import Map2 from "../components/map2";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { isHostModeHost } from "../lib/hooks";
+import { isHostModeHost, removedByAdmin } from "../lib/hooks";
 import ErrorPage from "./errorpage";
+import RemovedByAdmin from "../components/removedbyadmin";
 
 // import { responsiveProperty } from "@mui/material/styles/cssUtils";
 const Calendar = dynamic(() => import("../components/calendar"), {
@@ -29,10 +32,13 @@ const Calendar = dynamic(() => import("../components/calendar"), {
 export default function HostsBoard({
   propertiesJSON,
   propertiesIds,
+  isRemovedByAdmin,
 }: {
   propertiesJSON: string;
   propertiesIds: string[];
+  isRemovedByAdmin: boolean;
 }) {
+  if (isRemovedByAdmin) return <RemovedByAdmin />;
   const properties: DocumentData[] = JSON.parse(propertiesJSON);
   // const [showProgress, setShowProgress] = useState<boolean>(true);
   // const { user, myUser } = useContext(AuthContext);
@@ -74,150 +80,141 @@ export default function HostsBoard({
   //     });
   // }, [getHostProperties, user]);
 
-  const { user, myUser } = useContext(AuthContext);
-  if (isHostModeHost(user, myUser))
-    return (
-      <Layout>
-        {/* {showProgress ? (
+  return (
+    <Layout>
+      {/* {showProgress ? (
         <progress className="progress w-full"></progress>
       ) : ( */}
-        <>
-          <div className="pt-7 pb-5 text-center text-3xl font-bold">
-            My properties
-          </div>
-          <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16 ">
-            <section className=" w-full ">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {properties.map((item: DocumentData) => {
-                  const property = item;
-                  const propertyid = item.id;
-                  // { title, description, images, pricePerNight }
-                  return (
-                    <CardHostsProperty
-                      key={propertyid}
-                      propertyid={propertyid}
-                      name={property.title}
-                      description={property.description}
-                      image={property.images[0]}
-                      price={property.pricePerNight}
-                      totalStars={property.totalStars}
-                      numberOfReviews={property.numberOfReviews}
-                    />
-                  );
-                })}
-              </div>
-            </section>
-            <div className="pt-7 pb-5 text-center text-3xl font-bold">
-              Statstics
+      <>
+        <div className="pt-7 pb-5 text-center text-3xl font-bold">
+          My properties
+        </div>
+        <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16 ">
+          <section className=" w-full ">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {properties.map((item: DocumentData) => {
+                const property = item;
+                const propertyid = item.id;
+                // { title, description, images, pricePerNight }
+                return (
+                  <CardHostsProperty
+                    key={propertyid}
+                    propertyid={propertyid}
+                    name={property.title}
+                    description={property.description}
+                    image={property.images[0]}
+                    price={property.pricePerNight}
+                    totalStars={property.totalStars}
+                    numberOfReviews={property.numberOfReviews}
+                  />
+                );
+              })}
             </div>
-            <div>
-              <div className="grid  grid-cols-2 lg:grid-cols-1 gap-4">
-                {properties.map((item: DocumentData) => {
-                  const property = item;
-                  const propertyid = item.id;
-                  const monthsFromDateAddedProperty = Math.ceil(
-                    //round
-                    (new Date().getTime() -
-                      new Date(property.createdAt).getTime()) /
-                      // dateAddedProperty
-                      (1000 * 60 * 60 * 24 * 30.5)
-                  );
-                  const daysFromDateAddedProperty = Math.ceil(
-                    //round
-                    (new Date().getTime() -
-                      new Date(property.createdAt).getTime()) /
-                      // dateAddedProperty
-                      (1000 * 60 * 60 * 24)
-                  );
-                  return (
-                    <div key={propertyid} className="grid">
-                      <div className="stats stats-vertical lg:stats-horizontal shadow">
-                        <p className="text-2xl text-center m-3 font-semibold">
-                          {property.title.length < 15
-                            ? property.title
-                            : property.title.slice(
-                                0,
-                                property.title.indexOf(" ", 15)
-                              ) + "..."}
-                        </p>
-                        <div className="stat ">
-                          <div className="stat-title">Total earnings</div>
-                          <div className="stat-value">
-                            {property.totalEarnings}e
-                          </div>
-                          <div className="stat-desc">
-                            {/* from {property.dateAddedProperty} */}
-                            from {new Date(property.createdAt).toDateString()}
-                          </div>
+          </section>
+          <div className="pt-7 pb-5 text-center text-3xl font-bold">
+            Statstics
+          </div>
+          <div>
+            <div className="grid  grid-cols-2 lg:grid-cols-1 gap-4">
+              {properties.map((item: DocumentData) => {
+                const property = item;
+                const propertyid = item.id;
+                const monthsFromDateAddedProperty = Math.ceil(
+                  //round
+                  (new Date().getTime() -
+                    new Date(property.createdAt).getTime()) /
+                    // dateAddedProperty
+                    (1000 * 60 * 60 * 24 * 30.5)
+                );
+                const daysFromDateAddedProperty = Math.ceil(
+                  //round
+                  (new Date().getTime() -
+                    new Date(property.createdAt).getTime()) /
+                    // dateAddedProperty
+                    (1000 * 60 * 60 * 24)
+                );
+                return (
+                  <div key={propertyid} className="grid">
+                    <div className="stats stats-vertical lg:stats-horizontal shadow">
+                      <p className="text-2xl text-center m-3 font-semibold">
+                        {property.title.length < 15
+                          ? property.title
+                          : property.title.slice(
+                              0,
+                              property.title.indexOf(" ", 15)
+                            ) + "..."}
+                      </p>
+                      <div className="stat ">
+                        <div className="stat-title">Total earnings</div>
+                        <div className="stat-value">
+                          {property.totalEarnings}e
                         </div>
-                        <div className="stat">
-                          <div className="stat-title">
-                            Average earnings per month
-                          </div>
-                          <div className="stat-value">
-                            {property.totalEarnings /
-                              monthsFromDateAddedProperty}
-                            e
-                          </div>
-                          <div className="stat-desc">
-                            {/* from {property.dateAddedProperty} */}
-                            from {new Date(property.createdAt).toDateString()}
-                          </div>
+                        <div className="stat-desc">
+                          {/* from {property.dateAddedProperty} */}
+                          from {new Date(property.createdAt).toDateString()}
                         </div>
-                        <div className="stat">
-                          <div className="stat-title">Total occupancy</div>
-                          <div className="stat-value">
-                            {property.totalOccupancyDays} days
-                          </div>
-                          <div className="stat-desc">
-                            {/* from {property.dateAddedProperty} */}
-                            from {new Date(property.createdAt).toDateString()}
-                          </div>
+                      </div>
+                      <div className="stat">
+                        <div className="stat-title">
+                          Average earnings per month
                         </div>
-                        <div className="stat">
-                          <div className="stat-title">Average occupancy</div>
-                          <div className="stat-value">
-                            {(
-                              (property.totalOccupancyDays /
-                                daysFromDateAddedProperty) *
-                              100
-                            ).toFixed(1)}
-                            %
-                          </div>
-                          <div className="stat-desc">
-                            {/* from {property.dateAddedProperty} */}
-                            from {new Date(property.createdAt).toDateString()}
-                          </div>
+                        <div className="stat-value">
+                          {property.totalEarnings / monthsFromDateAddedProperty}
+                          e
+                        </div>
+                        <div className="stat-desc">
+                          {/* from {property.dateAddedProperty} */}
+                          from {new Date(property.createdAt).toDateString()}
+                        </div>
+                      </div>
+                      <div className="stat">
+                        <div className="stat-title">Total occupancy</div>
+                        <div className="stat-value">
+                          {property.totalOccupancyDays} days
+                        </div>
+                        <div className="stat-desc">
+                          {/* from {property.dateAddedProperty} */}
+                          from {new Date(property.createdAt).toDateString()}
+                        </div>
+                      </div>
+                      <div className="stat">
+                        <div className="stat-title">Average occupancy</div>
+                        <div className="stat-value">
+                          {(
+                            (property.totalOccupancyDays /
+                              daysFromDateAddedProperty) *
+                            100
+                          ).toFixed(1)}
+                          %
+                        </div>
+                        <div className="stat-desc">
+                          {/* from {property.dateAddedProperty} */}
+                          from {new Date(property.createdAt).toDateString()}
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="pt-7 pb-5 text-center text-3xl font-bold ">
-              Calendar
-            </div>
-            {propertiesIds && propertiesIds.length <= 10 && (
-              <Calendar propertyId={propertiesIds} />
-            )}
-            {(!propertiesIds || propertiesIds.length == 0) && <div>NEMA</div>}
-
-            <div className="flex flex-col items-center justify-center mt-10">
-              {properties.length > 0 && <Map2 arrLoc={properties} />}
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </>
-        {/* )} */}
-      </Layout>
-    );
-  else
-    return (
-      <>
-        <ErrorPage />
+
+          <div className="pt-7 pb-5 text-center text-3xl font-bold ">
+            Calendar
+          </div>
+          {propertiesIds && propertiesIds.length <= 10 && (
+            <Calendar propertyId={propertiesIds} />
+          )}
+          {(!propertiesIds || propertiesIds.length === 0) && <div>NEMA</div>}
+
+          <div className="flex flex-col items-center justify-center mt-10 w-full h-96">
+            {properties.length > 0 && <Map2 arrLoc={properties} />}
+          </div>
+        </div>
       </>
-    );
+      {/* )} */}
+    </Layout>
+  );
 }
 
 export async function getServerSideProps(context) {
@@ -226,6 +223,27 @@ export async function getServerSideProps(context) {
     const token = await verifyIdToken(cookies.token);
     const { uid } = token;
 
+    var hasPermission: boolean = false;
+    var isRemovedByAdmin: boolean = false;
+    const docSnap = await getDoc(doc(db, "users", uid));
+
+    if (docSnap.exists()) {
+      const myUser: DocumentData = docSnap.data();
+      if (isHostModeHost(myUser)) {
+        hasPermission = true;
+        if (removedByAdmin(myUser)) {
+          isRemovedByAdmin = true;
+        }
+      }
+    }
+    if (!hasPermission) {
+      return {
+        redirect: {
+          destination: "/",
+        },
+        props: [],
+      };
+    }
     var properties: DocumentData[] = [];
     var propertiesIds: string[] = [];
     const q = query(
@@ -246,6 +264,7 @@ export async function getServerSideProps(context) {
         uid: uid,
         propertiesJSON: JSON.stringify(properties),
         propertiesIds: propertiesIds,
+        isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

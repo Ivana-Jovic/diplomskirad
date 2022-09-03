@@ -18,8 +18,10 @@ import { AuthContext } from "../firebase-authProvider";
 
 export default function CommentCard({
   comment,
+  propertyOwnerId,
 }: {
   comment: QueryDocumentSnapshot<DocumentData>;
+  propertyOwnerId: string;
 }) {
   const months = [
     "January",
@@ -90,9 +92,12 @@ export default function CommentCard({
         />
       </div>
       <div className="font-normal">{comment.data().comment}</div>
-      {myUser && myUser.host && !reported && (
-        <div className="mt-3">
-          {myUser.host && (
+      {myUser &&
+        myUser.host &&
+        !reported &&
+        user &&
+        user.uid === propertyOwnerId && ( // it has to be hosts property
+          <div className="mt-3">
             <button
               className="btn"
               onClick={() => {
@@ -101,9 +106,8 @@ export default function CommentCard({
             >
               Do you want to report?
             </button>
-          )}
-        </div>
-      )}
+          </div>
+        )}
     </div>
   );
 }

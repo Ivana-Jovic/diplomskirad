@@ -9,6 +9,7 @@ import {
   Timestamp,
   updateDoc,
   increment,
+  DocumentData,
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import Button from "../components/button";
@@ -20,7 +21,12 @@ import Map from "../components/map";
 import ImageForm from "../components/imageform";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useRouter } from "next/router";
-import { isHostModeHost, isLoggedUser } from "../lib/hooks";
+import { isHostModeHost, isLoggedUser, removedByAdmin } from "../lib/hooks";
+import nookies from "nookies";
+import { verifyIdToken } from "../firebaseadmin";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import RemovedByAdmin from "../components/removedbyadmin";
+
 type IFormInput = {
   title: string;
   desc: string;
@@ -36,7 +42,17 @@ type IFormInput = {
   picturesNEW: File[];
 };
 
-export default function AddProperty() {
+export default function AddProperty({
+  uid,
+  // UserEmail,
+  myUserJSON,
+  isRemovedByAdmin,
+}: {
+  myUserJSON: string;
+  uid: string;
+  isRemovedByAdmin: boolean;
+  // UserEmail: string;
+}) {
   const [loc, setLoc] = useState<any>();
   const [urlArr, setUrlArr] = useState<string[]>([]);
   const [state, setState] = useState<string>("");
@@ -67,10 +83,12 @@ export default function AddProperty() {
       picturesNEW: [],
     },
   });
-  const { user, myUser } = useContext(AuthContext);
-  const imgNew: File[] = Array.from(watch("picturesNEW"));
-
   const router = useRouter();
+  if (isRemovedByAdmin) return <RemovedByAdmin />;
+
+  const myUser: DocumentData = JSON.parse(myUserJSON);
+  // const { user, myUser } = useContext(AuthContext);
+  const imgNew: File[] = Array.from(watch("picturesNEW"));
 
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     setError("");
@@ -80,17 +98,17 @@ export default function AddProperty() {
     } else if (data.desc.length > 500) {
       setError("Description must be shorter than 500 characters");
     } else if (
-      state == "" ||
-      city == "" ||
-      streetName == "" ||
-      streetNum == ""
+      state === "" ||
+      city === "" ||
+      streetName === "" ||
+      streetNum === ""
     ) {
       setError("Street name and number must be entered in map searchbox");
     } else if (
-      data.numRoooms == 0 ||
-      data.numPers == 0 ||
-      data.priceN == 0 ||
-      data.addCosts == 0
+      data.numRoooms === 0 ||
+      data.numPers === 0 ||
+      data.priceN === 0 ||
+      data.addCosts === 0
     ) {
       setError("Numerical fields must be grater than 0");
     } else if (data.numRoooms > 20 || data.numPers > 20) {
@@ -126,7 +144,8 @@ export default function AddProperty() {
       if (selected && allowedTypes.includes(selected.type)) {
         const extension = selected.type.split("/")[1];
         const nnNEW: string = `uploads/${
-          user.uid
+          uid
+          // user.uid
         }/properties/${Date.now()}.${extension}`;
         const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
         //when we upload using this ref this file should have that name
@@ -146,7 +165,7 @@ export default function AddProperty() {
   const add = async (data: IFormInput): Promise<boolean> => {
     const urlArr: string[] = await uploadPictures(data);
     // uploadPictures(data).then(async (urlArr) => {
-    if (urlArr == null) {
+    if (urlArr === null) {
       console.log("RETURNED FALSE add");
       return false;
     }
@@ -164,8 +183,9 @@ export default function AddProperty() {
       numOfPersons: data.numPers,
       pricePerNight: data.priceN,
       additionalCosts: data.addCosts,
-      garage: data.garage == "Yes" ? true : false,
-      ownerId: user?.uid,
+      garage: data.garage === "Yes" ? true : false,
+      ownerId: uid,
+      // user?.uid,
       images: urlArr,
       totalStars: 0,
       numberOfReviews: 0,
@@ -195,12 +215,13 @@ export default function AddProperty() {
     //incrementing numberOfProperties is done in admin
 
     const docRef2 = await addDoc(collection(db, "reports"), {
-      hostId: user?.uid,
+      hostId: uid,
+      // user?.uid,
       reportText: "wantsToAddProperty",
       processed: false,
       createdAt: Timestamp.now().toMillis(),
       propertyId: docRef.id,
-      firstProperty: myUser.numberOfProperties == 0,
+      firstProperty: myUser.numberOfProperties === 0,
     });
     await updateDoc(doc(db, "reports", docRef2.id), {
       id: docRef2.id,
@@ -209,24 +230,24 @@ export default function AddProperty() {
     return true;
   };
 
-  if (isHostModeHost(user, myUser) || isLoggedUser(user, myUser))
-    //TODO mozda dovuci user i myuser u gsp
-    return (
-      <>
-        {user && myUser && myUser.numberOfProperties < 10 ? (
+  return (
+    <>
+      {
+        // user &&
+        myUser && myUser.numberOfProperties < 10 ? (
           <>
             <Layout>
               <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="max-w-7xl px-5 mx-auto text-center">
+                <div className="max-w-7xl px-5 mx-auto text-center gap-4">
                   <div className="pt-7 pb-5 text-center text-3xl font-bold">
                     New property
                   </div>
-
+                  {/* <div className="grid gap-y-4"> */}
                   <TextField
                     {...register("title", {
                       required: "Please enter your last name",
                     })}
-                    className="w-full mb-2"
+                    className="w-full "
                     id="outlined-required"
                     label="Title"
                     helperText={errors.title ? errors.title.message : " "}
@@ -237,16 +258,17 @@ export default function AddProperty() {
                       required: "Please enter  a description",
                       // maxLength: 2,
                     })}
-                    className="w-full mb-2 "
+                    className="w-full "
                     id="outlined-required"
                     label="Description"
                     multiline
                     maxRows={15}
                     helperText={errors.desc ? errors.desc.message : " "}
                   />
+                  {/* </div> */}
 
-                  <div className="grid grid-cols-3 ">
-                    <div className="mr-3  mb-2">
+                  <div className="grid sm:grid-cols-3 grid-cols-2 gap-x-4 gap-y-1 sm:gap-x-4 sm:gap-y-1">
+                    <div className="">
                       <Controller
                         name="type"
                         control={control}
@@ -290,7 +312,7 @@ export default function AddProperty() {
                             // {...register("numRoooms", {
                             //   required: "Please enter your last name",
                             // })}
-                            className="mx-3 mb-2"
+                            className=""
                             id="outlined-required"
                             label="Number of Rooms"
                             value={value}
@@ -321,7 +343,7 @@ export default function AddProperty() {
                             //  {...register("lastName", {
                             //   required: "Please enter your last name",
                             // })}
-                            className="ml-3  mb-2"
+                            className=""
                             id="outlined-required"
                             label="Number of Persons"
                             value={value}
@@ -341,8 +363,8 @@ export default function AddProperty() {
                         </>
                       )}
                     />
-                  </div>
-                  <div className="grid grid-cols-3">
+                    {/* </div> */}
+                    {/* <div className="grid sm:grid-cols-3 grid-cols-1 gap-0 sm:gap-4"> */}
                     <Controller
                       name="priceN"
                       control={control}
@@ -354,7 +376,7 @@ export default function AddProperty() {
                             //   required: "Please enter your last name",
                             // })}
 
-                            className="mr-3  mb-2"
+                            className=""
                             id="outlined-required"
                             label="Price per night"
                             value={value}
@@ -415,7 +437,7 @@ export default function AddProperty() {
                         />
                       </>
                     )}
-                  /> */}
+                   /> */}
                     <Controller
                       name="addCosts"
                       control={control}
@@ -426,7 +448,7 @@ export default function AddProperty() {
                             //  {...register("lastName", {
                             //   required: "Please enter your last name",
                             // })}
-                            className="ml-3 mb-2"
+                            className=""
                             id="outlined-required"
                             label="Additional costs"
                             value={value}
@@ -464,7 +486,7 @@ export default function AddProperty() {
                             //   required: "Please enter your last name",
                             // })}
                             // className="w-full"
-                            className="ml-3 mb-2"
+                            className=""
                             id="outlined-select-currency"
                             select
                             label="Is there any parking spot"
@@ -509,14 +531,14 @@ export default function AddProperty() {
                     </div>
                   )} */}
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-0 sm:gap-3 grid-cols-1 mt-14">
+                  <div className="grid sm:grid-cols-2 gap-3 sm:gap-3 grid-cols-1 mt-14">
                     <TextField
                       // {...register("state", {
                       //   required: "Please enter a state name",
                       // })}
                       disabled
                       InputLabelProps={{ shrink: true }}
-                      className="mb-2"
+                      // className="mb-2"
                       id="outlined-required"
                       label="State"
                       value={state}
@@ -529,23 +551,22 @@ export default function AddProperty() {
                       // })}
                       disabled
                       InputLabelProps={{ shrink: true }}
-                      className="mb-2"
+                      // className="mb-2"
                       id="outlined-required"
                       label="City"
                       value={city}
                       // helperText={errors.city ? errors.city.message : " "}
                     />
 
-                    <div></div>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-0 grid-cols-1  sm:gap-3">
+                    {/* </div> */}
+                    {/* <div className="grid sm:grid-cols-2 gap-3 grid-cols-1  sm:gap-3"> */}
                     <TextField
                       disabled
                       // {...register("street", {
                       //   required: "Please enter a street name",
                       // })}
                       InputLabelProps={{ shrink: true }}
-                      className="mb-2"
+                      // className="mb-2"
                       id="outlined-required"
                       label="Street"
                       value={streetName}
@@ -558,7 +579,7 @@ export default function AddProperty() {
                       //   required: "Please entera value",
                       // })}
                       InputLabelProps={{ shrink: true }}
-                      className=" mb-2"
+                      // className=" mb-2"
                       id="outlined-required"
                       label="StreetNum"
                       value={streetNum}
@@ -625,17 +646,64 @@ export default function AddProperty() {
         ) : (
           <>
             <ErrorPage />
-            {user && myUser && myUser.numberOfProperties >= 10 && (
-              <div>Maximum number of properties is 10</div>
-            )}
+            {
+              // user &&
+              myUser && myUser.numberOfProperties >= 10 && (
+                <div>Maximum number of properties is 10</div>
+              )
+            }
           </>
-        )}
-      </>
-    );
-  else
-    return (
-      <>
-        <ErrorPage />
-      </>
-    );
+        )
+      }
+    </>
+  );
+}
+
+export async function getServerSideProps(context) {
+  try {
+    const cookies = nookies.get(context);
+    const token = await verifyIdToken(cookies.token);
+    const { uid } = token;
+
+    var myUser: DocumentData = null;
+    var hasPermission: boolean = false;
+    var isRemovedByAdmin: boolean = false;
+    const docSnap = await getDoc(doc(db, "users", uid));
+
+    if (docSnap.exists()) {
+      myUser = docSnap.data();
+      if (isHostModeHost(myUser) || isLoggedUser(myUser)) {
+        hasPermission = true;
+        if (removedByAdmin(myUser)) {
+          isRemovedByAdmin = true;
+        }
+      }
+    }
+    if (!hasPermission) {
+      return {
+        redirect: {
+          destination: "/",
+        },
+        props: [],
+      };
+    }
+    return {
+      props: {
+        uid: uid,
+        // myUser: JSON.stringify(myUser),
+        myUserJSON: JSON.stringify(myUser),
+        isRemovedByAdmin: isRemovedByAdmin,
+      },
+    };
+  } catch (err) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+      props: [],
+    };
+    // context.res.writeHead(302, { location: "/" });
+    // context.res.end();
+    // return { props: [] };
+  }
 }

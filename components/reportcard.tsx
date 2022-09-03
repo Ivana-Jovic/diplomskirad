@@ -25,6 +25,10 @@ export default function ReportCard({ report }: { report: DocumentData }) {
     }).then(() => setProcessed(true));
   };
   const deleteUser = async () => {
+    // if the user is removed by admin he cannot See any content
+    // if a property is rremoved it can no longer be reserved
+    // but reservations already made stay there
+
     if (report.guestIsReporting) {
       //meaning host is beeing reported -> delete his properties
 
@@ -120,7 +124,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
   };
   return (
     <>
-      {report.reportText != "wantsToAddProperty" && (
+      {report.reportText !== "wantsToAddProperty" && (
         <div className="card w-full bg-base-100 shadow-xl">
           <div className="card-body">
             <h2 className="card-title">
@@ -153,7 +157,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
               <div className="">Reservation Id {report.reservationId}</div>
               {!processed && (
                 <div>
-                  {report.reportText != "comment" && (
+                  {report.reportText !== "comment" && (
                     // <Button
                     //   action={deleteUser}
                     //   text="Report processed - delete this user and his properties"
@@ -164,7 +168,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
                     </button>
                   )}
                   <div className="flex flex-col">
-                    {report.reportText == "comment" && (
+                    {report.reportText === "comment" && (
                       // <Button action={deleteComment} text="Delete comment" type="" />
                       <button className="btn mt-3" onClick={deleteComment}>
                         Delete comment
@@ -186,7 +190,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
           </div>
         </div>
       )}
-      {report.reportText == "wantsToAddProperty" && (
+      {report.reportText === "wantsToAddProperty" && (
         <div className="card w-full bg-base-100 shadow-xl">
           <div className="card-body">
             <h2 className="card-title">

@@ -10,22 +10,39 @@ import {
   orderBy,
   limit,
   DocumentData,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useEffect, useState } from "react";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
+import {
+  isAdmin,
+  isHost,
+  isHostModeHost,
+  isHostModeTravel,
+  isLoggedUser,
+  removedByAdmin,
+} from "../lib/hooks";
+import ErrorPage from "./errorpage";
+import IndexHostModeHost from "../components/indexhostmodehost";
+import IndexAdmin from "../components/indexadmin";
+import RemovedByAdmin from "../components/removedbyadmin";
 
 export default function Index({
-  // uid,
+  isAdmin,
+  isHostModeHost,
   propertiesJSON,
+  isRemovedByAdmin,
 }: {
-  // uid: string;
+  isAdmin: boolean;
+  isHostModeHost: boolean;
   propertiesJSON: string;
+  isRemovedByAdmin: boolean;
 }) {
-  const arr: DocumentData[] = JSON.parse(propertiesJSON);
-
+  if (isRemovedByAdmin) return <RemovedByAdmin />;
   // const [arr, setArr] = useState<DocumentData[]>([]);
 
   // const getRanodomProperties = async () => {
@@ -46,7 +63,25 @@ export default function Index({
   // useEffect(() => {
   //   getRanodomProperties();
   // }, []);
-
+  if (isAdmin)
+    return (
+      <>
+        <Layout>
+          <IndexAdmin />
+        </Layout>
+      </>
+    );
+  if (isHostModeHost)
+    return (
+      <div className="h-full">
+        <Layout>
+          <div className="h-full">
+            <IndexHostModeHost />
+          </div>
+        </Layout>
+      </div>
+    );
+  const arr: DocumentData[] = JSON.parse(propertiesJSON);
   return (
     <Layout>
       <Head>
@@ -93,10 +128,37 @@ export default function Index({
 
 export async function getServerSideProps(context) {
   try {
-    // const cookies = nookies.get(context);
-    // const token = await verifyIdToken(cookies.token);
-    // const { uid } = token;
+    const cookies = nookies.get(context);
+    const token = await verifyIdToken(cookies.token);
+    const { uid } = token;
+    var myUser: DocumentData = null;
+    var hasPermission: boolean = false;
+    var isRemovedByAdmin: boolean = false;
+    const docSnap = await getDoc(doc(db, "users", uid));
 
+    if (docSnap.exists()) {
+      myUser = docSnap.data();
+      if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
+        hasPermission = true;
+        if (removedByAdmin(myUser)) {
+          isRemovedByAdmin = true;
+        }
+      }
+    }
+    if (!hasPermission) {
+      //only admin can't access to text on this page
+      return {
+        // redirect: {
+        //   destination: "/",
+        // },
+        props: {
+          isAdmin: isAdmin(myUser),
+          isHostModeHost: isHostModeHost(myUser),
+          isRemovedByAdmin: isRemovedByAdmin,
+        },
+      };
+    }
+    ////////
     var properties: DocumentData[] = [];
     const q = query(
       collection(db, "property"),
@@ -111,19 +173,34 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        // uid: uid,
         propertiesJSON: JSON.stringify(properties),
+        isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {
     // context.res.writeHead(302, { location: "/" });
     // context.res.end();
     // return { props: [] };
+    var isRemovedByAdmin: boolean = false;
+    var properties: DocumentData[] = [];
+    const q = query(
+      collection(db, "property"),
+      orderBy("numberOfReviews", "desc"),
+      orderBy("totalStars", "desc"),
+      limit(8)
+    );
+    const querySnapshot = await getDocs(q);
+    for (let index = 0; index < querySnapshot.docs.length; index++) {
+      properties.push(querySnapshot.docs[index].data());
+    }
     return {
-      redirect: {
-        destination: "/",
+      // redirect: {
+      //   destination: "/",
+      // },
+      props: {
+        propertiesJSON: JSON.stringify(properties),
+        isRemovedByAdmin: isRemovedByAdmin,
       },
-      props: [],
     };
   }
 }

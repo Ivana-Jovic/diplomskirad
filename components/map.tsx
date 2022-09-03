@@ -84,7 +84,7 @@ const Map = (props: props) => {
       ttSearchBox.on("tomtom.searchbox.resultselected", function (event: any) {
         setSelectedStreet(false);
         const t: any = event.data.result.type;
-        if (t == "Point Address") {
+        if (t === "Point Address") {
           const bl: any = event.data.result.position;
           marker.setLngLat(bl).addTo(ivaninaMapa);
           ivaninaMapa.easeTo({ center: bl });
