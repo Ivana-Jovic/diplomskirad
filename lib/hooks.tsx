@@ -75,11 +75,11 @@ export async function isAvailable(from: Date, to: Date, propertyId: string) {
 export function isFullyRegisteredUser(myUser: DocumentData) {
   if (
     myUser &&
-    myUser.firstname &&
-    myUser.lastname &&
+    myUser.firstName &&
+    myUser.lastName &&
     myUser.photoURL &&
-    myUser.firstname !== "" &&
-    myUser.lastname !== "" &&
+    myUser.firstName !== "" &&
+    myUser.lastName !== "" &&
     myUser.photoURL !== ""
   )
     return true;

@@ -104,13 +104,13 @@ cursor-pointer"
           </div>
           <div className="flex justify-between items-center">
             <div className="text-sm flex items-center text-gray-500 ">
-              {parseInt(price) * numberOfNights}€/
+              <p>{parseInt(price) * numberOfNights}€/</p>
               <p className="text-sm text-gray-500 ">total</p>
             </div>
             <div className="flex items-center">
-              <p className="text-sm font-semibold">
+              <div className="text-sm font-semibold">
                 {(totalStars / numberOfReviews).toFixed(1)}
-              </p>
+              </div>
               <Rating
                 name="read-only"
                 value={totalStars / numberOfReviews}

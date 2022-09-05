@@ -96,7 +96,7 @@ a:hover {
         ,.MuiOutlinedInput-input{
           /* .label.Mui-focused{ */
      /* m-3 .css-1u3bzj6-MuiFormControl-root-MuiTextField-root{ */
-  color: #161616;
+  color: #161616!important;
   border-color: #161616;
 }
 /* img {
@@ -216,6 +216,7 @@ h3{
   
   }
 } */
+
 .btn {
   @apply  bg-footer hover:bg-footer active:bg-footer hover:text-background text-background;
   @apply shadow-md hover:shadow-lg active:scale-90 transition duration-150 text-center ;
