@@ -70,25 +70,25 @@ export default function Banner({
   }, []);
 
   const search = () => {
-    alert("HELOO");
-    // if (location === null || location === "") {
-    //   setError("Please choose a location");
-    // } else if (dateFrom && dateTo && dateFrom >= dateTo) {
-    //   setError("Check out date must be after check in date");
-    // } else {
-    //   setOpenSearch(false);
-    //   router.push({
-    //     pathname: "/search",
-    //     query: {
-    //       location: location,
-    //       from: dateFrom?.toDateString(),
-    //       to: dateTo?.toDateString(),
-    //       numOfGuests: guests,
-    //       rooms: rooms,
-    //     },
-    //   });
-    // }
+    if (location === null || location === "") {
+      setError("Please choose a location");
+    } else if (dateFrom && dateTo && dateFrom >= dateTo) {
+      setError("Check out date must be after check in date");
+    } else {
+      setOpenSearch?.(false);
+      router.push({
+        pathname: "/search",
+        query: {
+          location: location,
+          from: dateFrom?.toDateString(),
+          to: dateTo?.toDateString(),
+          numOfGuests: guests,
+          rooms: rooms,
+        },
+      });
+    }
   };
+
   const menu = (
     <Menu
       className="rounded-xl py-3"
