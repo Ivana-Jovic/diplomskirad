@@ -1,4 +1,4 @@
-import { User } from "firebase/auth";
+import { signOut, User } from "firebase/auth";
 import { getDocs } from "firebase/firestore";
 import {
   addDoc,
@@ -16,6 +16,27 @@ import { useRouter } from "next/router";
 import { useContext } from "react";
 import { db, storage } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
+import { auth } from "../firebase";
+
+import nookies from "nookies";
+
+// export async function logout() {
+//   //event: React.MouseEvent<HTMLButtonElement>
+//   console.log("nnn");
+//   // event.preventDefault(); // Preventing the page from reloading
+//   try {
+//     await signOut(auth);
+//     // .then(() => {
+//     console.log("the user signed out");
+//     nookies.set(undefined, "token", "", {});
+//     // setIsLoggedIn(false);sad
+//     router.push({
+//       pathname: "/",
+//     });
+//   } catch (err) {
+//     console.log(err.message);
+//   }
+// }
 
 export async function isAvailable(from: Date, to: Date, propertyId: string) {
   const querySnapshot6 = await getDocs(
@@ -51,8 +72,22 @@ export async function isAvailable(from: Date, to: Date, propertyId: string) {
 //   if (!user) return true;
 //   else return false;
 // }
+export function isFullyRegisteredUser(myUser: DocumentData) {
+  if (
+    myUser &&
+    myUser.firstname &&
+    myUser.lastname &&
+    myUser.photoURL &&
+    myUser.firstname !== "" &&
+    myUser.lastname !== "" &&
+    myUser.photoURL !== ""
+  )
+    return true;
+  else return false;
+}
 export function isLoggedUser(myUser: DocumentData) {
   // console.log(myUser, myUser.host, myUser.isAdmin);
+  // if (!isFullyRegisteredUser(myUser)) return false;
   if (myUser && !myUser.host && !myUser.isAdmin) return true;
   else return false;
 }

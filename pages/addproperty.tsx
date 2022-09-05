@@ -21,7 +21,12 @@ import Map from "../components/map";
 import ImageForm from "../components/imageform";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useRouter } from "next/router";
-import { isHostModeHost, isLoggedUser, removedByAdmin } from "../lib/hooks";
+import {
+  isFullyRegisteredUser,
+  isHostModeHost,
+  isLoggedUser,
+  removedByAdmin,
+} from "../lib/hooks";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -46,11 +51,11 @@ export default function AddProperty({
   uid,
   // UserEmail,
   myUserJSON,
-  isRemovedByAdmin,
-}: {
+}: // isRemovedByAdmin,
+{
   myUserJSON: string;
   uid: string;
-  isRemovedByAdmin: boolean;
+  // isRemovedByAdmin: boolean;
   // UserEmail: string;
 }) {
   const [loc, setLoc] = useState<any>();
@@ -84,7 +89,7 @@ export default function AddProperty({
     },
   });
   const router = useRouter();
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
 
   const myUser: DocumentData = JSON.parse(myUserJSON);
   // const { user, myUser } = useContext(AuthContext);
@@ -667,15 +672,29 @@ export async function getServerSideProps(context) {
 
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
       myUser = docSnap.data();
+      if (!isFullyRegisteredUser(myUser)) {
+        return {
+          redirect: {
+            destination: "/profilesettings",
+          },
+          props: [],
+        };
+      }
       if (isHostModeHost(myUser) || isLoggedUser(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
     }
@@ -692,7 +711,7 @@ export async function getServerSideProps(context) {
         uid: uid,
         // myUser: JSON.stringify(myUser),
         myUserJSON: JSON.stringify(myUser),
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

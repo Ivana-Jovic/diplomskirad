@@ -37,7 +37,7 @@ const Map = (props: props) => {
       var center: tt.LngLatLike = [20.4609, 44.81647189463462];
 
       const ivaninaMapa = tt.map({
-        key: "g1vbv71TIZn39gozG2KycjVd1AuWJ9TC",
+        key: process.env.NEXT_PUBLIC_TOMTOM,
         container: mapElement.current,
         center: center,
         zoom: 12,
@@ -61,12 +61,12 @@ const Map = (props: props) => {
         idleTimePress: 100,
         minNumberOfCharacters: 0,
         searchOptions: {
-          key: "g1vbv71TIZn39gozG2KycjVd1AuWJ9TC",
+          key: process.env.NEXT_PUBLIC_TOMTOM,
           language: "en-GB",
           // idxSet: "PAD,Addr",
         },
         autocompleteOptions: {
-          key: "g1vbv71TIZn39gozG2KycjVd1AuWJ9TC",
+          key: process.env.NEXT_PUBLIC_TOMTOM,
           language: "en-GB",
         },
 

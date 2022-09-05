@@ -21,7 +21,7 @@ export default function Popup({
           onClick={handleClose}
           // onClick={props.handleClose}
           className="self-end cursor-pointer bg-footer text-header rounded-3xl
-           w-8 h-8 text-center mb-3"
+           w-8 h-8 mb-3 flex justify-center items-center "
         >
           <CloseIcon />
         </div>

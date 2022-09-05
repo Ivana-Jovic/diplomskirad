@@ -7,14 +7,25 @@ import { db, storage } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
 import { useRouter } from "next/router";
 import { TextField } from "@mui/material";
-
+import { auth } from "../firebase";
 import { useForm, SubmitHandler } from "react-hook-form";
 import ErrorPage from "./errorpage";
-import { isAdmin, isHost, isLoggedUser, removedByAdmin } from "../lib/hooks";
+import {
+  isAdmin,
+  isFullyRegisteredUser,
+  isHost,
+  isLoggedUser,
+  removedByAdmin,
+} from "../lib/hooks";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import RemovedByAdmin from "../components/removedbyadmin";
-import { reauthenticateWithCredential, updatePassword } from "firebase/auth";
+import {
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  signOut,
+  updatePassword,
+} from "firebase/auth";
 
 type IFormInput = {
   title: string;
@@ -29,20 +40,21 @@ type IFormInput = {
 
 export default function ProfileSettings({
   uid,
-  UserEmail,
+  userEmail,
   myUserJSON,
-  isRemovedByAdmin,
-}: {
+}: // isRemovedByAdmin,
+{
   myUserJSON: string;
   uid: string;
-  UserEmail: string;
-  isRemovedByAdmin: boolean;
+  userEmail: string;
+  // isRemovedByAdmin: boolean;
 }) {
   const myUser: DocumentData = JSON.parse(myUserJSON);
-  // const { user, myUser } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const router = useRouter();
 
   const [error, setError] = useState<string>(""); //any
+  const [errorPassword, setErrorPassword] = useState<string>("");
   const [url, setUrl] = useState<string>("");
   const [wantToChangePass, setWantToChangePass] = useState<boolean>(false);
 
@@ -56,7 +68,7 @@ export default function ProfileSettings({
     watch,
   } = useForm<IFormInput>({
     defaultValues: {
-      email: UserEmail,
+      email: userEmail,
       //  user?.email ?? "",
       passwordNew: "",
       passwordOld: myUser?.passwordState,
@@ -66,7 +78,7 @@ export default function ProfileSettings({
     },
   });
 
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
 
   const imgNew = watch("profilePictureNEW");
 
@@ -144,33 +156,38 @@ export default function ProfileSettings({
         );
       }
     }
-    //TODOpp promena sifre plus da i spojiti updatove
-    if (
-      wantToChangePass &&
-      data.passwordNew !== "" &&
-      data.passwordOld !== ""
-    ) {
-      // UserEmail
-      // reauthenticateWithCredential(user, credential)
-      //   .then(() => {
-      //     // User re-authenticated.
-      //     updatePassword(user, data.passwordNew)
-      //       .then(() => {
-      //         // Update successful.
-      //       })
-      //       .catch((error) => {
-      //         // An error ocurred
-      //         // ...
-      //       });
-      //   })
-      //   .catch((error) => {
-      //     // An error ocurred
-      //     // ...
-      //   });
+
+    if (wantToChangePass) {
+      try {
+        const credential = EmailAuthProvider.credential(
+          userEmail,
+          data.passwordOld
+        );
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, data.passwordNew);
+
+        await signOut(auth);
+        console.log("the user signed out");
+        nookies.set(undefined, "token", "", {});
+        router.push({
+          pathname: "/",
+        });
+      } catch (err) {
+        if (err.code === "auth/weak-password") {
+          setErrorPassword("Can't update password - weak password"); //
+        } else if (err.code === "auth/too-many-requests") {
+          setErrorPassword("Too many requests - try again later");
+        } else if (err.code === "auth/wrong-password") {
+          setErrorPassword("Can't update password - wrong password"); //
+        } else {
+          setErrorPassword("Can't update password - wrong data ");
+        }
+        console.log(err.message, err.code);
+        return false;
+      }
       //TODO mozad toast i za uspeh i za neuspeh
       //TODO kod nekretnina i za izmeni i za dodavanje
-      setError("Sth went wrong");
-      return false;
+      return true;
     }
     // update first name
     if (
@@ -217,6 +234,7 @@ export default function ProfileSettings({
   const onSubmit: SubmitHandler<IFormInput> = async (data: IFormInput) => {
     console.log(data);
     setError("");
+    setErrorPassword("");
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
     const fileArr = data.profilePictureNEW ?? null;
     const file = fileArr.length > 0 ? fileArr[0] : null;
@@ -316,6 +334,7 @@ export default function ProfileSettings({
                     errors.passwordNew ? errors.passwordNew.message : " "
                   }
                 />
+                {errorPassword && <div>{errorPassword}</div>}
               </>
             )}
           </div>
@@ -371,15 +390,22 @@ export async function getServerSideProps(context) {
 
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
       myUser = docSnap.data();
       if (isLoggedUser(myUser) || isHost(myUser) || isAdmin(myUser)) {
+        //JEDINO OVDE NE MORA BITI FULLY REGISTERED USER
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
     }
@@ -394,9 +420,9 @@ export async function getServerSideProps(context) {
     return {
       props: {
         uid: uid,
-        UserEmail: email,
+        userEmail: email,
         myUserJSON: JSON.stringify(myUser),
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

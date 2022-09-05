@@ -260,7 +260,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
       {openSearch && router.pathname !== "/" && (
         // {searchInput && (
         <div className="flex flex-col w-screen col-span-2  mt-5 -mb-5">
-          <Banner />
+          <Banner setOpenSearch={setOpenSearch} />
           {/* <div className="flex">
             <button onClick={resetSearch} className="flex-grow cursor-pointer">
               Cancel

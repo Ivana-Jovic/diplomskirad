@@ -29,12 +29,12 @@ export default function PropertySettings({
   uid,
   propertyJSON,
   myUserJSON,
-  isRemovedByAdmin,
-}: {
+}: // isRemovedByAdmin,
+{
   uid: string;
   propertyJSON: string;
   myUserJSON: string;
-  isRemovedByAdmin: boolean;
+  // isRemovedByAdmin: boolean;
 }) {
   const property: DocumentData = JSON.parse(propertyJSON);
   const [urlArr, setUrlArr] = useState<string[]>([]);
@@ -56,7 +56,7 @@ export default function PropertySettings({
       picturesNEW: [],
     },
   });
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
 
   const myUser: DocumentData = JSON.parse(myUserJSON);
   // const { user, myUser } = useContext(AuthContext);
@@ -326,7 +326,7 @@ export async function getServerSideProps(context) {
 
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap2 = await getDoc(doc(db, "users", uid));
 
     if (docSnap2.exists()) {
@@ -334,7 +334,13 @@ export async function getServerSideProps(context) {
       if (isHostModeHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
     }
@@ -358,7 +364,7 @@ export async function getServerSideProps(context) {
         uid: uid,
         propertyJSON: JSON.stringify(property),
         myUserJSON: JSON.stringify(myUser),
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

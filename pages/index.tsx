@@ -20,6 +20,7 @@ import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import {
   isAdmin,
+  isFullyRegisteredUser,
   isHost,
   isHostModeHost,
   isHostModeTravel,
@@ -28,21 +29,22 @@ import {
 } from "../lib/hooks";
 import ErrorPage from "./errorpage";
 import IndexHostModeHost from "../components/indexhostmodehost";
-import IndexAdmin from "../components/indexadmin";
 import RemovedByAdmin from "../components/removedbyadmin";
+import { useRouter } from "next/router";
 
 export default function Index({
-  isAdmin,
+  // isAdmin,
   isHostModeHost,
   propertiesJSON,
-  isRemovedByAdmin,
-}: {
-  isAdmin: boolean;
+}: // isRemovedByAdmin,
+{
+  // isAdmin: boolean;
   isHostModeHost: boolean;
   propertiesJSON: string;
-  isRemovedByAdmin: boolean;
+  // isRemovedByAdmin: boolean;
 }) {
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  const router = useRouter();
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
   // const [arr, setArr] = useState<DocumentData[]>([]);
 
   // const getRanodomProperties = async () => {
@@ -63,14 +65,21 @@ export default function Index({
   // useEffect(() => {
   //   getRanodomProperties();
   // }, []);
-  if (isAdmin)
-    return (
-      <>
-        <Layout>
-          <IndexAdmin />
-        </Layout>
-      </>
-    );
+  // if (isAdmin)
+  //   return (
+  //     <>
+  //       <Layout>
+  //         <IndexAdmin />
+  //       </Layout>
+  //     </>
+  //   );
+
+  // if (isAdmin) {
+  //   router.push({
+  //     pathname: "/indexadmin",
+  //   });
+  // }
+
   if (isHostModeHost)
     return (
       <div className="h-full">
@@ -133,28 +142,51 @@ export async function getServerSideProps(context) {
     const { uid } = token;
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
       myUser = docSnap.data();
+      if (!isFullyRegisteredUser(myUser)) {
+        return {
+          redirect: {
+            destination: "/profilesettings",
+          },
+          props: [],
+        };
+      }
       if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
+
+      if (isAdmin(myUser)) {
+        return {
+          redirect: {
+            destination: "/indexadmin",
+          },
+          props: [],
+        };
+      }
     }
+
     if (!hasPermission) {
-      //only admin can't access to text on this page
       return {
         // redirect: {
         //   destination: "/",
         // },
         props: {
-          isAdmin: isAdmin(myUser),
+          // isAdmin: isAdmin(myUser),
           isHostModeHost: isHostModeHost(myUser),
-          isRemovedByAdmin: isRemovedByAdmin,
+          // isRemovedByAdmin: isRemovedByAdmin,
         },
       };
     }
@@ -174,14 +206,15 @@ export async function getServerSideProps(context) {
     return {
       props: {
         propertiesJSON: JSON.stringify(properties),
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
+        // isAdmin: false,
       },
     };
   } catch (err) {
     // context.res.writeHead(302, { location: "/" });
     // context.res.end();
     // return { props: [] };
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     var properties: DocumentData[] = [];
     const q = query(
       collection(db, "property"),
@@ -199,7 +232,8 @@ export async function getServerSideProps(context) {
       // },
       props: {
         propertiesJSON: JSON.stringify(properties),
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
+        // isAdmin: false,
       },
     };
   }

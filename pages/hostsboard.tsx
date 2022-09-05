@@ -20,7 +20,11 @@ import Map2 from "../components/map2";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { isHostModeHost, removedByAdmin } from "../lib/hooks";
+import {
+  isFullyRegisteredUser,
+  isHostModeHost,
+  removedByAdmin,
+} from "../lib/hooks";
 import ErrorPage from "./errorpage";
 import RemovedByAdmin from "../components/removedbyadmin";
 
@@ -32,13 +36,13 @@ const Calendar = dynamic(() => import("../components/calendar"), {
 export default function HostsBoard({
   propertiesJSON,
   propertiesIds,
-  isRemovedByAdmin,
-}: {
+}: // isRemovedByAdmin,
+{
   propertiesJSON: string;
   propertiesIds: string[];
-  isRemovedByAdmin: boolean;
+  // isRemovedByAdmin: boolean;
 }) {
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
   const properties: DocumentData[] = JSON.parse(propertiesJSON);
   // const [showProgress, setShowProgress] = useState<boolean>(true);
   // const { user, myUser } = useContext(AuthContext);
@@ -224,7 +228,7 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -232,7 +236,13 @@ export async function getServerSideProps(context) {
       if (isHostModeHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
     }
@@ -264,7 +274,7 @@ export async function getServerSideProps(context) {
         uid: uid,
         propertiesJSON: JSON.stringify(properties),
         propertiesIds: propertiesIds,
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

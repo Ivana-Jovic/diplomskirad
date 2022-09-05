@@ -28,6 +28,7 @@ import ImageGallery from "react-image-gallery";
 import CommentCard from "../components/commentcard";
 import ErrorPage from "./errorpage";
 import {
+  isFullyRegisteredUser,
   isHost,
   isHostModeHost,
   isHostModeTravel,
@@ -47,12 +48,12 @@ export default function PropertyPage({
   uid,
   isHostModeHost,
   myUserJSON,
-  isRemovedByAdmin,
-}: {
+}: // isRemovedByAdmin,
+{
   uid: string;
   isHostModeHost: boolean;
   myUserJSON: string;
-  isRemovedByAdmin: boolean;
+  // isRemovedByAdmin: boolean;
 }) {
   const myUser: DocumentData | null = uid ? JSON.parse(myUserJSON) : null; //null ako je neulogovan
   const [more, setMore] = useState<boolean>(false);
@@ -105,9 +106,13 @@ export default function PropertyPage({
   };
 
   useEffect(() => {
-    if (propertyid && !isRemovedByAdmin) getProperty();
+    if (
+      propertyid
+      // && !isRemovedByAdmin
+    )
+      getProperty();
   }, [propertyid]); //probaj i property ako ne radi
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
 
   return (
     <Layout>
@@ -285,11 +290,19 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
       myUser = docSnap.data();
+      if (!isFullyRegisteredUser(myUser)) {
+        return {
+          redirect: {
+            destination: "/profilesettings",
+          },
+          props: [],
+        };
+      }
       if (
         isLoggedUser(myUser) ||
         isHostModeHost(myUser) ||
@@ -297,7 +310,13 @@ export async function getServerSideProps(context) {
       ) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
     }
@@ -316,7 +335,7 @@ export async function getServerSideProps(context) {
           uid: uid,
           isHostModeHost: true,
           myUserJSON: JSON.stringify(myUser),
-          isRemovedByAdmin: isRemovedByAdmin,
+          // isRemovedByAdmin: isRemovedByAdmin,
         },
       };
     }
@@ -325,11 +344,11 @@ export async function getServerSideProps(context) {
         uid: uid,
         isHostModeHost: false,
         myUserJSON: JSON.stringify(myUser),
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     // context.res.writeHead(302, { location: "/" });
     // context.res.end();
     // return { props: [] };
@@ -344,7 +363,7 @@ export async function getServerSideProps(context) {
         isHostModeHost: false,
         myUserJSON: JSON.stringify(myUser), // ovde je myUser null
 
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   }

@@ -71,7 +71,7 @@ const Map2 = (props: props) => {
       // .setDOMContent(popupDiv);
 
       const ivaninaMapa = tt.map({
-        key: "g1vbv71TIZn39gozG2KycjVd1AuWJ9TC",
+        key: process.env.NEXT_PUBLIC_TOMTOM,
         container: mapElement.current,
         center: center,
         zoom: 12,

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import type {} from "@mui/x-date-pickers/themeAugmentation";
@@ -25,24 +25,27 @@ import { db } from "../firebase";
 //   },
 // });
 //TODOppp na firebasu uslovi
-//TODOp pomeri secrets file
 
 //TODOpp kad se registruje zabrani sve dok ne popuni formu
-//TODOppp search na search stranici zanimljivo se desava
-//TODOppp slicno i npr ako se admin izloguje ostace se na index admin stranici
-//TODO nadji gde se jos desavaju ove stvari
-//TODO vercel
+
+//TODOp vercel
 //TODOpp mozda spineri svuda
-//TODOpp velicina slajdera na mobilnom
-//TODOp da li mi je ok putanja za slike
+
+//TODO paginacija sortiranje panela po is seen i created at
+//TODO probaj ako si hostmodehost na indexu da menjas modove, da li se refreshuje
 //TODO provere
 //- za dugacke titlove i descriptione svuda da li izgleda ok
 //- na raznim velicinama ekrana
 //- provere za sve pristupe plus pri promeni moda
 //- dugme za search
 //- slicno (search na search stranici yanimljivo se desava) i npr ako se admin izloguje ostace se na index admin stranici
-//nadji gde se jos desavaju ove stvari
-export default function Banner() {
+//- nadji gde se jos desavaju ove stvari tipa kad se admin izlogovao nije se vratilo n aindex itd
+
+export default function Banner({
+  setOpenSearch,
+}: {
+  setOpenSearch?: Dispatch<SetStateAction<boolean>>;
+}) {
   const [location, setLocation] = useState<string>("");
   const [guests, setGuests] = useState<number>(1);
   const [rooms, setRooms] = useState<number>(1);
@@ -72,6 +75,7 @@ export default function Banner() {
     } else if (dateFrom && dateTo && dateFrom >= dateTo) {
       setError("Check out date must be after check in date");
     } else {
+      setOpenSearch(false);
       router.push({
         pathname: "/search",
         query: {

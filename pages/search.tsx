@@ -27,6 +27,7 @@ import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import {
   isAvailable,
+  isFullyRegisteredUser,
   isHostModeTravel,
   isLoggedUser,
   removedByAdmin,
@@ -116,7 +117,7 @@ function valuetext(value: number) {
 //   return true;
 // }
 export default function Search({
-  isRemovedByAdmin,
+  // isRemovedByAdmin,
   // uid,
   location,
   // fromDateJSON,
@@ -129,11 +130,9 @@ export default function Search({
   sumPricesPropertiesLocation,
   ppp,
 }: {
-  isRemovedByAdmin: boolean;
+  // isRemovedByAdmin: boolean;
   // uid: string;
   location: string;
-  // fromDateJSON: string;
-  // toDateJSON: string;
   fromStr: string;
   toStr: string;
   rooms: number;
@@ -141,32 +140,13 @@ export default function Search({
   numPropertiesLocation: number;
   sumPricesPropertiesLocation: number;
   ppp: string;
-  //  DocumentData[]; //OVO JE RADILI SA ANY
 }) {
-  // const fromDate: Date = JSON.parse(fromDateJSON);
-  // const toDate: Date = JSON.parse(toDateJSON);
   const fromDate = new Date(fromStr);
   const toDate = new Date(toStr);
   var rangeRef = useRef<NodeJS.Timeout>(null);
   const arr: DocumentData[] = JSON.parse(ppp);
-  // const arr = ppp;
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  //U GSP su ove
-  // const [numPropertiesLocation, setNumPropertiesLocation] = useState<number>(0);
-  // const [sumPricesPropertiesLocation, setSumPricesPropertiesLocation] =
-  //   useState<number>(0);
-  // const router = useRouter();
-  // const { location: locationQuery, from, to } = router.query;
-  // const location: string = locationQuery
-  //   ? locationQuery.includes(", ")
-  //     ? (locationQuery as string).split(", ")[0]
-  //     : (locationQuery as string)
-  //   : "";
-  // const fromDate = new Date(router.query.from as string);
-  // const toDate = new Date(router.query.to as string);
-  // const rooms = (router.query.rooms ?? 0) as number;
-  // const numOfGuests = (router.query.numOfGuests ?? 0) as number;
-  // //const [arr, setArr] = useState<any[]>([]);
+
   const [filteredArr, setFilteredArr] = useState<DocumentData[]>(arr); //any
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [selectedSuperhost, setSelectedSuperhost] = useState<boolean>(false);
@@ -179,50 +159,6 @@ export default function Search({
   const factorPrice = 10;
 
   console.log("...", arr.length, filteredArr.length);
-  // const getSearchProperties = async () => {
-  // console.log("in search gethostproperty");
-  // const qs44: string[] = [];
-  // const qs33: string[] = [];
-  // const querySnapshot1 = await getDocs(
-  //   query(collection(db, "property"), where("city", "==", location))
-  // );
-  // const querySnapshot2 = await getDocs(
-  //   query(collection(db, "property"), where("state", "==", location))
-  // );
-  // // setFilteredArr([]);ks
-  // // setArr([]);
-  // let r: QueryDocumentSnapshot<DocumentData>[] = querySnapshot1.docs.concat(
-  //   querySnapshot2.docs
-  // );
-  // setArr([]);
-  // setFilteredArr([]);
-  // //UNIJA
-  // setNumPropertiesLocation(0);
-  // setSumPricesPropertiesLocation(0);
-  // // r
-  // r.forEach(async (doc) => {
-  //   setNumPropertiesLocation((prev) => prev + 1);
-  //   setSumPricesPropertiesLocation((prev) => prev + doc.data().pricePerNight);
-  //   if (
-  //     rooms &&
-  //     numOfGuests &&
-  //     doc.data().numOfPersons >= numOfGuests &&
-  //     doc.data().numOfRooms >= rooms
-  //   ) {
-  //     console.log("MAIN", fromDate, toDate);
-  //     isAvailable(fromDate, toDate, doc.id).then((isAv) => {
-  //       if (isAv) {
-  //         setArr((prev) => {
-  //           return [...prev, doc];
-  //         });
-  //         setFilteredArr((prev) => {
-  //           return [...prev, doc];
-  //         });
-  //       }
-  //     });
-  //   }
-  // });
-  // };
 
   const shouldBeShown = (
     num: number,
@@ -284,12 +220,17 @@ export default function Search({
     );
     return false;
   };
+  useEffect(() => {
+    setFilteredArr(arr);
+    setSelectedSuperhost(false);
+    setSelectedRatingFourAndUp(false);
+    setSelectedGarage(false);
+    setSelectedPrice(false);
+    setSortPrice(null);
+    setPriceRange([0, 100]);
+  }, [ppp]);
 
   useEffect(() => {
-    // if (firstLoad) {
-    //   // setArr([]);
-    //   setFilteredArr([]);
-    // }
     if (
       selectedSuperhost ||
       selectedRatingFourAndUp ||
@@ -340,28 +281,7 @@ export default function Search({
     sortPrice,
   ]);
 
-  // useEffect(() => {
-  //   setArr([]);
-  //   setFilteredArr([]);
-  //   if (
-  //     location != undefined &&
-  //     rooms != undefined &&
-  //     numOfGuests != undefined &&
-  //     fromDate != undefined &&
-  //     toDate != undefined &&
-  //     rooms &&
-  //     location &&
-  //     numOfGuests &&
-  //     fromDate &&
-  //     toDate
-  //   ) {
-  //     setFirstLoad(false);
-  //     setArr([]);
-  //     setFilteredArr([]);
-  //     getSearchProperties();
-  //   }
-  // }, [location, rooms, numOfGuests]);
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
   return (
     <Layout
       placeholder={
@@ -401,7 +321,7 @@ export default function Search({
                     {/* hover:bg-inherit*/}
                     <div className="mt-10 flex flex-col w-52 sm:w-80  !bg-transparent">
                       <Box
-                        sx={{ width: 300 }}
+                        sx={{ width: "90%" }}
                         // className="w-80 sm:w-80"
                       >
                         <AirbnbSlider
@@ -617,15 +537,29 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
       const myUser: DocumentData = docSnap.data();
+      if (!isFullyRegisteredUser(myUser)) {
+        return {
+          redirect: {
+            destination: "/profilesettings",
+          },
+          props: [],
+        };
+      }
       if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
     }
@@ -644,7 +578,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         // uid: uid,
 
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
         location: returns.location,
         // fromDateJSON: JSON.stringify(fromDate),
         // toDateJSON: JSON.stringify(toDate),
@@ -658,7 +592,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   } catch (err) {
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     // return {
     //   // redirect: {!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //   //   destination: "/",
@@ -672,7 +606,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // console.log("wwwwwwwwwww", arr);
     return {
       props: {
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
         // uid: uid,
         location: returns.location,
         // fromDateJSON: JSON.stringify(fromDate),

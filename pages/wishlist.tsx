@@ -9,19 +9,24 @@ import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import ErrorPage from "./errorpage";
-import { isHostModeTravel, isLoggedUser, removedByAdmin } from "../lib/hooks";
+import {
+  isFullyRegisteredUser,
+  isHostModeTravel,
+  isLoggedUser,
+  removedByAdmin,
+} from "../lib/hooks";
 import RemovedByAdmin from "../components/removedbyadmin";
 
 export default function Wishlist({
   propertiesJSON,
-  isRemovedByAdmin,
-}: // hasPermission,
+}: // isRemovedByAdmin,
+// hasPermission,
 {
   propertiesJSON: string;
-  isRemovedByAdmin: boolean;
+  // isRemovedByAdmin: boolean;
   // hasPermission: boolean;
 }) {
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
   const faves: DocumentData[] = JSON.parse(propertiesJSON);
   // const { user, myUser } = useContext(AuthContext);
   // const [faves, setFaves] = useState<any[]>([]);
@@ -91,15 +96,29 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
       const myUser: DocumentData = docSnap.data();
+      if (!isFullyRegisteredUser(myUser)) {
+        return {
+          redirect: {
+            destination: "/profilesettings",
+          },
+          props: [],
+        };
+      }
       if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
     }
@@ -130,7 +149,7 @@ export async function getServerSideProps(context) {
       props: {
         uid: uid,
         propertiesJSON: JSON.stringify(properties),
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

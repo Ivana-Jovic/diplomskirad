@@ -16,20 +16,25 @@ import ReservationCard from "../components/reservationcard";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import ErrorPage from "./errorpage";
-import { isHostModeTravel, isLoggedUser, removedByAdmin } from "../lib/hooks";
+import {
+  isFullyRegisteredUser,
+  isHostModeTravel,
+  isLoggedUser,
+  removedByAdmin,
+} from "../lib/hooks";
 import RemovedByAdmin from "../components/removedbyadmin";
 
 export default function GuestBoard({
   uid,
   reservations,
-  isRemovedByAdmin,
-}: {
+}: // isRemovedByAdmin,
+{
   uid: string;
   reservations: string;
-  isRemovedByAdmin: boolean;
+  // isRemovedByAdmin: boolean;
   // DocumentData[]; //RADILO SA string
 }) {
-  if (isRemovedByAdmin) return <RemovedByAdmin />;
+  // if (isRemovedByAdmin) return <RemovedByAdmin />;
 
   const reserv: DocumentData[] =
     // reservations;
@@ -71,15 +76,29 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    var isRemovedByAdmin: boolean = false;
+    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
       const myUser: DocumentData = docSnap.data();
+      if (!isFullyRegisteredUser(myUser)) {
+        return {
+          redirect: {
+            destination: "/profilesettings",
+          },
+          props: [],
+        };
+      }
       if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          isRemovedByAdmin = true;
+          // isRemovedByAdmin = true;
+          return {
+            redirect: {
+              destination: "/removedbyadmin",
+            },
+            props: [],
+          };
         }
       }
     }
@@ -113,7 +132,7 @@ export async function getServerSideProps(context) {
         reservations:
           // arrData,
           JSON.stringify(arrData),
-        isRemovedByAdmin: isRemovedByAdmin,
+        // isRemovedByAdmin: isRemovedByAdmin,
         // reservations: { ...{ ...querySnapshot.docs } },
         // session: "Your email is ${email} and your UID is ${uid}",
       },

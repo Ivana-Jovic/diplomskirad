@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 import Button from "./button";
 import Inputs from "./inputs";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { AuthContext } from "../firebase-authProvider";
 import { useRouter } from "next/router";
 import { TextField } from "@mui/material";
@@ -89,37 +89,49 @@ export default function SignInRegisterPopup() {
         console.log(err.message, err.code);
       });
   };
-  const sig = (data: IFormInput) => {
+  const sig = async (data: IFormInput) => {
     setError("");
-    signInWithEmailAndPassword(auth, data.email, data.password)
-      .then((cred) => {
-        console.log("User signedin:", cred.user);
-        router.push({
-          pathname: "/",
-        });
-      })
-      .catch((err) => {
-        //TODOpp DA li ima jos neka sifra ili bolji nacin,
-        //TODOpp sta raditi sa POST ispisom u konzoli crveno
+    try {
+      const cred = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      // .then(async (cred) => {
+      console.log("User signedin:", cred.user);
 
-        if (err.code === "auth/user-not-found") {
-          setError("Can't sign in  - user not found");
-        } else if (err.code === "auth/wrong-password") {
-          setError("Can't sign in  - wrong password");
-        } else if (err.code === "auth/too-many-requests") {
-          setError("Too many requests - try again later");
-        } else {
-          setError("Can't sign in  - wrong data ");
+      const docSnap = await getDoc(doc(db, "users", cred.user.uid));
+
+      if (docSnap.exists()) {
+        if (docSnap.data().isAdmin) {
+          router.push({
+            pathname: "/indexadmin",
+          });
+          return;
         }
-        console.log(err.message, err.code);
-      });
+      }
+      // router.push({
+      //   pathname: "/",
+      // });
+    } catch (err) {
+      if (err.code === "auth/user-not-found") {
+        setError("Can't sign in  - user not found");
+      } else if (err.code === "auth/wrong-password") {
+        setError("Can't sign in  - wrong password");
+      } else if (err.code === "auth/too-many-requests") {
+        setError("Too many requests - try again later");
+      } else {
+        setError("Can't sign in  - wrong data ");
+      }
+      console.log(err.message, err.code);
+    }
   };
-  const onSubmitRegister: SubmitHandler<IFormInput> = (data: IFormInput) => {
-    reg(data);
-  };
-  const onSubmitSignIn: SubmitHandler<IFormInput> = (data: IFormInput) => {
-    sig(data);
-  };
+  // const onSubmitRegister: SubmitHandler<IFormInput> = (data: IFormInput) => {
+  //   reg(data);
+  // };
+  // const onSubmitSignIn: SubmitHandler<IFormInput> = (data: IFormInput) => {
+  //   sig(data);
+  // };
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     if (isSignIn) {
       sig(data);
