@@ -10,7 +10,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { Autocomplete } from "@mui/material";
+import { alertTitleClasses, Autocomplete } from "@mui/material";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 // const theme = createTheme({
@@ -70,23 +70,24 @@ export default function Banner({
   }, []);
 
   const search = () => {
-    if (location === null || location === "") {
-      setError("Please choose a location");
-    } else if (dateFrom && dateTo && dateFrom >= dateTo) {
-      setError("Check out date must be after check in date");
-    } else {
-      setOpenSearch(false);
-      router.push({
-        pathname: "/search",
-        query: {
-          location: location,
-          from: dateFrom?.toDateString(),
-          to: dateTo?.toDateString(),
-          numOfGuests: guests,
-          rooms: rooms,
-        },
-      });
-    }
+    alert("HELOO");
+    // if (location === null || location === "") {
+    //   setError("Please choose a location");
+    // } else if (dateFrom && dateTo && dateFrom >= dateTo) {
+    //   setError("Check out date must be after check in date");
+    // } else {
+    //   setOpenSearch(false);
+    //   router.push({
+    //     pathname: "/search",
+    //     query: {
+    //       location: location,
+    //       from: dateFrom?.toDateString(),
+    //       to: dateTo?.toDateString(),
+    //       numOfGuests: guests,
+    //       rooms: rooms,
+    //     },
+    //   });
+    // }
   };
   const menu = (
     <Menu
