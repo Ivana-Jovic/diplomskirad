@@ -43,21 +43,21 @@ export default function CardPopup({ property }: { property: DocumentData }) {
       <div className="card-body flex flex-col p-2">
         <div className="flex justify-between items-center ">
           <div className="flex flex items-center">
-            <p className="text-sm ">
+            <div className="text-sm ">
               {(property.totalStars / property.numberOfReviews).toFixed(1)}
-            </p>
+            </div>
             <Rating name="read-only" value={1} readOnly size="small" max={1} />
           </div>
           {/* <Heart propertyid={property.id} /> */}
         </div>
-        <p className="">
+        <div className="">
           {property.title.length < 20
             ? property.title
             : property.title.slice(0, property.title.indexOf(" ", 20)) + "..."}
-        </p>
+        </div>
         <div className=" flex items-center ">
           {property.price}€/
-          <p className="text-md text-gray-500 ">night</p>
+          <div className="text-md text-gray-500 ">night</div>
         </div>
       </div>
     </div>

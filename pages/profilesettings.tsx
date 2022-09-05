@@ -303,8 +303,8 @@ export default function ProfileSettings({
                 });
               }}
             >
-              {!wantToChangePass && <p>Change password</p>}
-              {wantToChangePass && <p>Cancel change password</p>}
+              {!wantToChangePass && <div>Change password</div>}
+              {wantToChangePass && <div>Cancel change password</div>}
             </button>
             {wantToChangePass && (
               <>

@@ -51,12 +51,14 @@ body {
   /* background-color:; */
   width: 100%;
   height: 100%;
+  color:#0f172a;
   background-color: #f8fafc;
 }
 
 a {
   /* color: #0f172a; */
-  text-decoration: none;
+  color:#0f172a !important;
+  text-decoration: none ;
 }
 a:hover {
   color: inherit;
@@ -87,7 +89,7 @@ a:hover {
   background: #161616 !important;
   border-color:#f8fafc !important;
  }
-
+/* ."MuiSvgIcon-root */
  .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline ,
   /* .MuiOutlinedInput-input .MuiInputBase-input{
      */
@@ -97,7 +99,7 @@ a:hover {
           /* .label.Mui-focused{ */
      /* m-3 .css-1u3bzj6-MuiFormControl-root-MuiTextField-root{ */
   color: #161616!important;
-  border-color: #161616;
+  border-color: #161616 !important;
 }
 /* img {
   max-width: 100%;

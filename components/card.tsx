@@ -84,22 +84,22 @@ export default function Card({
         <div className="card-body">
           <div>
             <div className="flex justify-between items-center mb-2">
-              <p className="text-xl font-semibold">
+              <div className="text-xl font-semibold">
                 {/* {name} */}
                 {name.length < 23 ? name : name.slice(0, 23) + "..."}
-              </p>
+              </div>
               {/* <Heart propertyid={propertyid} /> */}
             </div>
 
             <div className="flex justify-between items-center ">
               <div className="text-lg flex items-center">
                 {price}€/
-                <p className="text-md text-gray-500 ">night</p>
+                <div className="text-md text-gray-500 ">night</div>
               </div>
               <div className="flex items-center ">
-                <p className="text-sm font-semibold mr-1">
+                <div className="text-sm font-semibold mr-1">
                   {(totalStars / numberOfReviews).toFixed(1)}
-                </p>
+                </div>
                 <Rating
                   name="read-only"
                   value={totalStars / numberOfReviews}

@@ -353,13 +353,13 @@ export default function Search({
                       </Box>
                       <div className="mb-4  flex">
                         Price from&nbsp;
-                        <p className="font-medium">
+                        <div className="font-medium">
                           {priceRange[0] * factorPrice}e
-                        </p>
+                        </div>
                         &nbsp;to&nbsp;
-                        <p className="font-medium">
+                        <div className="font-medium">
                           {priceRange[1] * factorPrice}e
-                        </p>
+                        </div>
                       </div>
                       <StyledToggleButtonGroup
                         value={sortPrice}

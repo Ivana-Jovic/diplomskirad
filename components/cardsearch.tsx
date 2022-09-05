@@ -82,7 +82,7 @@ cursor-pointer"
       <div className="card-body">
         <div>
           <div className="flex justify-between items-center mb-2">
-            <p className="text-xl font-semibold">{name}</p>
+            <div className="text-xl font-semibold">{name}</div>
             {avgPricePerNight > parseFloat(price) && (
               <div className="text-center hidden lg:inline-block mr-3">
                 **Great deal**
@@ -90,22 +90,22 @@ cursor-pointer"
             )}
             <Heart propertyid={propertyid} />
           </div>
-          <p
+          <div
             className="text-sm text-gray-600 flex-grow mb-5
           "
           >
             {description.length < 100
               ? description
               : description.slice(0, description.indexOf(" ", 100)) + "..."}
-          </p>
+          </div>
           <div className="text-lg flex items-center  mb-2">
             {price}€/
-            <p className="text-md text-gray-500 ">night</p>
+            <div className="text-md text-gray-500 ">night</div>
           </div>
           <div className="flex justify-between items-center">
             <div className="text-sm flex items-center text-gray-500 ">
-              <p>{parseInt(price) * numberOfNights}€/</p>
-              <p className="text-sm text-gray-500 ">total</p>
+              <div>{parseInt(price) * numberOfNights}€/</div>
+              <div className="text-sm text-gray-500 ">total</div>
             </div>
             <div className="flex items-center">
               <div className="text-sm font-semibold">

@@ -4,8 +4,8 @@ export default function Footer() {
       className="bg-footer text-textFooter text-center p-5
     mt-auto  "
     >
-      <p>Ivana Jovic</p>
-      <p>Diplomski rad - 2022.</p>
+      <div>Ivana Jovic</div>
+      <div>Diplomski rad - 2022.</div>
     </footer>
   );
 }

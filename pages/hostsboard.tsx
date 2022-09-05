@@ -140,14 +140,14 @@ export default function HostsBoard({
                 return (
                   <div key={propertyid} className="grid">
                     <div className="stats stats-vertical lg:stats-horizontal shadow">
-                      <p className="text-2xl text-center m-3 font-semibold">
+                      <div className="text-2xl text-center m-3 font-semibold">
                         {property.title.length < 15
                           ? property.title
                           : property.title.slice(
                               0,
                               property.title.indexOf(" ", 15)
                             ) + "..."}
-                      </p>
+                      </div>
                       <div className="stat ">
                         <div className="stat-title">Total earnings</div>
                         <div className="stat-value">

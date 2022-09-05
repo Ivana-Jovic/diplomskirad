@@ -202,7 +202,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
       <div className="sm:px-5  md:px-10 grid grid-cols-3">
         <Link href="/">
           <a
-            className=" text-2xl text-darkGreen  font-logo
+            className=" text-2xl !text-darkGreen  font-logo
          font-semibold mr-2 cursor-pointer pl-3 "
           >
             <LocationCityIcon fontSize="large" />
