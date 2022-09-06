@@ -1,7 +1,5 @@
 import Image from "next/image";
 import {
-  addDoc,
-  collection,
   collectionGroup,
   doc,
   DocumentData,
@@ -10,19 +8,16 @@ import {
   orderBy,
   query,
   QueryDocumentSnapshot,
-  Timestamp,
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/layout";
 import { db } from "../firebase";
-import { AuthContext } from "../firebase-authProvider";
 import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
 import Heart from "../components/heart";
-import Extrawierd from "../components/extrawierd";
+import MakeAReservation from "../components/makeareservation";
 import { Rating } from "@mui/material";
-import Button from "../components/button";
 import Map2 from "../components/map2";
 import ImageGallery from "react-image-gallery";
 import CommentCard from "../components/commentcard";
@@ -38,6 +33,7 @@ import {
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import RemovedByAdmin from "../components/removedbyadmin";
+import toast from "react-hot-toast";
 
 type imgGalleryType = {
   original: string;
@@ -48,16 +44,14 @@ export default function PropertyPage({
   uid,
   isHostModeHost,
   myUserJSON,
-}: // isRemovedByAdmin,
-{
+}: {
   uid: string;
   isHostModeHost: boolean;
   myUserJSON: string;
-  // isRemovedByAdmin: boolean;
 }) {
   const myUser: DocumentData | null = uid ? JSON.parse(myUserJSON) : null; //null ako je neulogovan
   const [more, setMore] = useState<boolean>(false);
-  // const { user, myUser } = useContext(AuthContext);
+
   const router = useRouter();
   const { property: propertyid, from, to, numOfGuests } = router.query;
   const [property, setProperty] = useState<DocumentData>();
@@ -90,11 +84,9 @@ export default function PropertyPage({
       const subColl = query(
         collectionGroup(db, "comments"),
         where("propertyId", "==", pid),
-        orderBy("createdAt")
+        orderBy("createdAt", "desc")
       );
 
-      // const subDocSnap = await getDocs(subColl);
-      // const subColl = collection(db, "property", pid, "comments");
       const subDocSnap = await getDocs(subColl);
       subDocSnap.forEach((doc) => {
         comm.push(doc);
@@ -106,13 +98,8 @@ export default function PropertyPage({
   };
 
   useEffect(() => {
-    if (
-      propertyid
-      // && !isRemovedByAdmin
-    )
-      getProperty();
+    if (propertyid) getProperty();
   }, [propertyid]); //probaj i property ako ne radi
-  // if (isRemovedByAdmin) return <RemovedByAdmin />;
 
   return (
     <Layout>
@@ -235,10 +222,12 @@ export default function PropertyPage({
           </div>
 
           {uid !== "" && !isHostModeHost && !myUser?.removedByAdmin && (
-            <div className=" w-full  grid place-content-center  mb-10 ">
-              {property.adminApproved && <Extrawierd property={property} />}
+            <div className=" w-full  grid place-content-center   ">
+              {property.adminApproved && (
+                <MakeAReservation property={property} />
+              )}
               {!property.adminApproved && (
-                <div>
+                <div className="badge">
                   **It is not posible to make a reservation yet. Waiting for
                   admin approval.**
                 </div>
@@ -246,18 +235,18 @@ export default function PropertyPage({
             </div>
           )}
           {uid === "" && (
-            <div className=" w-full  grid place-content-center  mb-10 ">
+            <div className="badge w-full  grid place-content-center  mb-10 ">
               **You must be logged in to make a reservation**
             </div>
           )}
           {isHostModeHost && (
-            <div className=" w-full  grid place-content-center  mb-10 ">
+            <div className="badge w-full  grid place-content-center  mb-10 ">
               **You can&apos;t make a reservation in host mode**
             </div>
           )}
 
           {property.removedByAdmin && (
-            <div className=" w-full  grid place-content-center  mb-10 ">
+            <div className="badge w-full  grid place-content-center  mb-10 ">
               **You can&apos;t make a reservation - property removed by admin**
             </div>
           )}
@@ -290,7 +279,6 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -310,7 +298,6 @@ export async function getServerSideProps(context) {
       ) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          // isRemovedByAdmin = true;
           return {
             redirect: {
               destination: "/removedbyadmin",
@@ -335,7 +322,6 @@ export async function getServerSideProps(context) {
           uid: uid,
           isHostModeHost: true,
           myUserJSON: JSON.stringify(myUser),
-          // isRemovedByAdmin: isRemovedByAdmin,
         },
       };
     }
@@ -344,26 +330,14 @@ export async function getServerSideProps(context) {
         uid: uid,
         isHostModeHost: false,
         myUserJSON: JSON.stringify(myUser),
-        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {
-    // var isRemovedByAdmin: boolean = false;
-    // context.res.writeHead(302, { location: "/" });
-    // context.res.end();
-    // return { props: [] };
     return {
-      //ovde za neulogovanog korisnika
-      // redirect: {!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      //   destination: "/",
-      // },
-      // props: [],
       props: {
         uid: "", //not logged in
         isHostModeHost: false,
         myUserJSON: JSON.stringify(myUser), // ovde je myUser null
-
-        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   }

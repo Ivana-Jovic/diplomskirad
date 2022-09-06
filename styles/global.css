@@ -218,12 +218,14 @@ h3{
   
   }
 } */
-
+.badge{
+  @apply bg-footer p-4 text-center ;
+}
 .btn {
-  @apply  bg-footer hover:bg-footer active:bg-footer hover:text-background text-background;
+  @apply  bg-footer hover:bg-footer active:bg-footer hover:text-background !text-background;
   @apply shadow-md hover:shadow-lg active:scale-90 transition duration-150 text-center ;
 }
 .stat-value{
-  @apply font-semibold text-2xl;
+  @apply font-medium text-2xl;
 }
 .menuItem { @apply hover:opacity-80  transition duration-200 ease-out  py-1 pl-1;}

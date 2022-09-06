@@ -14,39 +14,24 @@ import ReservationCard from "../components/reservationcard";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import ErrorPage from "./errorpage";
-import {
-  isFullyRegisteredUser,
-  isHostModeHost,
-  removedByAdmin,
-} from "../lib/hooks";
-import { useContext } from "react";
-import { AuthContext } from "../firebase-authProvider";
-import RemovedByAdmin from "../components/removedbyadmin";
+import { isHostModeHost, removedByAdmin } from "../lib/hooks";
 
 export default function HostsReservations({
   uid,
   reservations,
-}: // isRemovedByAdmin,
-{
+}: {
   uid: string;
   reservations: string;
-  // isRemovedByAdmin: boolean;
-  // DocumentData[];
 }) {
   const q = query(
     collection(db, "reservations"),
     where("hostId", "==", uid),
-    orderBy("createdAt")
+    orderBy("createdAt", "desc")
   );
   const [realtimeReservations] = useCollectionData(q);
 
-  // if (isRemovedByAdmin) return <RemovedByAdmin />;
-
   const reserv: DocumentData[] =
-    realtimeReservations ||
-    //  reservations;
-    JSON.parse(reservations);
+    realtimeReservations || JSON.parse(reservations);
 
   return (
     <Layout>
@@ -84,7 +69,6 @@ export async function getServerSideProps(context) {
     const { uid, email } = token;
 
     var hasPermission: boolean = false;
-    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -92,7 +76,6 @@ export async function getServerSideProps(context) {
       if (isHostModeHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          // isRemovedByAdmin = true;
           return {
             redirect: {
               destination: "/removedbyadmin",
@@ -103,6 +86,7 @@ export async function getServerSideProps(context) {
       }
     }
     if (!hasPermission) {
+      console.log("1");
       return {
         redirect: {
           destination: "/",
@@ -114,33 +98,21 @@ export async function getServerSideProps(context) {
     const q = query(
       collection(db, "reservations"),
       where("hostId", "==", uid),
-      orderBy("createdAt")
+      orderBy("createdAt", "desc")
     );
     const querySnapshot = await getDocs(q);
-    // querySnapshot.docs.sort((a, b) => {
-    //   return a.data().createdAt - b.data().createdAt;
-    // });
-    // setArr([]);
-    // querySnapshot.forEach((doc) => {
-    //   arrData.push(doc.data());
-    // });
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       arrData.push(querySnapshot.docs[index].data());
     }
-    ////
+
     return {
       props: {
         uid: uid,
-        reservations:
-          //  arrData,
-          JSON.stringify(arrData),
-        // isRemovedByAdmin: isRemovedByAdmin,
+        reservations: JSON.stringify(arrData),
       },
     };
   } catch (err) {
-    // context.res.writeHead(302, { location: "/" });
-    // context.res.end();
-    // return { props: [] };
+    console.log("2");
     return {
       redirect: {
         destination: "/",

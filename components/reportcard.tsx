@@ -14,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { useRef, useState } from "react";
 import { db } from "../firebase";
-import Button from "./button";
+import toast from "react-hot-toast";
 
 export default function ReportCard({ report }: { report: DocumentData }) {
   const [processed, setProcessed] = useState<boolean>(report.processed);
@@ -22,7 +22,10 @@ export default function ReportCard({ report }: { report: DocumentData }) {
   const processReport = async () => {
     await updateDoc(doc(db, "reports", report.id), {
       processed: true,
-    }).then(() => setProcessed(true));
+    }).then(() => {
+      setProcessed(true);
+      toast.success("Report marked as seen");
+    });
   };
   const deleteUser = async () => {
     // if the user is removed by admin he cannot See any content
@@ -30,8 +33,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
     // but reservations already made stay there
 
     if (report.guestIsReporting) {
-      //meaning host is beeing reported -> delete his properties
-
+      //meaning host is beeing reported
       const q = query(
         collection(db, "property"),
         where("ownerId", "==", report.hostId)
@@ -45,59 +47,21 @@ export default function ReportCard({ report }: { report: DocumentData }) {
       await updateDoc(doc(db, "users", report.hostId), {
         removedByAdmin: true,
       });
-      // //meaning host is beeing reported -> delete his properties
-      // // proveri da li ovo brisanje negde remeti rezervacije,reportove
-      // const q = query(
-      //   collection(db, "property"),
-      //   where("ownerId", "==", "YSX0mxwY9CsRy4IJd8ft") // reportedUser.current  VRATI OVO
-      // );
-      // const querySnapshot = await getDocs(q);
-      // querySnapshot.forEach(async (doc1) => {
-      //   await deleteDoc(doc(db, "property", doc1.id));
-      // });
     } else {
       await updateDoc(doc(db, "users", report.guestId), {
         removedByAdmin: true,
       });
     }
-    // proveri da li ovo brisanje negde remeti rezervacije,reportove
-    // reportedUser.current // VRATI OVO
-    // await deleteDoc(doc(db, "users", "YSX0mxwY9CsRy4IJd8ft")); //Warning: Deleting a document does not delete its subcollections!
-    // obrisi usera u auth tj disable
-
-    // deleteUser(user)//  dodaj brisanje
-    //   .then(() => {
-    //     // User deleted.
-    //   })
-    //   .catch((error: any) => {
-    //     // An error ocurred
-    //     // ...
-    //   });
-    // Important: To delete a user, the user must have signed in recently. See Re-authenticate a user.
     processReport();
   };
   const deleteComment = async () => {
-    // const docSnap = await getDoc(doc(db, "reservations", report.reservationId));
-
-    // if (docSnap.exists()) {
-    // console.log(docSnap.data().propertyId, report.id);
     await updateDoc(
-      doc(
-        db,
-        "property",
-        report.propertyId,
-        // docSnap.data().propertyId,
-        "comments",
-        report.commentId
-      ),
+      doc(db, "property", report.propertyId, "comments", report.commentId),
       {
         comment: "* removed because of  inappropriate vocabulary *",
       }
     );
     processReport();
-    // .then(() => setProcessed(true));
-    // processReport  ZATSO NIJE UBACENO
-    // }
   };
 
   const deleteProperty = async () => {
@@ -158,11 +122,6 @@ export default function ReportCard({ report }: { report: DocumentData }) {
               {!processed && (
                 <div>
                   {report.reportText !== "comment" && (
-                    // <Button
-                    //   action={deleteUser}
-                    //   text="Report processed - delete this user and his properties"
-                    //   type=""
-                    // />
                     <button className="btn mt-3 w-full" onClick={deleteUser}>
                       Report processed - delete this user and his properties{" "}
                     </button>
@@ -174,18 +133,15 @@ export default function ReportCard({ report }: { report: DocumentData }) {
                         Delete comment
                       </button>
                     )}
-                    {/* <Button
-                action={processReport}
-                text="Report processed - false report"
-                type=""
-              /> */}
                     <button className="btn mt-3" onClick={processReport}>
                       Report processed - false report
                     </button>
                   </div>
                 </div>
               )}
-              {processed && <div>** PROCESSED **</div>}
+              {processed && (
+                <div className="badge mt-3 w-full">** PROCESSED **</div>
+              )}
             </div>
           </div>
         </div>
@@ -217,7 +173,9 @@ export default function ReportCard({ report }: { report: DocumentData }) {
                   </button>
                 </div>
               )}
-              {processed && <div>** PROCESSED **</div>}
+              {processed && (
+                <div className="badge mt-3 w-full">** PROCESSED **</div>
+              )}
             </div>
           </div>
         </div>

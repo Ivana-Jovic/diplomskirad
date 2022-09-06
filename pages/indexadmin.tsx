@@ -5,22 +5,31 @@ import { db } from "../firebase";
 import { isAdmin } from "../lib/hooks";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
+import { useState } from "react";
+import SimpleBackdrop from "../components/backdrop";
 
 export default function IndexAdmin() {
+  const [loading, setLoading] = useState<boolean>(false);
   return (
     <Layout>
-      {" "}
+      {loading && <SimpleBackdrop loading={loading} />}
       <div className="mt-20 flex flex-col mx-auto max-w-md  px-8 sm:px-16  text-center gap-4 ">
         <Link href="/profilesettings">
-          <a className="btn">Profile</a>
+          <a className="btn" onClick={() => setLoading(true)}>
+            Profile
+          </a>
         </Link>
 
         <Link href="/adminboard">
-          <a className="btn">Admin board</a>
+          <a className="btn" onClick={() => setLoading(true)}>
+            Admin board
+          </a>
         </Link>
 
         <Link href="/faq">
-          <a className="btn">FAQ</a>
+          <a className="btn" onClick={() => setLoading(true)}>
+            FAQ
+          </a>
         </Link>
       </div>
     </Layout>
@@ -51,7 +60,7 @@ export async function getServerSideProps(context) {
     }
 
     return {
-      props: [],
+      props: {},
     };
   } catch (err) {
     return {
@@ -60,8 +69,5 @@ export async function getServerSideProps(context) {
       },
       props: [],
     };
-    // context.res.writeHead(302, { location: "/" });
-    // context.res.end();
-    // return { props: [] };
   }
 }

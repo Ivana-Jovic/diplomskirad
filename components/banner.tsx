@@ -13,6 +13,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { alertTitleClasses, Autocomplete } from "@mui/material";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import SimpleBackdrop from "./backdrop";
 // const theme = createTheme({
 //   components: {
 //     MuiDatePicker: {
@@ -26,26 +27,24 @@ import { db } from "../firebase";
 // });
 //TODOppp na firebasu uslovi
 
-//TODOpp kad se registruje zabrani sve dok ne popuni formu
-
-//TODOp vercel
-//TODOpp mozda spineri svuda
-
-//TODO paginacija sortiranje panela po is seen i created at
-//TODO probaj ako si hostmodehost na indexu da menjas modove, da li se refreshuje
-//TODO provere
+//TODO provere i loc i vercel
 //- za dugacke titlove i descriptione svuda da li izgleda ok
 //- na raznim velicinama ekrana
 //- provere za sve pristupe plus pri promeni moda
 //- dugme za search
 //- slicno (search na search stranici yanimljivo se desava) i npr ako se admin izloguje ostace se na index admin stranici
 //- nadji gde se jos desavaju ove stvari tipa kad se admin izlogovao nije se vratilo n aindex itd
+//- kad se registruje zabrani sve dok ne popuni formu
+//-toast svuda
+// -spiner svuda kartice, dugmici
+//- indexi da li su asc ili esc
 
 export default function Banner({
   setOpenSearch,
 }: {
   setOpenSearch?: Dispatch<SetStateAction<boolean>>;
 }) {
+  const [loading, setLoading] = useState<boolean>(false);
   const [location, setLocation] = useState<string>("");
   const [guests, setGuests] = useState<number>(1);
   const [rooms, setRooms] = useState<number>(1);
@@ -86,6 +85,7 @@ export default function Banner({
           rooms: rooms,
         },
       });
+      setLoading(true);
     }
   };
 
@@ -167,6 +167,7 @@ export default function Banner({
   };
   return (
     <>
+      {loading && <SimpleBackdrop loading={loading} />}
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <div
           className="relative h-[300px] sm:h-[400px] lg:h-[500px] 

@@ -6,8 +6,6 @@ export default function ImageForm({ url }: { url: string }) {
       className="my-5 rounded-md shadow-md 
       relative h-60 w-60"
     >
-      {/* // cursor-pointer 
-      // transition transform duration-300 ease-out hover:scale-105  */}
       <Image
         src={url}
         alt=""

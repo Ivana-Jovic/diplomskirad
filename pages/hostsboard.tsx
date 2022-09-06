@@ -5,30 +5,17 @@ import {
   query,
   where,
   getDocs,
-  QueryDocumentSnapshot,
   DocumentData,
-  orderBy,
   getDoc,
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { AuthContext } from "../firebase-authProvider";
 import dynamic from "next/dynamic";
-// import FullCalendar from "@fullcalendar/react";
 import Map2 from "../components/map2";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import {
-  isFullyRegisteredUser,
-  isHostModeHost,
-  removedByAdmin,
-} from "../lib/hooks";
-import ErrorPage from "./errorpage";
-import RemovedByAdmin from "../components/removedbyadmin";
+import { isHostModeHost, removedByAdmin } from "../lib/hooks";
 
-// import { responsiveProperty } from "@mui/material/styles/cssUtils";
 const Calendar = dynamic(() => import("../components/calendar"), {
   ssr: false,
 });
@@ -36,59 +23,14 @@ const Calendar = dynamic(() => import("../components/calendar"), {
 export default function HostsBoard({
   propertiesJSON,
   propertiesIds,
-}: // isRemovedByAdmin,
-{
+}: {
   propertiesJSON: string;
   propertiesIds: string[];
-  // isRemovedByAdmin: boolean;
 }) {
-  // if (isRemovedByAdmin) return <RemovedByAdmin />;
   const properties: DocumentData[] = JSON.parse(propertiesJSON);
-  // const [showProgress, setShowProgress] = useState<boolean>(true);
-  // const { user, myUser } = useContext(AuthContext);
-  // const [arr, setArr] = useState<any[]>([]);
-  // const [arrLocation, setArrLocation] = useState<DocumentData[]>([]);
-
-  // const bljuc = useRef<string[]>([]);
-  // const getHostProperties = useCallback(async () => {
-  //   bljuc.current = [];
-  //   const arrData: any[] = [];
-  //   const q = query(
-  //     collection(db, "property"),
-  //     where("ownerId", "==", user?.uid)
-  //     // orderBy("createdAt")
-  //     //?????????????
-  //   );
-  //   console.log("--------------");
-  //   const querySnapshot = await getDocs(q);
-  //   setArr([]);
-  //   setArrLocation([]);
-  //   bljuc.current = [];
-  //   querySnapshot.forEach((doc) => {
-  //     // console.log("\\\\\\\\\\\\]", doc.id);
-  //     // arrData.push(doc.id + "---" + JSON.stringify(doc.data()));
-  //     bljuc.current.push(doc.id);
-  //     // console.log(doc.id + "---" + JSON.stringify(doc.data()));
-  //     console.log("WWWWWWWWWWWW", bljuc.current.length);
-  //     // setArr(arrData);
-
-  //     setArr((prev) => [...prev, doc]);
-  //     setArrLocation((prev) => [...prev, doc.data()]);
-  //   });
-  // }, [user?.uid]);
-
-  // useEffect(() => {
-  //   if (user)
-  //     getHostProperties().then(() => {
-  //       setShowProgress(false);
-  //     });
-  // }, [getHostProperties, user]);
 
   return (
     <Layout>
-      {/* {showProgress ? (
-        <progress className="progress w-full"></progress>
-      ) : ( */}
       <>
         <div className="pt-7 pb-5 text-center text-3xl font-bold">
           My properties
@@ -99,7 +41,6 @@ export default function HostsBoard({
               {properties.map((item: DocumentData) => {
                 const property = item;
                 const propertyid = item.id;
-                // { title, description, images, pricePerNight }
                 return (
                   <CardHostsProperty
                     key={propertyid}
@@ -124,23 +65,27 @@ export default function HostsBoard({
                 const property = item;
                 const propertyid = item.id;
                 const monthsFromDateAddedProperty = Math.ceil(
-                  //round
                   (new Date().getTime() -
                     new Date(property.createdAt).getTime()) /
-                    // dateAddedProperty
                     (1000 * 60 * 60 * 24 * 30.5)
                 );
                 const daysFromDateAddedProperty = Math.ceil(
-                  //round
                   (new Date().getTime() -
                     new Date(property.createdAt).getTime()) /
-                    // dateAddedProperty
                     (1000 * 60 * 60 * 24)
                 );
                 return (
                   <div key={propertyid} className="grid">
+                    <div className="text-2xl text-center m-3 font-bold hidden lg:inline-block">
+                      {property.title.length < 15
+                        ? property.title
+                        : property.title.slice(
+                            0,
+                            property.title.indexOf(" ", 15)
+                          ) + "..."}
+                    </div>
                     <div className="stats stats-vertical lg:stats-horizontal shadow">
-                      <div className="text-2xl text-center m-3 font-semibold">
+                      <div className="text-2xl text-center m-3 font-semibold lg:hidden">
                         {property.title.length < 15
                           ? property.title
                           : property.title.slice(
@@ -154,7 +99,6 @@ export default function HostsBoard({
                           {property.totalEarnings}e
                         </div>
                         <div className="stat-desc">
-                          {/* from {property.dateAddedProperty} */}
                           from {new Date(property.createdAt).toDateString()}
                         </div>
                       </div>
@@ -167,7 +111,6 @@ export default function HostsBoard({
                           e
                         </div>
                         <div className="stat-desc">
-                          {/* from {property.dateAddedProperty} */}
                           from {new Date(property.createdAt).toDateString()}
                         </div>
                       </div>
@@ -177,7 +120,6 @@ export default function HostsBoard({
                           {property.totalOccupancyDays} days
                         </div>
                         <div className="stat-desc">
-                          {/* from {property.dateAddedProperty} */}
                           from {new Date(property.createdAt).toDateString()}
                         </div>
                       </div>
@@ -192,7 +134,6 @@ export default function HostsBoard({
                           %
                         </div>
                         <div className="stat-desc">
-                          {/* from {property.dateAddedProperty} */}
                           from {new Date(property.createdAt).toDateString()}
                         </div>
                       </div>
@@ -228,7 +169,6 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -236,7 +176,6 @@ export async function getServerSideProps(context) {
       if (isHostModeHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          // isRemovedByAdmin = true;
           return {
             redirect: {
               destination: "/removedbyadmin",
@@ -256,12 +195,7 @@ export async function getServerSideProps(context) {
     }
     var properties: DocumentData[] = [];
     var propertiesIds: string[] = [];
-    const q = query(
-      collection(db, "property"),
-      where("ownerId", "==", uid)
-      // orderBy("createdAt")
-      //?????????????
-    );
+    const q = query(collection(db, "property"), where("ownerId", "==", uid));
 
     const querySnapshot = await getDocs(q);
 
@@ -274,7 +208,6 @@ export async function getServerSideProps(context) {
         uid: uid,
         propertiesJSON: JSON.stringify(properties),
         propertiesIds: propertiesIds,
-        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

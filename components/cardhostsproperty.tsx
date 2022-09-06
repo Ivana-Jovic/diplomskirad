@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
-import { yellow, red } from "@mui/material/colors";
 import Heart from "./heart";
 import { Rating } from "@mui/material";
 import Link from "next/link";
+import SimpleBackdrop from "./backdrop";
+import { useState } from "react";
 export default function CardHostsProperty({
   propertyid,
   name,
@@ -23,9 +23,10 @@ export default function CardHostsProperty({
   numberOfReviews: number;
 }) {
   const router = useRouter();
-
+  const [loading, setLoading] = useState<boolean>(false);
   return (
     <div>
+      {loading && <SimpleBackdrop loading={loading} />}
       <Link
         href={{
           pathname: "/propertypage",
@@ -35,6 +36,7 @@ export default function CardHostsProperty({
         }}
       >
         <a
+          onClick={() => setLoading(true)}
           className="card rounded-md bg-base-100 shadow-lg mt-3  max-w-5xl hover:opacity-90 hover:shadow-lg
   transition duration-200 ease-out rounded-b-none"
         >
@@ -83,21 +85,13 @@ export default function CardHostsProperty({
           query: { property: propertyid },
         }}
       >
-        <a className="btn mt-0 w-full rounded-t-none">Edit</a>
+        <a
+          className="btn mt-0 w-full rounded-t-none"
+          onClick={() => setLoading(true)}
+        >
+          Edit
+        </a>
       </Link>
-      {/* <button
-        className="btn mt-0 w-full rounded-t-none"
-        onClick={() => {
-          router.push({
-            pathname: "/propertysettings",
-            query: {
-              property: propertyid,
-            },
-          });
-        }}
-      >
-        Edit
-      </button> */}
     </div>
   );
 }

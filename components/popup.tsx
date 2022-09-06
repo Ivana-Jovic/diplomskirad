@@ -6,7 +6,6 @@ export default function Popup({
   content: JSX.Element;
   handleClose: any;
 }) {
-  //props:any
   return (
     <div className="grid place-items-center fixed bg-slate-200  bg-opacity-60 w-full h-screen top-0 left-0">
       <div
@@ -16,16 +15,13 @@ export default function Popup({
       text-lg sm:text-2xl font-semibold 
       flex flex-col"
       >
-        {/*//mx-auto */}
         <div
           onClick={handleClose}
-          // onClick={props.handleClose}
           className="self-end cursor-pointer bg-footer text-header rounded-3xl
            w-8 h-8 mb-3 flex justify-center items-center "
         >
           <CloseIcon />
         </div>
-        {/* {props.content} */}
         {content}
       </div>
     </div>

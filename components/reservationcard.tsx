@@ -12,7 +12,6 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import Button from "./button";
 import { db } from "../firebase";
 import Rating from "@mui/material/Rating";
 import {
@@ -22,7 +21,7 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-
+import toast from "react-hot-toast";
 // const theme = createTheme({
 //   components: {
 //     MuiDatePicker: {
@@ -87,6 +86,7 @@ export default function ReservationCard({
   isHost: boolean;
   createdAt: number;
 }) {
+  const len: number = 15;
   const [leftFB, setLeftFB] = useState<boolean>(leftFeedback);
   const [comment, setComment] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -95,32 +95,12 @@ export default function ReservationCard({
   const [reportReason, setReportReason] = useState<string>("");
 
   const leaveFeedback = async () => {
-    if (comment === "") {
+    if (!isHost && comment === "") {
       setError("Please enter a comment.");
       return;
     }
     console.log("OH NOOOOO");
     const propertiesRef = collection(db, "property");
-    // const docRef = await setDoc(
-    //   doc(
-    //     collection(
-    //       db,
-    //       "property/" + propertiesRef + "/" + propertyId + "/" + "comments"
-    //     )
-    //     // Timestamp.now().seconds
-    //   ),
-
-    //   {
-    //     comment: comment,
-    //     stars: stars ? stars : 1,
-    //     userId: userId,
-    //     firstName: firstName,
-    //     lastName: lastName,
-    //     date: to,
-    //     reservationId: reservationId,
-    //     createdAt: Timestamp.now(),
-    //   }
-    // )
     const docRef = await addDoc(
       collection(propertiesRef, propertyId, "comments"),
       {
@@ -174,7 +154,7 @@ export default function ReservationCard({
         });
       }
     }
-
+    toast.success("Left feedback successfully");
     if (reportOpen) {
       report();
     }
@@ -188,13 +168,9 @@ export default function ReservationCard({
   const report = async () => {
     const docRef = await addDoc(collection(db, "reports"), {
       guestId: userId,
-      // guestFirstName: firstName,
-      // guestLastName: lastName,
       reservationId: reservationId,
       propertyId: propertyId,
       hostId: hostId,
-      // reportedFirstName: myUser.firstName,
-      // reportedLastName: myUser.lastName,
       guestIsReporting: !isHost,
       reportText: reportReason,
       processed: false,
@@ -203,64 +179,102 @@ export default function ReservationCard({
     await updateDoc(doc(db, "reports", docRef.id), {
       id: docRef.id,
     });
+    toast.success("Reported successfully");
   };
 
   return (
     <div
       className={
-        `card rounded-md shadow-lg my-3  max-w-5xl h-96 ` +
+        `card rounded-md shadow-lg my-3  max-w-5xl h-[400px] ` +
         `${new Date(to) <= new Date() ? " bg-[#f1efef]" : " bg-[#eff5ef]"}`
       }
     >
       <div className="card-body">
         <div>
-          <div className="text-center  text-xl font-semibold">
-            {new Date(to) <= new Date() ? (
-              ""
-            ) : (
-              <div className="badge p-4 mb-3 bg-footer">** UPCOMING **</div>
-            )}
-          </div>
-          <div className="text-xl font-semibold text-center  mb-3">{title}</div>
-          {/* <div>{item.data().propertyId}</div> */}
-          <div className="flex text-lg font-semibold justify-center text-center items-center">
-            <div>{user}</div>
-            <div className="text-xs">-{userId}</div>
-          </div>
-          <div className="text-center text-xs">
-            Created at: {new Date(createdAt).toDateString()}
-            {/* // toLocaleString()} ne moye ovo */}
-          </div>
-          <div className="text-center text-xs">
-            Reservation number: {reservationId}
-          </div>
-          <div className="text-center text-xs">Propertyid:{propertyId}</div>
-          <div className="text-lg font-semibold text-center mb-5">
+          {/* <div className="text-lg font-semibold text-center mb-5">
             {from} -{to}
           </div>
+          <div className="flex text-center text-xs">
+            <div className="text-md font-semibold"> Reservation number:</div>
+            {reservationId}
+          </div>
+          <div className="flex text-center text-xs">
+            <div className="text-md font-semibold">Created at:</div>
+            {new Date(createdAt).toDateString()}
+          </div>
+          <div className="flex ">
+            <div className="text-md font-semibold">{user}</div>
+            {userId}
+          </div>
+          <div className="flex text-center text-xs">
+            <div className="text-md font-semibold">Propertyid:</div>
+            {propertyId}
+          </div> */}
           <div className="w-full overflow-x-auto">
             <table className="w-full">
               <tbody>
                 <tr>
-                  <td>Total:</td>
-                  <td>{total}e</td>
+                  <td className="text-md font-semibold">Reservation number:</td>
+                  <td>
+                    {reservationId?.length < len
+                      ? reservationId
+                      : reservationId?.slice(0, len) + "..."}
+                  </td>
                 </tr>
                 <tr>
-                  <td>Guests:</td>
+                  <td className="text-md font-semibold">Property id:</td>
+                  <td>
+                    {propertyId?.length < len
+                      ? propertyId
+                      : propertyId?.slice(0, len) + "..."}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="text-md font-semibold">User id:</td>
+                  <td>
+                    {userId?.length < len
+                      ? userId
+                      : userId?.slice(0, len) + "..."}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="text-md font-semibold">Created at:</td>
+                  <td> {new Date(createdAt).toDateString()}</td>
+                </tr>
+                <tr>
+                  <td className="text-md font-semibold">From:</td>
+                  <td>{from}</td>
+                </tr>
+                <tr>
+                  <td className="text-md font-semibold">To:</td>
+                  <td>{to}</td>
+                </tr>
+                <tr>
+                  <td className="text-md font-semibold">Total:</td>
+                  <td>{total}€</td>
+                </tr>
+                <tr>
+                  <td className="text-md font-semibold">Total:</td>
+                  <td>{total}€</td>
+                </tr>
+                <tr>
+                  <td className="text-md font-semibold">Guests:</td>
                   <td> {guests}</td>
                 </tr>
                 <tr>
-                  <td>Garage:</td>
+                  <td className="text-md font-semibold">Garage:</td>
                   <td>{garage ? "YES" : "NO"}</td>
                 </tr>
                 <tr>
-                  <td> Time of check in/out:</td>
+                  <td className="text-md font-semibold">
+                    Time of check in/out:
+                  </td>
                   <td>
                     {timeCheckIn}-{timeCheckOut}
                   </td>
                 </tr>
                 <tr>
-                  <td>Special request:</td>
+                  <td className="text-md font-semibold">Special request:</td>
                   <td>{specialReq ? specialReq : "none"}</td>
                 </tr>
               </tbody>
@@ -274,8 +288,7 @@ export default function ReservationCard({
                     <label
                       htmlFor="my-modal-3"
                       className="btn btn-active border-none
-                      
-                      shadow-md 
+                    shadow-md  w-full
                       hover:shadow-lg active:scale-90 transition duration-150"
                     >
                       {isHost ? "Report" : "Leave feedback"}
@@ -320,11 +333,6 @@ export default function ReservationCard({
                           )}
                           <div className="flex flex-col">
                             {!isHost && (
-                              // <Button
-                              //   action={() => setReportOpen(!reportOpen)}
-                              //   text="Do you want to report?"
-                              //   type=""
-                              // />
                               <button
                                 className="btn mt-3"
                                 onClick={() => setReportOpen(!reportOpen)}
@@ -332,11 +340,7 @@ export default function ReservationCard({
                                 Do you want to report?
                               </button>
                             )}
-                            {/* <Button //ako je vlasnik onda ne ostavlja feedback vec samo reportuje
-                            action={leaveFeedback}
-                            text={isHost ? "Report" : "Leave feedback"}
-                            type=""
-                          /> */}
+
                             {reportOpen && (
                               <div className="mt-3">
                                 <FormControl>
@@ -359,7 +363,6 @@ export default function ReservationCard({
                                       value="behavior"
                                       control={<Radio />}
                                       label="Inappropriate behavior"
-                                      // checked
                                     />
                                     {isHost && (
                                       <FormControlLabel
@@ -382,7 +385,6 @@ export default function ReservationCard({
                                     />
                                   </RadioGroup>
                                 </FormControl>
-                                {/* <Button action={report} text="Report" type="" /> */}
                               </div>
                             )}
                             <button
@@ -399,6 +401,13 @@ export default function ReservationCard({
                   </>
                 )}
               </div>
+            )}
+          </div>
+          <div className="text-center  text-xl font-semibold mt-5 ">
+            {new Date(to) <= new Date() ? (
+              ""
+            ) : (
+              <div className="badge !p-5  bg-footer w-full">** UPCOMING **</div>
             )}
           </div>
         </div>

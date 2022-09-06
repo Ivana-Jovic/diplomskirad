@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import Layout from "../components/layout";
 import {
   collection,
@@ -8,13 +8,10 @@ import {
   getDoc,
   Timestamp,
   updateDoc,
-  increment,
   DocumentData,
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
-import Button from "../components/button";
 import ErrorPage from "./errorpage";
-import { AuthContext } from "../firebase-authProvider";
 import { InputAdornment, MenuItem, TextField } from "@mui/material";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import Map from "../components/map";
@@ -29,8 +26,9 @@ import {
 } from "../lib/hooks";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import RemovedByAdmin from "../components/removedbyadmin";
+
+import toast from "react-hot-toast";
+import SimpleBackdrop from "../components/backdrop";
 
 type IFormInput = {
   title: string;
@@ -49,14 +47,10 @@ type IFormInput = {
 
 export default function AddProperty({
   uid,
-  // UserEmail,
   myUserJSON,
-}: // isRemovedByAdmin,
-{
+}: {
   myUserJSON: string;
   uid: string;
-  // isRemovedByAdmin: boolean;
-  // UserEmail: string;
 }) {
   const [loc, setLoc] = useState<any>();
   const [urlArr, setUrlArr] = useState<string[]>([]);
@@ -89,10 +83,8 @@ export default function AddProperty({
     },
   });
   const router = useRouter();
-  // if (isRemovedByAdmin) return <RemovedByAdmin />;
-
+  const [loading, setLoading] = useState<boolean>(false);
   const myUser: DocumentData = JSON.parse(myUserJSON);
-  // const { user, myUser } = useContext(AuthContext);
   const imgNew: File[] = Array.from(watch("picturesNEW"));
 
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
@@ -127,14 +119,28 @@ export default function AddProperty({
     ) {
       setError("You must upload 3 to 10 picures at most");
     } else {
-      add(data).then((ret) => {
-        console.log(ret);
-        if (ret) {
-          router.push({
-            pathname: "/",
-          });
-        } else console.log("RETURNED FALSE subm");
-      });
+      const ret = add(data);
+      console.log(ret);
+      if (ret) {
+        toast.success("Property added successfully");
+        setLoading(true);
+        router.push({
+          pathname: "/",
+        });
+      } else {
+        console.log("RETURNED FALSE subm");
+        toast.error("Property not added successfully");
+      }
+
+      // add(data).then((ret) => {
+      //   console.log(ret);
+      //   if (ret) {
+      //     toast.success("Reservation successful");
+      //     router.push({
+      //       pathname: "/",
+      //     });
+      //   } else console.log("RETURNED FALSE subm");
+      // });
     }
   };
 
@@ -242,6 +248,7 @@ export default function AddProperty({
         myUser && myUser.numberOfProperties < 10 ? (
           <>
             <Layout>
+              {loading && <SimpleBackdrop loading={loading} />}
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="max-w-7xl px-5 mx-auto text-center gap-4">
                   <div className="pt-7 pb-5 text-center text-3xl font-bold">
@@ -408,41 +415,7 @@ export default function AddProperty({
                         </>
                       )}
                     />
-                    {/* <Controller
-                    name="addPers"
-                    control={control}
-                    rules={{ required: "Please enter a value" }}
-                    render={({ field: { onChange, value } }) => (
-                      <>
-                        <TextField
-                          //  {...register("lastName", {
-                          //   required: "Please enter your last name",
-                          // })}
-                          className="mx-3 mb-2"
-                          id="outlined-required"
-                          label="Additional price per person per night"
-                          value={value}
-                          inputProps={{
-                            inputMode: "numeric",
-                            pattern: "[0-9]*",
-                          }}
-                          onChange={(e) => {
-                            onChange(
-                              e.target.value ? parseInt(e.target.value) : 0
-                            );
-                          }}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">€</InputAdornment>
-                            ),
-                          }}
-                          helperText={
-                            errors.addPers ? errors.addPers.message : " "
-                          }
-                        />
-                      </>
-                    )}
-                   /> */}
+
                     <Controller
                       name="addCosts"
                       control={control}
@@ -513,7 +486,6 @@ export default function AddProperty({
                       )}
                     />
                   </div>
-                  {/* <div className="mb-2"></div> */}
 
                   {!selectedStreet && (
                     <div className="pt-7 pb-5 text-center text-lg font-bold">
@@ -529,12 +501,6 @@ export default function AddProperty({
                       setStreetNum={setStreetNum}
                       setSelectedStreet={setSelectedStreet}
                     />
-                    {/* {loc && (
-                    <div>
-                      {JSON.parse(loc.split("-")[0])}-
-                      {JSON.parse(loc.split("-")[1])}
-                    </div>
-                  )} */}
                   </div>
                   <div className="grid sm:grid-cols-2 gap-3 sm:gap-3 grid-cols-1 mt-14">
                     <TextField
@@ -620,24 +586,11 @@ export default function AddProperty({
                           );
                         })}
                     </div>
-
-                    {/* // ((item, index) => { */}
-                    {/* //   return (
-                  //     <div key={item.name}>
-                  //       <ImageForm url={URL.createObjectURL(imgNew[index])} />
-                  //     </div>
-                  //   );
-                  // })} */}
                   </div>
                   <div className="pt-7 pb-5 text-center text-sm font-thin">
                     {error}
                   </div>
-                  {/* <Button
-                  action={() => {
-                  }}
-                  text="Add"
-                  type="submit"
-                /> */}
+
                   <button
                     className="btn mx-auto text-center w-full"
                     type="submit"
@@ -651,12 +604,9 @@ export default function AddProperty({
         ) : (
           <>
             <ErrorPage />
-            {
-              // user &&
-              myUser && myUser.numberOfProperties >= 10 && (
-                <div>Maximum number of properties is 10</div>
-              )
-            }
+            {myUser && myUser.numberOfProperties >= 10 && (
+              <div>Maximum number of properties is 10</div>
+            )}
           </>
         )
       }
@@ -672,7 +622,6 @@ export async function getServerSideProps(context) {
 
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -688,7 +637,6 @@ export async function getServerSideProps(context) {
       if (isHostModeHost(myUser) || isLoggedUser(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          // isRemovedByAdmin = true;
           return {
             redirect: {
               destination: "/removedbyadmin",
@@ -709,9 +657,7 @@ export async function getServerSideProps(context) {
     return {
       props: {
         uid: uid,
-        // myUser: JSON.stringify(myUser),
         myUserJSON: JSON.stringify(myUser),
-        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {

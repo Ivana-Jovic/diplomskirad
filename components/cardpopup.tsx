@@ -8,27 +8,6 @@ import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 export default function CardPopup({ property }: { property: DocumentData }) {
   const router = useRouter();
-
-  // const goToPropertyPage = () => {
-  //   if (router && router.pathname == "/search") {
-  //     router.push({
-  //       pathname: "/propertypage",
-  //       query: {
-  //         property: property.id,
-  //         from: router.query.from,
-  //         numOfGuests: router.query.numOfGuests,
-  //         to: router.query.to,
-  //       },
-  //     });
-  //   } else {
-  //     router.push({
-  //       pathname: "/propertypage",
-  //       query: {
-  //         property: property.id,
-  //       },
-  //     });
-  //   }
-  // };
   return (
     <div className="card card-side  p-2 rounded-md  cursor-pointer bg-base-100 shadow-md hover:opacity-90 hover:shadow-lg">
       <figure className="relative h-auto w-1/3  flex-shrink-0">
@@ -37,18 +16,16 @@ export default function CardPopup({ property }: { property: DocumentData }) {
           alt={property.id}
           layout="fill"
           objectFit="cover"
-          // objectPosition="bottom"
         />
       </figure>
       <div className="card-body flex flex-col p-2">
         <div className="flex justify-between items-center ">
-          <div className="flex flex items-center">
+          <div className="flex items-center">
             <div className="text-sm ">
               {(property.totalStars / property.numberOfReviews).toFixed(1)}
             </div>
             <Rating name="read-only" value={1} readOnly size="small" max={1} />
           </div>
-          {/* <Heart propertyid={property.id} /> */}
         </div>
         <div className="">
           {property.title.length < 20

@@ -27,19 +27,11 @@ import RemovedByAdmin from "../components/removedbyadmin";
 export default function GuestBoard({
   uid,
   reservations,
-}: // isRemovedByAdmin,
-{
+}: {
   uid: string;
   reservations: string;
-  // isRemovedByAdmin: boolean;
-  // DocumentData[]; //RADILO SA string
 }) {
-  // if (isRemovedByAdmin) return <RemovedByAdmin />;
-
-  const reserv: DocumentData[] =
-    // reservations;
-    JSON.parse(reservations);
-  // console.log(reserv);
+  const reserv: DocumentData[] = JSON.parse(reservations);
 
   return (
     <Layout>
@@ -49,7 +41,7 @@ export default function GuestBoard({
           <div className="pt-7 pb-5 text-center text-3xl font-bold">
             My reservations
           </div>
-          <div className="flex flex-col ">
+          <div className="grid  lg:grid-cols-2 grid-cols-1 gap-4 ">
             {Array.from(reserv).map((item, index) => {
               return (
                 <div key={index}>
@@ -76,7 +68,6 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -92,7 +83,6 @@ export async function getServerSideProps(context) {
       if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          // isRemovedByAdmin = true;
           return {
             redirect: {
               destination: "/removedbyadmin",
@@ -114,13 +104,10 @@ export async function getServerSideProps(context) {
     const q = query(
       collection(db, "reservations"),
       where("userId", "==", uid),
-      orderBy("createdAt")
+      orderBy("createdAt", "desc")
     );
 
     const querySnapshot = await getDocs(q);
-    // querySnapshot.forEach((doc) => {
-    //   arrData.push(doc.data());
-    // });
 
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       arrData.push(querySnapshot.docs[index].data());
@@ -128,19 +115,10 @@ export async function getServerSideProps(context) {
     return {
       props: {
         uid: uid,
-        // reservations: { ...{ ...arrData } },
-        reservations:
-          // arrData,
-          JSON.stringify(arrData),
-        // isRemovedByAdmin: isRemovedByAdmin,
-        // reservations: { ...{ ...querySnapshot.docs } },
-        // session: "Your email is ${email} and your UID is ${uid}",
+        reservations: JSON.stringify(arrData),
       },
     };
   } catch (err) {
-    // context.res.writeHead(302, { location: "/" });
-    // context.res.end();
-    // return { props: [] };
     return {
       redirect: {
         destination: "/",

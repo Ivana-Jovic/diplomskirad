@@ -4,7 +4,6 @@ import { db } from "../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import CardSearch from "../components/cardsearch";
-import Loader from "../components/loader";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -19,47 +18,16 @@ import RemovedByAdmin from "../components/removedbyadmin";
 
 export default function Wishlist({
   propertiesJSON,
-}: // isRemovedByAdmin,
-// hasPermission,
-{
+}: {
   propertiesJSON: string;
-  // isRemovedByAdmin: boolean;
-  // hasPermission: boolean;
 }) {
-  // if (isRemovedByAdmin) return <RemovedByAdmin />;
   const faves: DocumentData[] = JSON.parse(propertiesJSON);
-  // const { user, myUser } = useContext(AuthContext);
-  // const [faves, setFaves] = useState<any[]>([]);
-  // const [showProgress, setShowProgress] = useState<boolean>(true);
-  // const getFaves = async () => {
-  //   const arrData: any[] = [];
-  //   myUser.faves.forEach(async (item: any) => {
-  //     const docSnap = await getDoc(doc(db, "property", item));
 
-  //     if (docSnap.exists()) {
-  //       arrData.push(docSnap);
-  //     }
-  //     setFaves(arrData);
-  //   });
-  // };
-  // useEffect(() => {
-  //   if (myUser)
-  //     getFaves().then(() => {
-  //       setShowProgress(false);
-  //     });
-  // }, [user, myUser]);
-  // if (!hasPermission)
-  //   return (
-  //     <>
-  //       <ErrorPage />
-  //     </>
-  //   );
   return (
     <Layout>
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
         <div>
           <div className="flex flex-col mt-10 ">
-            {/* {showProgress && <progress className="progress w-full"></progress>} */}
             <div className="pt-7 pb-5 text-center text-3xl font-bold">
               Wishlist
             </div>
@@ -73,7 +41,6 @@ export default function Wishlist({
                     description={property.description}
                     image={property.images[0]}
                     price={property.pricePerNight}
-                    // stars="5"
                     totalStars={property.totalStars}
                     numberOfReviews={property.numberOfReviews}
                     numberOfNights={0}
@@ -96,7 +63,6 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -112,7 +78,6 @@ export async function getServerSideProps(context) {
       if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          // isRemovedByAdmin = true;
           return {
             redirect: {
               destination: "/removedbyadmin",
@@ -149,7 +114,6 @@ export async function getServerSideProps(context) {
       props: {
         uid: uid,
         propertiesJSON: JSON.stringify(properties),
-        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {
@@ -159,8 +123,5 @@ export async function getServerSideProps(context) {
       },
       props: [],
     };
-    // context.res.writeHead(302, { location: "/" });
-    // context.res.end();
-    // return { props: [] };
   }
 }

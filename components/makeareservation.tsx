@@ -1,20 +1,14 @@
 import type {} from "@mui/x-date-pickers/themeAugmentation";
-
-// import Wierder from "./wierder";
 import {
   addDoc,
   collection,
   doc,
   DocumentData,
   getDoc,
-  getDocs,
-  query,
   Timestamp,
   updateDoc,
-  where,
 } from "firebase/firestore";
 import { MenuItem, Rating, TextField } from "@mui/material";
-// Menu,
 import { useContext, useState } from "react";
 import { useRouter } from "next/router";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -22,7 +16,6 @@ import {
   DatePicker,
   LocalizationProvider,
   MobileTimePicker,
-  TimePicker,
 } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { AuthContext } from "../firebase-authProvider";
@@ -31,45 +24,21 @@ import { Dropdown, Menu, Space } from "antd";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
-import Button from "./button";
 import { isAvailable } from "../lib/hooks";
+import toast from "react-hot-toast";
+
 type IFormInput = {
   garage: boolean;
   specialReq: string;
   timeFrom: Date;
   timeTo: Date;
 };
-//PAZI OVO JE COPY PASE FJA IZ SEARCHA
-// async function isAvailable(from: Date, to: Date, propertyId: string) {
-//   const querySnapshot6 = await getDocs(
-//     query(collection(db, "reservations"), where("propertyId", "==", propertyId))
-//   );
-//   for (let index = 0; index < querySnapshot6.docs.length; index++) {
-//     const doc = querySnapshot6.docs[index];
-//     console.log("KK ", propertyId, index, doc.id);
 
-//     //oni koji se potencijalno poklapaju
-//     if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
-//       //ne poklapaju se
-//     } else {
-//       //poklapaju se kako god
-//       //ako je doc.to izmedju to i from poklapaju se sigurno
-//       //ako doc.to vece od to poklapaju se  ako je from iymedju ili pre from
-//       //
-//       console.log(
-//         "ELSE GRANA",
-//         propertyId,
-//         from.toDateString(),
-//         to.toDateString()
-//       );
-//       console.log("IS AVAILABLE JE FALSE", doc.id);
-//       return false;
-//     }
-//   }
-//   console.log("IS AVAILABLE JE TRUE");
-//   return true;
-// }
-export default function Extrawierd({ property }: { property: DocumentData }) {
+export default function MakeAReservation({
+  property,
+}: {
+  property: DocumentData;
+}) {
   const {
     control,
     handleSubmit,
@@ -111,23 +80,33 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
   const { user, myUser } = useContext(AuthContext);
   const [error, setError] = useState<string>("");
   const tryToReserve = async (data: IFormInput) => {
-    // if (!router || !router.query || !router.query.from || !router.query.to) {
-    isAvailable(dateFrom, dateTo, prId).then((isAv) => {
-      if (!isAv) {
-        console.log(" POKLAPAJU SE");
-        setError("NOT AVAILABLE, please select other dates");
-      } else {
-        console.log("NE POKLAPAJU SE");
-        reserve(data);
+    const isAv = await isAvailable(dateFrom, dateTo, prId);
+    if (!isAv) {
+      console.log(" POKLAPAJU SE");
+      setError("Not available, please select other dates");
+    } else {
+      console.log("NE POKLAPAJU SE");
+      const re = await reserve(data);
+      if (re) {
+        toast.success("Reservation successful");
+        return;
       }
-    });
-    // } else {
-    //   reserve(data);
-    // }
+    }
+    toast.error("Reservation NOT successful");
+    // isAvailable(dateFrom, dateTo, prId).then(async (isAv) => {
+    //   if (!isAv) {
+    //     console.log(" POKLAPAJU SE");
+    //     setError("NOT AVAILABLE, please select other dates");
+    //   } else {
+    //     console.log("NE POKLAPAJU SE");
+    //     await reserve(data);
+    //   }
+    // });
   };
   const reserve = async (data: IFormInput) => {
     if (dateFrom && dateTo && dateFrom >= dateTo) {
       setError("Check out date must be after check in date");
+      return false;
     } else {
       const docSnap = await getDoc(doc(db, "property", prId));
       let title = "";
@@ -137,6 +116,7 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
         console.log("--------------------!");
       } else {
         console.log("-------------No such document!");
+        return false;
       }
 
       console.log(data.timeFrom, data.timeFrom.getHours());
@@ -155,7 +135,6 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
         userId: user.uid,
         firstName: myUser.firstName,
         lastName: myUser.lastName,
-        // user: myUser.username,
         hostId: property.ownerId,
         from: dateFrom?.toDateString(),
         to: dateTo?.toDateString(),
@@ -179,6 +158,8 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
       await updateDoc(doc(db, "reservations", docRef.id), {
         id: docRef.id,
       });
+
+      return true;
     }
   };
   const menu = (
@@ -233,12 +214,12 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
   };
   return (
     <>
+      {/*  */}
       <div
-        className="relative w-80 xs:w-96 h-[600px] sm:h-[600px] lg:h-[600px] 
-    xl:h-[600px] 2xl:h-[700px]  "
+        className="relative w-80 xs:w-96  h-[700px] sm:h-[700px] lg:h-[700px] 
+    xl:h-[700px] 2xl:h-[700px] "
       >
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          {/* grid place-items-center max-w-md  */}{" "}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div
               className={`absolute flex  flex-col  items-center rounded-3xl border-2 border-solid py-5  text-xl justify-around bg-background opacity-95 pr-7 pl-7 `}
@@ -273,13 +254,11 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 </a>
               </Dropdown>
               <div className="flex justify-between w-full gap-3 mt-5 mb-3">
-                {/* <div className="mr-3"> */}
                 <DatePicker
                   // disabled
                   disablePast
                   label="Check in"
                   inputFormat="dd/MM/yyyy"
-                  // views={["year", "month", "day"]}
                   value={dateFrom}
                   onChange={(newValue) => {
                     setDateFrom(newValue);
@@ -289,10 +268,8 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                   }}
                   renderInput={(params) => <TextField {...params} />}
                 />
-                {/* </div> */}
 
                 <DatePicker
-                  // disabled
                   disablePast
                   shouldDisableDate={(date: Date) => {
                     if (dateTo && dateFrom && date <= dateFrom) {
@@ -352,13 +329,9 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 <Controller
                   name="timeFrom"
                   control={control}
-                  // rules={{ required: "Please enter a value" }}
                   render={({ field: { onChange, value } }) => (
                     <>
                       <MobileTimePicker
-                        // {...register("timeFrom", {
-                        //   // required: "Please enter if you need a garage",
-                        // })}
                         renderInput={(params) => <TextField {...params} />}
                         label="Time of check in"
                         value={value}
@@ -373,13 +346,9 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 <Controller
                   name="timeTo"
                   control={control}
-                  // rules={{ required: "Please enter a value" }}
                   render={({ field: { onChange, value } }) => (
                     <>
                       <MobileTimePicker
-                        // {...register("timeTo", {
-                        //   // required: "Please enter if you need a garage",
-                        // })}
                         className="w-full"
                         renderInput={(params) => <TextField {...params} />}
                         label="Time of check out"
@@ -394,12 +363,6 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                 />
               </div>
               <div className="w-full  my-3">
-                {/* <Controller
-  name="desc"
-  control={control}
-  rules={{ required: "Please enter a description" }}
-  render={({ field: { onChange, value } }) => (
-    <> */}
                 <TextField
                   {...register("specialReq")}
                   className="w-full"
@@ -407,17 +370,8 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                   label="Special requests"
                   multiline
                   maxRows={15}
-                  // value={value}
-                  // onChange={(e) => {
-                  //   onChange(e.target.value);
-                  // }}
                   InputLabelProps={{ shrink: true }}
-                  // helperText={errors.specialReq ? errors.specialReq.message : " "}
                 />
-                {/* </>
-  )}
-/> */}
-                {/* </div> */}
               </div>
 
               <div className="w-full mt-5 text-sm">
@@ -440,12 +394,12 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                             (1000 * 60 * 60 * 24)
                         )
                       : 0}
-                    e
+                    €
                   </div>
                 </div>
                 <div className="flex justify-between px-10 my-2">
                   <div>Service fee</div>
-                  <div>{property.additionalCosts}e</div>
+                  <div>{property.additionalCosts}€</div>
                 </div>
                 <hr />
                 <div className="flex justify-between px-10 my-3">
@@ -459,19 +413,16 @@ export default function Extrawierd({ property }: { property: DocumentData }) {
                           ) +
                         property.additionalCosts
                       : 0}
-                    e
+                    €
                   </div>
                 </div>
                 <hr />
                 <hr />
               </div>
-              {/* <div className="">
-                <Button action={() => {}} text="Reserve" type="submit" />
-              </div> */}
               <button className="btn mt-5" type="submit">
                 Reserve
               </button>
-              {error}
+              <div className="text-center mt-3">{error}</div>
             </div>
           </form>
         </LocalizationProvider>

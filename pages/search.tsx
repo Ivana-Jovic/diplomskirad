@@ -91,37 +91,8 @@ function valuetext(value: number) {
   return `${value}€`;
 }
 
-// async function isAvailable(from: Date, to: Date, propertyId: string) {
-//   const querySnapshot6 = await getDocs(
-//     query(collection(db, "reservations"), where("propertyId", "==", propertyId))
-//   );
-//   for (let index = 0; index < querySnapshot6.docs.length; index++) {
-//     const doc = querySnapshot6.docs[index];
-//     //oni koji se potencijalno poklapaju
-//     if (new Date(doc.data().to) <= from || new Date(doc.data().from) >= to) {
-//       //ne poklapaju se
-//     } else {
-//       //poklapaju se kako god
-//       //ako je doc.to izmedju to i from poklapaju se sigurno
-//       //ako doc.to vece od to poklapaju se  ako je from iymedju ili pre from
-//       //
-//       console.log(
-//         "ELSE GRANA",
-//         propertyId,
-//         from.toDateString(),
-//         to.toDateString()
-//       );
-//       return false;
-//     }
-//   }
-//   return true;
-// }
 export default function Search({
-  // isRemovedByAdmin,
-  // uid,
   location,
-  // fromDateJSON,
-  // toDateJSON,
   fromStr,
   toStr,
   rooms,
@@ -130,8 +101,6 @@ export default function Search({
   sumPricesPropertiesLocation,
   ppp,
 }: {
-  // isRemovedByAdmin: boolean;
-  // uid: string;
   location: string;
   fromStr: string;
   toStr: string;
@@ -176,11 +145,8 @@ export default function Search({
   };
 
   const filterProperties = (item: DocumentData) => {
-    //any
     const property = item;
     const propertyid = item.id;
-    //if selectedSuperhost and isSuperhost
-    // or !selectedSuperhost   -> SHOULD BE SHOWN
     console.log(
       "PRICE",
       property.pricePerNight,
@@ -281,7 +247,6 @@ export default function Search({
     sortPrice,
   ]);
 
-  // if (isRemovedByAdmin) return <RemovedByAdmin />;
   return (
     <Layout
       placeholder={
@@ -318,14 +283,9 @@ export default function Search({
                   "
                 >
                   <li>
-                    {/* hover:bg-inherit*/}
                     <div className="mt-10 flex flex-col w-52 sm:w-80  !bg-transparent">
-                      <Box
-                        sx={{ width: "90%" }}
-                        // className="w-80 sm:w-80"
-                      >
+                      <Box sx={{ width: "90%" }}>
                         <AirbnbSlider
-                          // className="w-52 sm:w-80"
                           getAriaLabel={() => "Price range"}
                           value={priceRange}
                           onChange={(e: Event, newValue: number | number[]) => {
@@ -450,10 +410,10 @@ export default function Search({
               {filteredArr.length}
             </div>
           </div>
-        </section>{" "}
+        </section>
         {filteredArr && filteredArr.length === 0 && (
-          <div className="text-center">**No search results**</div>
-        )}{" "}
+          <div className=" badge text-center">**No search results**</div>
+        )}
       </div>
     </Layout>
   );
@@ -471,8 +431,6 @@ async function getEverything(context) {
   const toDate = new Date(queryUrl.to as string);
   const rooms = (queryUrl.rooms ?? 0) as number;
   const numOfGuests = (queryUrl.numOfGuests ?? 0) as number;
-  // const qs44: string[] = [];
-  // const qs33: string[] = [];
 
   const querySnapshot1 = await getDocs(
     query(collection(db, "property"), where("city", "==", location))
@@ -537,7 +495,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -553,7 +510,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          // isRemovedByAdmin = true;
           return {
             redirect: {
               destination: "/removedbyadmin",
@@ -573,55 +529,33 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     }
     const returns: ReturnType = await getEverything(context);
-    // console.log("wwwwwwwwwww", arr);
+
     return {
       props: {
-        // uid: uid,
-
-        // isRemovedByAdmin: isRemovedByAdmin,
         location: returns.location,
-        // fromDateJSON: JSON.stringify(fromDate),
-        // toDateJSON: JSON.stringify(toDate),
         fromStr: returns.from,
         toStr: returns.to,
         rooms: returns.rooms,
         numOfGuests: returns.numOfGuests,
         numPropertiesLocation: returns.numPropertiesLocation,
         sumPricesPropertiesLocation: returns.sumPricesPropertiesLocation,
-        ppp: JSON.stringify(returns.arr), //mozda json stringify JSON.stringify(arr),
+        ppp: JSON.stringify(returns.arr),
       },
     };
   } catch (err) {
-    // var isRemovedByAdmin: boolean = false;
-    // return {
-    //   // redirect: {!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //   //   destination: "/",
-    //   // },
-    //   // props: [],
-    //   props: {
-    //     uid: "",
-    //   },
-    // };
     const returns: ReturnType = await getEverything(context);
-    // console.log("wwwwwwwwwww", arr);
+
     return {
       props: {
-        // isRemovedByAdmin: isRemovedByAdmin,
-        // uid: uid,
         location: returns.location,
-        // fromDateJSON: JSON.stringify(fromDate),
-        // toDateJSON: JSON.stringify(toDate),
         fromStr: returns.from,
         toStr: returns.to,
         rooms: returns.rooms,
         numOfGuests: returns.numOfGuests,
         numPropertiesLocation: returns.numPropertiesLocation,
         sumPricesPropertiesLocation: returns.sumPricesPropertiesLocation,
-        ppp: JSON.stringify(returns.arr), //mozda json stringify JSON.stringify(arr),
+        ppp: JSON.stringify(returns.arr),
       },
-      // context.res.writeHead(302, { location: "/" });
-      // context.res.end();
-      // return { props: [] };
     };
   }
 };

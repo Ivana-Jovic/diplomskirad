@@ -2,65 +2,62 @@ import Layout from "../components/layout";
 import {
   collection,
   query,
-  where,
   getDocs,
-  onSnapshot,
   getDoc,
   doc,
-  QuerySnapshot,
   DocumentData,
-  QueryDocumentSnapshot,
-  updateDoc,
   orderBy,
+  limit,
+  startAfter,
+  Timestamp,
+  QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useContext, useEffect, useRef, useState } from "react";
-import { AuthContext } from "../firebase-authProvider";
-import ReservationCard from "../components/reservationcard";
-import CardSearch from "../components/cardsearch";
-import Button from "../components/button";
 import ReportCard from "../components/reportcard";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { isAdmin, removedByAdmin } from "../lib/hooks";
-import ErrorPage from "./errorpage";
+import { isAdmin } from "../lib/hooks";
+import { useState } from "react";
 
-export default function AdminBoard({
-  uid,
-  reports,
-}: {
-  uid: string;
-  reports: // DocumentData[];
-  string;
-}) {
-  // const { user, myUser } = useContext(AuthContext);
+const LIMIT = 5;
 
-  const q = query(collection(db, "reports"), orderBy("createdAt"));
-  const [realtimeReservations] = useCollectionData(q);
+export default function AdminBoard({ reports }: { reports: string }) {
+  // const q = query(
+  //   collection(db, "reports"),
+  //   orderBy("processed"),
+  //   orderBy("createdAt"),
+  //   limit(LIMIT)
+  // );
 
-  const rep: DocumentData[] =
-    realtimeReservations ||
-    // reports;
-    JSON.parse(reports);
+  const repp: DocumentData[] = JSON.parse(reports);
+  const [rep, setRep] = useState<DocumentData[]>(repp);
+  const [loading, setLoading] = useState(false);
 
-  // const { user, myUser } = useContext(AuthContext);
-  // const [arr, setArr] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
+  const [postsEnd, setPostsEnd] = useState(false);
+  //STARO: bez paginationa
+  // const [realtimeReservations] = useCollectionData(q);
+  // const rep: DocumentData[] = realtimeReservations || JSON.parse(reports);
+  const getMorePosts = async () => {
+    setLoading(true);
+    const last = rep[rep.length - 1];
+    const cursor = last.createdAt;
+    const q = query(
+      collection(db, "reports"),
+      // orderBy("processed"),//NE radi i sa ovim
+      orderBy("createdAt", "desc"),
+      startAfter(cursor),
+      limit(LIMIT)
+    );
 
-  // const getReports = async () => {
-  //   const querySnapshot = await getDocs(query(collection(db, "reports")));
-  //   setArr([]);
-  //   querySnapshot.forEach((doc) => {
-  //     setArr((prev) => {
-  //       return [...prev, doc];
-  //     });
-  //   });
-  // };
+    const newPosts = (await getDocs(q)).docs.map((doc) => doc.data());
+    setRep(rep.concat(newPosts));
+    setLoading(false);
 
-  // useEffect(() => {
-  //   getReports();
-  // }, []);
-
+    if (newPosts.length < LIMIT) {
+      setPostsEnd(true);
+    }
+  };
   return (
     <Layout>
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
@@ -77,6 +74,15 @@ export default function AdminBoard({
               );
             })}
           </div>
+          {!loading && !postsEnd && (
+            <button className="btn w-full" onClick={getMorePosts}>
+              Load more
+            </button>
+          )}
+
+          {postsEnd && (
+            <div className="badge  w-full">You have reached the end!</div>
+          )}
         </div>
       </div>
     </Layout>
@@ -98,6 +104,7 @@ export async function getServerSideProps(context) {
         hasPermission = true;
       }
     }
+
     if (!hasPermission) {
       return {
         redirect: {
@@ -108,30 +115,23 @@ export async function getServerSideProps(context) {
     }
     const arrData: DocumentData[] = [];
     const querySnapshot = await getDocs(
-      query(collection(db, "reports"), orderBy("createdAt"))
+      query(
+        collection(db, "reports"),
+        // orderBy("processed"),
+        orderBy("createdAt", "desc"),
+        limit(LIMIT)
+      )
     );
-    // querySnapshot.forEach((doc) => {
-    //   //??KAO RADI
-    //   arrData.push(doc.data());
-    // });
-    // querySnapshot.docs.sort((a,b)=>{
-    //  return  a.data().createdAt-b.data().createdAt
-    // })
+
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       arrData.push(querySnapshot.docs[index].data());
     }
     return {
       props: {
-        uid: uid,
-        reports:
-          // arrData,
-          JSON.stringify(arrData),
+        reports: JSON.stringify(arrData),
       },
     };
   } catch (err) {
-    // context.res.writeHead(302, { location: "/" });
-    // context.res.end();
-    // return { props: [] };
     return {
       redirect: {
         destination: "/",

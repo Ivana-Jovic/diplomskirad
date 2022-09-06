@@ -1,10 +1,4 @@
-import {
-  arrayRemove,
-  arrayUnion,
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { db } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";

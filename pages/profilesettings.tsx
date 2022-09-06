@@ -26,6 +26,8 @@ import {
   signOut,
   updatePassword,
 } from "firebase/auth";
+import toast from "react-hot-toast";
+import SimpleBackdrop from "../components/backdrop";
 
 type IFormInput = {
   title: string;
@@ -42,13 +44,12 @@ export default function ProfileSettings({
   uid,
   userEmail,
   myUserJSON,
-}: // isRemovedByAdmin,
-{
+}: {
   myUserJSON: string;
   uid: string;
   userEmail: string;
-  // isRemovedByAdmin: boolean;
 }) {
+  const [loading, setLoading] = useState<boolean>(false);
   const myUser: DocumentData = JSON.parse(myUserJSON);
   const { user } = useContext(AuthContext);
   const router = useRouter();
@@ -69,7 +70,6 @@ export default function ProfileSettings({
   } = useForm<IFormInput>({
     defaultValues: {
       email: userEmail,
-      //  user?.email ?? "",
       passwordNew: "",
       passwordOld: myUser?.passwordState,
       firstName: myUser?.firstName,
@@ -77,8 +77,6 @@ export default function ProfileSettings({
       profilePictureNEW: [],
     },
   });
-
-  // if (isRemovedByAdmin) return <RemovedByAdmin />;
 
   const imgNew = watch("profilePictureNEW");
 
@@ -99,16 +97,12 @@ export default function ProfileSettings({
     const file = fileArr.length > 0 ? fileArr[0] : null;
 
     if (
-      // user &&
-      myUser.profilePicture !== data.profilePictureNEW &&
+      myUser.photoURL !== data.profilePictureNEW &&
       data.profilePictureNEW &&
       file
     ) {
       const extension = file.type.split("/")[1];
-      const nnNEW: string = `uploads/${
-        uid
-        // user.uid
-      }/profile/${Date.now()}.${extension}`;
+      const nnNEW: string = `uploads/${uid}/profile/${Date.now()}.${extension}`;
       const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
       //when we upload using this ref this file should have that name
       if (file) {
@@ -132,21 +126,10 @@ export default function ProfileSettings({
               async (downloadURL) => {
                 setUrl(downloadURL);
                 // update profile pic
-                if (
-                  // user &&
-                  myUser.photoURL !== downloadURL
-                ) {
-                  const docRef = await updateDoc(
-                    doc(
-                      db,
-                      "users",
-                      uid
-                      // user.uid
-                    ),
-                    {
-                      photoURL: downloadURL,
-                    }
-                  ).catch((err) => {
+                if (myUser.photoURL !== downloadURL) {
+                  const docRef = await updateDoc(doc(db, "users", uid), {
+                    photoURL: downloadURL,
+                  }).catch((err) => {
                     console.log("ERROR ", err.message);
                   });
                 }
@@ -185,46 +168,21 @@ export default function ProfileSettings({
         console.log(err.message, err.code);
         return false;
       }
-      //TODO mozad toast i za uspeh i za neuspeh
-      //TODO kod nekretnina i za izmeni i za dodavanje
-      return true;
     }
     // update first name
-    if (
-      // user &&
-      myUser.firstName !== data.firstName
-    ) {
-      const docRef = await updateDoc(
-        doc(
-          db,
-          "users",
-          uid
-          //  user.uid
-        ),
-        {
-          firstName: data.firstName,
-        }
-      ).catch((err) => {
+    if (myUser.firstName !== data.firstName) {
+      const docRef = await updateDoc(doc(db, "users", uid), {
+        firstName: data.firstName,
+      }).catch((err) => {
         console.log("ERROR ", err.message);
       });
     }
 
     // update last name
-    if (
-      // user &&
-      myUser.lastName !== data.lastName
-    ) {
-      const docRef = await updateDoc(
-        doc(
-          db,
-          "users",
-          uid
-          // user.uid
-        ),
-        {
-          lastName: data.lastName,
-        }
-      ).catch((err) => {
+    if (myUser.lastName !== data.lastName) {
+      const docRef = await updateDoc(doc(db, "users", uid), {
+        lastName: data.lastName,
+      }).catch((err) => {
         console.log("ERROR ", err.message);
       });
     }
@@ -232,30 +190,38 @@ export default function ProfileSettings({
   };
 
   const onSubmit: SubmitHandler<IFormInput> = async (data: IFormInput) => {
-    console.log(data);
     setError("");
     setErrorPassword("");
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
     const fileArr = data.profilePictureNEW ?? null;
     const file = fileArr.length > 0 ? fileArr[0] : null;
-
+    if (!myUser.photoURL && !file) {
+      setError("Please select a profile picture");
+      return;
+    }
     if (file && !allowedTypes.includes(file.type)) {
       setError("Image must be png, jpeg or jpg");
     } else {
       const res: boolean = await changeProfile(data);
       if (res) {
         console.log("res is true");
+        toast.success("Update successful");
+        setLoading(true);
         router.push({
           pathname: "/",
         });
+
+        return;
       } else {
         console.log("res is false");
+        toast.error("Update not successful");
       }
     }
   };
   return (
     <Layout>
-      <div className="max-w-7xl px-8 sm:px-16 text-center  mx-3 mt-5 ">
+      <div className="max-w-3xl px-8 sm:px-16 text-center  mx-auto  mt-5 ">
+        {loading && <SimpleBackdrop loading={loading} />}
         <form onSubmit={handleSubmit(onSubmit)} className="">
           <div className="flex flex-col">
             <TextField
@@ -338,13 +304,11 @@ export default function ProfileSettings({
               </>
             )}
           </div>
-          {/* <div className="mx-3"> */}
           <label className="btn w-full">
             Select profile picture
             <input
               {...register("profilePictureNEW")}
               type="file"
-              // onChange={changeHandler}
               className="hidden"
               accept="image/png, image/jpeg, image/jpg"
             />
@@ -361,7 +325,6 @@ export default function ProfileSettings({
               />
             )}
           </div>
-          {/* </div> */}
 
           {error && (
             <div className="pt-7 pb-5 text-center text-sm font-thin">
@@ -373,10 +336,6 @@ export default function ProfileSettings({
             Update
           </button>
         </form>
-
-        {/* <div className="flex flex-col mt-10">
-          
-        </div> */}
       </div>
     </Layout>
   );
@@ -390,7 +349,6 @@ export async function getServerSideProps(context) {
 
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    // var isRemovedByAdmin: boolean = false;
     const docSnap = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
@@ -399,7 +357,6 @@ export async function getServerSideProps(context) {
         //JEDINO OVDE NE MORA BITI FULLY REGISTERED USER
         hasPermission = true;
         if (removedByAdmin(myUser)) {
-          // isRemovedByAdmin = true;
           return {
             redirect: {
               destination: "/removedbyadmin",
@@ -422,14 +379,10 @@ export async function getServerSideProps(context) {
         uid: uid,
         userEmail: email,
         myUserJSON: JSON.stringify(myUser),
-        // isRemovedByAdmin: isRemovedByAdmin,
       },
     };
   } catch (err) {
     console.log("---", "no user");
-    // context.res.writeHead(302, { location: "/" });
-    // context.res.end();
-    // return { props: [] };
     return {
       redirect: {
         destination: "/",

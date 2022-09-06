@@ -2,19 +2,16 @@ import { Rating } from "@mui/material";
 import {
   addDoc,
   collection,
-  collectionGroup,
   doc,
   DocumentData,
-  orderBy,
-  query,
   QueryDocumentSnapshot,
   Timestamp,
   updateDoc,
-  where,
 } from "firebase/firestore";
 import { useContext, useState } from "react";
 import { db } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
+import toast from "react-hot-toast";
 
 export default function CommentCard({
   comment,
@@ -41,16 +38,11 @@ export default function CommentCard({
   const { user, myUser } = useContext(AuthContext);
   const [reported, setReported] = useState<boolean>(comment.data().reported);
   const report = async () => {
-    //report comment
     const docRef = await addDoc(collection(db, "reports"), {
       guestId: comment.data().userId, //ko je komentarisao
-      // guestFirstName: comment.data().firstName,
-      // guestLastName: comment.data().lastName,
       reservationId: comment.data().reservationId,
       propertyId: comment.data().propertyId,
       hostId: user?.uid ?? "",
-      // reportedFirstName: myUser.firstName,
-      // reportedLastName: myUser.lastName,
       guestIsReporting: false,
       reportText: "comment",
       processed: false,
@@ -70,6 +62,7 @@ export default function CommentCard({
     const docRef2 = await updateDoc(ref, {
       reported: true,
     });
+    toast.success("Reported successfully");
     setReported(true);
   };
   return (
@@ -78,6 +71,7 @@ export default function CommentCard({
         {comment.data().firstName}-{comment.data().lastName}
       </div>
       <div>{new Date(comment.data().createdAt).toDateString()}</div>
+
       <div className="text-xs">
         {months[new Date(comment.data().date).getMonth()]}
         &nbsp;
@@ -91,9 +85,11 @@ export default function CommentCard({
           size="small"
         />
       </div>
+
       <div className="font-normal">{comment.data().comment}</div>
       {myUser &&
         myUser.host &&
+        myUser.modeIsHosting &&
         !reported &&
         user &&
         user.uid === propertyOwnerId && ( // it has to be hosts property

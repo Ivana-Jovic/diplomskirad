@@ -5,13 +5,12 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-import Button from "./button";
-import Inputs from "./inputs";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { AuthContext } from "../firebase-authProvider";
 import { useRouter } from "next/router";
 import { TextField } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
+import SimpleBackdrop from "./backdrop";
 
 type IFormInput = {
   email: string;
@@ -30,17 +29,12 @@ export default function SignInRegisterPopup() {
       password: "",
     },
   });
+  const [loading, setLoading] = useState<boolean>(false);
   const { user } = useContext(AuthContext);
   const router = useRouter();
   const [error, setError] = useState<string>("");
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   const [isSignIn, setIsSignIn] = useState<boolean>(false); //SIgn in or Register popup
-
-  // const [emailState, setEmailState] = useState<string>("");
-  // const [passwordState, setPasswordState] = useState<string>("");
-
-  // const [emailState2, setEmailState2] = useState<string>("");
-  // const [passwordState2, setPasswordState2] = useState<string>("");
 
   const togglePopup = (RorS: string) => {
     //Register Or SignUp
@@ -72,6 +66,7 @@ export default function SignInRegisterPopup() {
           removedByAdmin: false,
           modeIsHosting: false,
         });
+        setLoading(true);
         router.push({
           pathname: "/profilesettings",
         });
@@ -104,6 +99,7 @@ export default function SignInRegisterPopup() {
 
       if (docSnap.exists()) {
         if (docSnap.data().isAdmin) {
+          setLoading(true);
           router.push({
             pathname: "/indexadmin",
           });
@@ -126,12 +122,6 @@ export default function SignInRegisterPopup() {
       console.log(err.message, err.code);
     }
   };
-  // const onSubmitRegister: SubmitHandler<IFormInput> = (data: IFormInput) => {
-  //   reg(data);
-  // };
-  // const onSubmitSignIn: SubmitHandler<IFormInput> = (data: IFormInput) => {
-  //   sig(data);
-  // };
   const onSubmit: SubmitHandler<IFormInput> = (data: IFormInput) => {
     if (isSignIn) {
       sig(data);
@@ -139,45 +129,10 @@ export default function SignInRegisterPopup() {
       reg(data);
     }
   };
-  // const registerForm = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault(); // Preventing the page from reloading
-  //   createUserWithEmailAndPassword(auth, emailState, passwordState)
-  //     .then(async (cred) => {
-  //       console.log("User created:", cred.user);
-  //       setEmailState("");
-  //       setPasswordState("");
-  //       // setIsLoggedIn(true);//sad
-  //       const docRef = await setDoc(doc(db, "users", cred.user.uid), {
-  //         userId: cred.user.uid,
-  //         host: false,
-  //         isSuperhost: false,
-  //         numberOfProperties: 0,
-  //         faves: [],
-  //         removedByAdmin: false,
-  //       });
-  //       router.push({
-  //         pathname: "/profilesettings",
-  //       });
-  //     })
-  //     .catch((err) => {
-  //       console.log(err.message);
-  //     });
-  // };
 
-  // const signin = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault(); // Preventing the page from reloading
-  //   signInWithEmailAndPassword(auth, emailState2, passwordState2)
-  //     .then((cred) => {
-  //       console.log("User signedin:", cred.user);
-  //       setEmailState2("");
-  //       setPasswordState2("");
-  //     })
-  //     .catch((err) => {
-  //       console.log(err.message);
-  //     });
-  // };
   return (
     <div className="">
+      {loading && <SimpleBackdrop loading={loading} />}
       <button
         onClick={() => {
           console.log("register clicked");
@@ -215,19 +170,18 @@ export default function SignInRegisterPopup() {
                   <TextField
                     {...register("password", {
                       required: "Please enter your password",
-                      // pattern: {//TODO vrati ovo
-                      //   value:
-                      //     /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[#$@!%&*?]).{8,15}$/,
-                      //   // /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,15}$/,
-                      //   message:
-                      //     "Password must be 8 to 15 characters long, contain at least one number, both lower and uppercase letters and special characters",
-                      //  },
+                      pattern: {
+                        value:
+                          /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[#$@!%&*?]).{8,15}$/,
+                        // /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,15}$/,
+                        message:
+                          "Password must be 8 to 15 characters long, contain at least one number, both lower and uppercase letters and special characters",
+                      },
                     })}
                     className="mb-2  w-full"
                     id="outlined-required3"
                     label="Password"
                     type="password"
-                    // InputLabelProps={{ shrink: true }}
                     helperText={errors.password ? errors.password.message : " "}
                   />
                   {!isSignIn && (
@@ -261,128 +215,6 @@ export default function SignInRegisterPopup() {
                 )}
                 {error}
               </div>
-              {/*              
-              {isSignIn && (
-                <div className="text-center">
-                  <form onSubmit={handleSubmit(onSubmitSignIn)}>
-                    <TextField
-                      {...register("email", {
-                        required: "Please enter your email",
-                      })}
-                      className="mb-2  w-full"
-                      id="outlined-required3"
-                      label="email"
-                      type="email"
-                      InputLabelProps={{ shrink: true }}
-                      helperText={errors.email ? errors.email.message : " "}
-                    />
-                    <TextField
-                      {...register("password", {
-                        required: "Please enter your password",
-                      })}
-                      className="mb-2  w-full"
-                      id="outlined-required3"
-                      label="enter password"
-                      type="password"
-                      InputLabelProps={{ shrink: true }}
-                      helperText={
-                        errors.password ? errors.password.message : " "
-                      }
-                    />
-                    <button className="btn my-3 w-full" type="submit">
-                      Sign in
-                    </button>
-                  </form>
-                  <div className="text-center">
-                    Don&apos;t have an account? Register&nbsp;
-                    <button onClick={() => setIsSignIn(false)}>
-                      <u>here.</u>
-                    </button>
-                  </div>
-                  {error}
-                </div>
-              )} */}
-
-              {/* {!isSignIn && (
-                <div className="text-center">
-                  <form onSubmit={handleSubmit(onSubmitRegister)}>
-                    <TextField
-                      {...register("email", {
-                        required: "Please enter your email",
-                      })}
-                      className="mb-2 w-full"
-                      id="outlined-required3"
-                      label="email"
-                      type="email"
-                      InputLabelProps={{ shrink: true }}
-                      helperText={errors.email ? errors.email.message : " "}
-                    />
-                    <TextField
-                      {...register("password", {
-                        required: "Please enter your password",
-                      })}
-                      className="mb-2  w-full"
-                      id="outlined-required3"
-                      label="enter password"
-                      type="password"
-                      InputLabelProps={{ shrink: true }}
-                      helperText={
-                        errors.password ? errors.password.message : " "
-                      }
-                    />
-                    <button className="btn my-3 w-full" type="submit">
-                      Register
-                    </button>
-                  </form>
-                  <div className="text-center">
-                    Already have an account? Sign in&nbsp;
-                    <button onClick={() => setIsSignIn(true)}>
-                      <u>here.</u>
-                    </button>
-                  </div>{" "}
-                  {error}
-                </div>
-              )}
-              {isSignIn && (
-                <div className="text-center">
-                  <form onSubmit={handleSubmit(onSubmitSignIn)}>
-                    <TextField
-                      {...register("email", {
-                        required: "Please enter your email",
-                      })}
-                      className="mb-2  w-full"
-                      id="outlined-required3"
-                      label="email"
-                      type="email"
-                      InputLabelProps={{ shrink: true }}
-                      helperText={errors.email ? errors.email.message : " "}
-                    />
-                    <TextField
-                      {...register("password", {
-                        required: "Please enter your password",
-                      })}
-                      className="mb-2  w-full"
-                      id="outlined-required3"
-                      label="enter password"
-                      type="password"
-                      InputLabelProps={{ shrink: true }}
-                      helperText={
-                        errors.password ? errors.password.message : " "
-                      }
-                    />
-                    <button className="btn my-3 w-full" type="submit">
-                      Sign in
-                    </button>
-                  </form>
-                  <div className="text-center">
-                    Don&apos;t have an account? Register&nbsp;
-                    <button onClick={() => setIsSignIn(false)}>
-                      <u>here.</u>
-                    </button>
-                  </div>
-                  {error}
-                </div>
-              )} */}
             </>
           }
           handleClose={togglePopup}
