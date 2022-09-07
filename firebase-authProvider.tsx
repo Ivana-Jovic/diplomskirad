@@ -4,10 +4,13 @@ import React, { createContext, useEffect, useRef, useState } from "react";
 import { auth, db } from "./firebase";
 import nookies from "nookies";
 import { useAuthState } from "react-firebase-hooks/auth";
+import toast from "react-hot-toast";
 
 type ContextType = {
   user: null | undefined | User;
   myUser: DocumentData | undefined;
+  setHostModeHostC: React.Dispatch<React.SetStateAction<boolean>>;
+  hostModeHostC: boolean;
   // loading: boolean;
 };
 
@@ -18,11 +21,14 @@ export const AuthContext = createContext<ContextType>({
   user: undefined,
   myUser: null,
   // loading: false,
+  setHostModeHostC: () => {},
+  hostModeHostC: true,
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, loading] = useAuthState(auth);
   const [myUser, setMyUser] = useState<DocumentData | undefined>(undefined);
+  const [hostModeHostC, setHostModeHostC] = useState<boolean>(true);
 
   useEffect(() => {
     let unsubscribe;
@@ -35,6 +41,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const ref = doc(db, "users", user.uid);
         unsubscribe = onSnapshot(ref, (doc) => {
           setMyUser(doc.data());
+          console.log(doc.data());
         });
       } else {
         // User is signed out
@@ -45,6 +52,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     helper();
     return unsubscribe;
   }, [user]);
+  useEffect(() => {
+    if (myUser && myUser.host)
+      toast.success(hostModeHostC ? "Mode: host" : "Mode: travel");
+  }, [hostModeHostC, myUser]);
   // const [user, setUser] = useState<User | null | undefined>(null);
   // const [myUser, setMyUser] = useState<any>(null);
   // useEffect(() => {
@@ -78,6 +89,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const u: ContextType = {
     user,
     myUser,
+    setHostModeHostC,
+    hostModeHostC,
     // , loading };
   };
   return (

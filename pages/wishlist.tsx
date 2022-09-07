@@ -17,7 +17,7 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import ErrorPage from "./errorpage";
 import {
   isFullyRegisteredUser,
-  isHostModeTravel,
+  isHost,
   isLoggedUser,
   removedByAdmin,
 } from "../lib/hooks";
@@ -30,6 +30,14 @@ export default function Wishlist({
   uid: string;
   propertiesJSON: string;
 }) {
+  const { user, myUser, hostModeHostC, setHostModeHostC } =
+    useContext(AuthContext);
+  useEffect(() => {
+    if (myUser && myUser.host && hostModeHostC) {
+      //can access only if isHostModeTravel, else change mod
+      setHostModeHostC(false);
+    }
+  }, [myUser]);
   const faves: DocumentData[] = JSON.parse(propertiesJSON);
   return (
     <Layout>
@@ -84,7 +92,7 @@ export async function getServerSideProps(context) {
           props: [],
         };
       }
-      if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
+      if (isLoggedUser(myUser) || isHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -105,12 +113,12 @@ export async function getServerSideProps(context) {
       };
     }
     var properties: DocumentData[] = [];
-    const docSnap1 = await getDoc(doc(db, "users", uid));
+    // const docSnap1 = await getDoc(doc(db, "users", uid));
 
-    if (docSnap1.exists()) {
-      for (let index = 0; index < docSnap1.data().faves.length; index++) {
+    if (docSnap.exists()) {
+      for (let index = 0; index < docSnap.data().faves.length; index++) {
         const docSnap2 = await getDoc(
-          doc(db, "property", docSnap1.data().faves[index])
+          doc(db, "property", docSnap.data().faves[index])
         );
 
         if (docSnap2.exists()) {

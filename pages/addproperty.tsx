@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Layout from "../components/layout";
 import {
   collection,
@@ -20,7 +20,7 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useRouter } from "next/router";
 import {
   isFullyRegisteredUser,
-  isHostModeHost,
+  isHost,
   isLoggedUser,
   removedByAdmin,
 } from "../lib/hooks";
@@ -29,6 +29,7 @@ import { verifyIdToken } from "../firebaseadmin";
 
 import toast from "react-hot-toast";
 import SimpleBackdrop from "../components/backdrop";
+import { AuthContext } from "../firebase-authProvider";
 
 type IFormInput = {
   title: string;
@@ -52,6 +53,20 @@ export default function AddProperty({
   myUserJSON: string;
   uid: string;
 }) {
+  const {
+    user,
+    myUser: myUserContext,
+    hostModeHostC,
+    setHostModeHostC,
+  } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (myUserContext && myUserContext.host && !hostModeHostC) {
+      //can access only if isHostModeHost, else change mod
+      setHostModeHostC(true);
+    }
+  }, [myUserContext]);
+
   const [loc, setLoc] = useState<any>();
   const [urlArr, setUrlArr] = useState<string[]>([]);
   const [state, setState] = useState<string>("");
@@ -641,7 +656,7 @@ export async function getServerSideProps(context) {
           props: [],
         };
       }
-      if (isHostModeHost(myUser) || isLoggedUser(myUser)) {
+      if (isHost(myUser) || isLoggedUser(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -653,6 +668,7 @@ export async function getServerSideProps(context) {
         }
       }
     }
+
     if (!hasPermission) {
       return {
         redirect: {

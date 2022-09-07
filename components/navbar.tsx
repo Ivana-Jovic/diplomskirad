@@ -13,34 +13,33 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
 import Link from "next/link";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import {
-  isAdmin,
-  isHostModeHost,
-  isHostModeTravel,
-  isLoggedUser,
-} from "../lib/hooks";
+import { isAdmin, isHost, isLoggedUser } from "../lib/hooks";
 import SimpleBackdrop from "./backdrop";
+import toast from "react-hot-toast";
 
 export default function Navbar({ placeholder }: { placeholder?: string }) {
-  const { user, myUser } = useContext(AuthContext);
   const [openSearch, setOpenSearch] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-
-  async function changeMod() {
-    if (myUser && myUser.modeIsHosting) {
-      await updateDoc(doc(db, "users", user?.uid), {
-        modeIsHosting: false,
-      });
-    }
-    if (myUser && !myUser.modeIsHosting) {
-      await updateDoc(doc(db, "users", user?.uid), {
-        modeIsHosting: true,
-      });
-    }
-    router.push({
-      pathname: "/",
-    });
+  const { user, myUser, hostModeHostC, setHostModeHostC } =
+    useContext(AuthContext);
+  function changeMod() {
+    setHostModeHostC(!hostModeHostC);
+    // toast.success(hostModeHostC ? "Mode: host" : "Mode: travel");
+    // console.log
+    // if (myUser && myUser.modeIsHosting) {
+    //   await updateDoc(doc(db, "users", user?.uid), {
+    //     modeIsHosting: false,
+    //   });
+    // }
+    // if (myUser && !myUser.modeIsHosting) {
+    //   await updateDoc(doc(db, "users", user?.uid), {
+    //     modeIsHosting: true,
+    //   });
+    // }
+    // router.push({
+    //   pathname: "/",
+    // });
   }
   ////////////////////////////////////////////////////////////////////////////////////////////
   const menuLoggedUser = (
@@ -227,7 +226,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
                 className="menuItem"
                 onClick={() => {
                   changeMod();
-                  setLoading(true);
+                  // setLoading(true);
                 }}
               >
                 Change mod
@@ -304,7 +303,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
                 className="menuItem"
                 onClick={() => {
                   changeMod();
-                  setLoading(true);
+                  // setLoading(true);
                 }}
               >
                 Change mod
@@ -331,8 +330,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
     <>
       {isLoggedUser(myUser) && menuLoggedUser}
       {isAdmin(myUser) && menuAdmin}
-      {isHostModeHost(myUser) && menuHostModeHost}
-      {isHostModeTravel(myUser) && menuHostModeTravel}
+      {isHost(myUser) && hostModeHostC && menuHostModeHost}
+      {isHost(myUser) && !hostModeHostC && menuHostModeTravel}
+      {/* {isHostModeHost(myUser) && menuHostModeHost}
+      {isHostModeTravel(myUser) && menuHostModeTravel} */}
     </>
   );
 
@@ -346,7 +347,9 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         <div className="sm:px-5  md:px-10 grid grid-cols-3">
           <Link href="/">
             <a
-              onClick={() => setLoading(true)}
+              onClick={() => {
+                if (router.pathname !== "/") setLoading(true);
+              }}
               className=" text-2xl !text-darkGreen  font-logo
          font-semibold mr-2 cursor-pointer pl-3 "
             >
@@ -359,7 +362,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
               {((user && myUser) || user === null) &&
                 router &&
                 router.pathname !== "/" &&
-                (isLoggedUser(myUser) || isHostModeTravel(myUser)) && (
+                (isLoggedUser(myUser) ||
+                  (isHost(myUser) && !hostModeHostC)) && (
                   <button
                     onClick={() => {
                       setOpenSearch(!openSearch);

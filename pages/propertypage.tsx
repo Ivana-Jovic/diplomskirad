@@ -13,7 +13,7 @@ import {
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Layout from "../components/layout";
 import { db } from "../firebase";
 import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
@@ -27,8 +27,6 @@ import ErrorPage from "./errorpage";
 import {
   isFullyRegisteredUser,
   isHost,
-  isHostModeHost,
-  isHostModeTravel,
   isLoggedUser,
   removedByAdmin,
 } from "../lib/hooks";
@@ -36,6 +34,7 @@ import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import RemovedByAdmin from "../components/removedbyadmin";
 import toast from "react-hot-toast";
+import { AuthContext } from "../firebase-authProvider";
 
 type imgGalleryType = {
   original: string;
@@ -45,13 +44,18 @@ const LIMIT = 5;
 
 export default function PropertyPage({
   uid,
-  isHostModeHost,
   myUserJSON,
 }: {
   uid: string;
-  isHostModeHost: boolean;
   myUserJSON: string;
 }) {
+  const {
+    user,
+    myUser: myUserContext,
+    hostModeHostC,
+    setHostModeHostC,
+  } = useContext(AuthContext);
+
   const myUser: DocumentData | null = uid ? JSON.parse(myUserJSON) : null; //null ako je neulogovan
   const [more, setMore] = useState<boolean>(false);
   const [makeARes, setMakeARes] = useState<boolean>(false);
@@ -245,7 +249,7 @@ export default function PropertyPage({
           </div>
 
           {uid !== "" &&
-            !isHostModeHost &&
+            !hostModeHostC &&
             !property.removedByAdmin &&
             property.adminApproved && (
               <div>
@@ -274,7 +278,7 @@ export default function PropertyPage({
               **You must be logged in to make a reservation**
             </div>
           )}
-          {isHostModeHost && (
+          {hostModeHostC && (
             <div className="badge w-full  grid place-content-center  mb-10 ">
               **You can&apos;t make a reservation in host mode**
             </div>
@@ -334,11 +338,7 @@ export async function getServerSideProps(context) {
           props: [],
         };
       }
-      if (
-        isLoggedUser(myUser) ||
-        isHostModeHost(myUser) ||
-        isHostModeTravel(myUser)
-      ) {
+      if (isLoggedUser(myUser) || isHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -359,19 +359,10 @@ export async function getServerSideProps(context) {
         props: [],
       };
     }
-    if (isHostModeHost(myUser)) {
-      return {
-        props: {
-          uid: uid,
-          isHostModeHost: true,
-          myUserJSON: JSON.stringify(myUser),
-        },
-      };
-    }
+
     return {
       props: {
         uid: uid,
-        isHostModeHost: false,
         myUserJSON: JSON.stringify(myUser),
       },
     };
@@ -379,7 +370,6 @@ export async function getServerSideProps(context) {
     return {
       props: {
         uid: "", //not logged in
-        isHostModeHost: false,
         myUserJSON: JSON.stringify(myUser), // ovde je myUser null
       },
     };

@@ -14,8 +14,10 @@ import ReservationCard from "../components/reservationcard";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { isHostModeHost, removedByAdmin } from "../lib/hooks";
-
+import { isHost, removedByAdmin } from "../lib/hooks";
+import toast from "react-hot-toast";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../firebase-authProvider";
 export default function HostsReservations({
   uid,
   reservations,
@@ -23,6 +25,16 @@ export default function HostsReservations({
   uid: string;
   reservations: string;
 }) {
+  const { user, myUser, hostModeHostC, setHostModeHostC } =
+    useContext(AuthContext);
+
+  useEffect(() => {
+    if (myUser && myUser.host && !hostModeHostC) {
+      //can access only if isHostModeHost, else change mod
+      setHostModeHostC(true);
+    }
+  }, [myUser]);
+
   const q = query(
     collection(db, "reservations"),
     where("hostId", "==", uid),
@@ -69,11 +81,20 @@ export async function getServerSideProps(context) {
     const { uid, email } = token;
 
     var hasPermission: boolean = false;
-    const docSnap = await getDoc(doc(db, "users", uid));
+    const q = query(
+      collection(db, "reservations"),
+      where("hostId", "==", uid),
+      orderBy("createdAt", "desc")
+    );
+    // const docSnap = await getDoc(doc(db, "users", uid));
+    const [docSnap, querySnapshot] = await Promise.all([
+      getDoc(doc(db, "users", uid)),
+      getDocs(q),
+    ]);
 
     if (docSnap.exists()) {
       const myUser: DocumentData = docSnap.data();
-      if (isHostModeHost(myUser)) {
+      if (isHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -95,12 +116,8 @@ export async function getServerSideProps(context) {
       };
     }
     const arrData: DocumentData[] = [];
-    const q = query(
-      collection(db, "reservations"),
-      where("hostId", "==", uid),
-      orderBy("createdAt", "desc")
-    );
-    const querySnapshot = await getDocs(q);
+
+    // const querySnapshot = await getDocs(q);
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       arrData.push(querySnapshot.docs[index].data());
     }

@@ -28,7 +28,7 @@ import { verifyIdToken } from "../firebaseadmin";
 import {
   isAvailable,
   isFullyRegisteredUser,
-  isHostModeTravel,
+  isHost,
   isLoggedUser,
   removedByAdmin,
 } from "../lib/hooks";
@@ -110,6 +110,14 @@ export default function Search({
   sumPricesPropertiesLocation: number;
   ppp: string;
 }) {
+  const { user, myUser, hostModeHostC, setHostModeHostC } =
+    React.useContext(AuthContext);
+  useEffect(() => {
+    if (myUser && myUser.host && hostModeHostC) {
+      //can access only if isHostModeTravel, else change mod
+      setHostModeHostC(false);
+    }
+  }, [myUser]);
   const fromDate = new Date(fromStr);
   const toDate = new Date(toStr);
   var rangeRef = useRef<NodeJS.Timeout>(null);
@@ -500,8 +508,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    const docSnap = await getDoc(doc(db, "users", uid));
-
+    // const docSnap = await getDoc(doc(db, "users", uid));
+    const [docSnap, returns] = await Promise.all([
+      getDoc(doc(db, "users", uid)),
+      getEverything(context),
+    ]);
     if (docSnap.exists()) {
       const myUser: DocumentData = docSnap.data();
       if (!isFullyRegisteredUser(myUser)) {
@@ -512,7 +523,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           props: [],
         };
       }
-      if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
+      if (isLoggedUser(myUser) || isHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -533,7 +544,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: [],
       };
     }
-    const returns: ReturnType = await getEverything(context);
+    // const returns: ReturnType = await getEverything(context);
 
     return {
       props: {

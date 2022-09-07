@@ -51,7 +51,12 @@ export default function ProfileSettings({
 }) {
   const [loading, setLoading] = useState<boolean>(false);
   const myUser: DocumentData = JSON.parse(myUserJSON);
-  const { user } = useContext(AuthContext);
+  const {
+    user,
+    myUser: myUserContext,
+    hostModeHostC,
+    setHostModeHostC,
+  } = useContext(AuthContext);
   const router = useRouter();
 
   const [error, setError] = useState<string>(""); //any

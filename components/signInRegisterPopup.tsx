@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { TextField } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import SimpleBackdrop from "./backdrop";
+// import admin from "../firebaseadmin";
 
 type IFormInput = {
   email: string;
@@ -92,6 +93,13 @@ export default function SignInRegisterPopup() {
         data.email,
         data.password
       );
+
+      // const authh = admin.auth();
+      // await authh.setCustomUserClaims(user.uid, {
+      //   isHost: false,
+      //   isAdmin: false,
+      // });
+
       // .then(async (cred) => {
       console.log("User signedin:", cred.user);
 

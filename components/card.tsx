@@ -1,7 +1,7 @@
 import Image from "next/image";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import { yellow, red } from "@mui/material/colors";
-import Heart from "./heart";
+// import Heart from "./heart";
 import { Rating } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";

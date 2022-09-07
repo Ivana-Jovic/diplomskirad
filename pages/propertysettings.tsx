@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Layout from "../components/layout";
 import { doc, DocumentData, getDoc, updateDoc } from "firebase/firestore";
 import { db, storage } from "../firebase";
@@ -11,9 +11,10 @@ import { useRouter } from "next/router";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import Link from "next/link";
-import { isHostModeHost, removedByAdmin } from "../lib/hooks";
+import { isHost, removedByAdmin } from "../lib/hooks";
 import SimpleBackdrop from "../components/backdrop";
 import toast from "react-hot-toast";
+import { AuthContext } from "../firebase-authProvider";
 
 type IFormInput = {
   title: string;
@@ -33,6 +34,20 @@ export default function PropertySettings({
   propertyJSON: string;
   myUserJSON: string;
 }) {
+  const {
+    user,
+    myUser: myUserContext,
+    hostModeHostC,
+    setHostModeHostC,
+  } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (myUser && myUser.host && !hostModeHostC) {
+      //can access only if isHostModeHost, else change mod
+      setHostModeHostC(true);
+    }
+  }, [myUserContext]);
+
   const property: DocumentData = JSON.parse(propertyJSON);
   const [urlArr, setUrlArr] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
@@ -322,11 +337,15 @@ export async function getServerSideProps(context) {
 
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    const docSnap2 = await getDoc(doc(db, "users", uid));
-
+    const queryUrl = context.query;
+    // const docSnap2 = await getDoc(doc(db, "users", uid));
+    const [docSnap2, docSnap] = await Promise.all([
+      getDoc(doc(db, "users", uid)),
+      getDoc(doc(db, "property", queryUrl.property)),
+    ]);
     if (docSnap2.exists()) {
       myUser = docSnap2.data();
-      if (isHostModeHost(myUser)) {
+      if (isHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -346,9 +365,9 @@ export async function getServerSideProps(context) {
         props: [],
       };
     }
-    const queryUrl = context.query;
+
     var property: DocumentData = null;
-    const docSnap = await getDoc(doc(db, "property", queryUrl.property));
+    // const docSnap = await getDoc(doc(db, "property", queryUrl.property));
     if (docSnap.exists()) {
       property = docSnap.data();
     }

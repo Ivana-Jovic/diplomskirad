@@ -10,7 +10,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import ReservationCard from "../components/reservationcard";
 import nookies from "nookies";
@@ -18,12 +18,12 @@ import { verifyIdToken } from "../firebaseadmin";
 import ErrorPage from "./errorpage";
 import {
   isFullyRegisteredUser,
-  isHostModeTravel,
+  isHost,
   isLoggedUser,
   removedByAdmin,
 } from "../lib/hooks";
 import RemovedByAdmin from "../components/removedbyadmin";
-
+import toast from "react-hot-toast";
 export default function GuestBoard({
   uid,
   reservations,
@@ -31,11 +31,21 @@ export default function GuestBoard({
   uid: string;
   reservations: string;
 }) {
+  const { user, myUser, hostModeHostC, setHostModeHostC } =
+    useContext(AuthContext);
   const reserv: DocumentData[] = JSON.parse(reservations);
+
+  useEffect(() => {
+    console.log("hostModeHostC", myUser, hostModeHostC);
+    if (myUser && myUser.host && hostModeHostC) {
+      console.log("MENJA SE mod");
+      //can access only if isHostModeTravel, else change mod
+      setHostModeHostC(false);
+    }
+  }, [myUser]);
 
   return (
     <Layout>
-      {" "}
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
         <div>
           <div className="pt-7 pb-5 text-center text-3xl font-bold">
@@ -68,7 +78,17 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    const docSnap = await getDoc(doc(db, "users", uid));
+    const q = query(
+      collection(db, "reservations"),
+      where("userId", "==", uid),
+      orderBy("createdAt", "desc")
+    );
+
+    // const docSnap = await getDoc(doc(db, "users", uid));
+    const [docSnap, querySnapshot] = await Promise.all([
+      getDoc(doc(db, "users", uid)),
+      getDocs(q),
+    ]);
 
     if (docSnap.exists()) {
       const myUser: DocumentData = docSnap.data();
@@ -80,7 +100,7 @@ export async function getServerSideProps(context) {
           props: [],
         };
       }
-      if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
+      if (isLoggedUser(myUser) || isHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -101,13 +121,8 @@ export async function getServerSideProps(context) {
       };
     }
     const arrData: DocumentData[] = [];
-    const q = query(
-      collection(db, "reservations"),
-      where("userId", "==", uid),
-      orderBy("createdAt", "desc")
-    );
 
-    const querySnapshot = await getDocs(q);
+    // const querySnapshot = await getDocs(q);
 
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       arrData.push(querySnapshot.docs[index].data());

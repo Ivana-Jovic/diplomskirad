@@ -26,7 +26,7 @@ import SimpleBackdrop from "./backdrop";
 //   },
 // });
 //TODOppp na firebasu uslovi
-
+//TODO obrisati sliku iz stoaraga u profile i u nekretninama
 //TODO provere i loc i vercel
 //- za dugacke titlove i descriptione svuda da li izgleda ok
 //- na raznim velicinama ekrana
@@ -39,6 +39,7 @@ import SimpleBackdrop from "./backdrop";
 // -spiner svuda kartice, dugmici
 //- indexi da li su asc ili esc
 //-  faq rounded md
+//- hh full za index host
 export default function Banner({
   setOpenSearch,
 }: {

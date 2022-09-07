@@ -5,26 +5,30 @@ import Link from "next/link";
 import { AuthContext } from "../firebase-authProvider";
 import { useRouter } from "next/router";
 import SimpleBackdrop from "./backdrop";
+import toast from "react-hot-toast";
 
 export default function IndexHostModeHost({}: {}) {
-  const { user, myUser } = useContext(AuthContext);
+  const { user, myUser, hostModeHostC, setHostModeHostC } =
+    useContext(AuthContext);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  async function changeMod() {
-    if (myUser && myUser.modeIsHosting) {
-      await updateDoc(doc(db, "users", user?.uid), {
-        modeIsHosting: false,
-      });
-    }
-    if (myUser && !myUser.modeIsHosting) {
-      await updateDoc(doc(db, "users", user?.uid), {
-        modeIsHosting: true,
-      });
-    }
-    router.push({
-      pathname: "/",
-    });
+  function changeMod() {
+    setHostModeHostC(!hostModeHostC);
+    // toast.success(hostModeHostC ? "Mode: host" : "Mode: travel");
+    // if (myUser && myUser.modeIsHosting) {
+    //   await updateDoc(doc(db, "users", user?.uid), {
+    //     modeIsHosting: false,
+    //   });
+    // }
+    // if (myUser && !myUser.modeIsHosting) {
+    //   await updateDoc(doc(db, "users", user?.uid), {
+    //     modeIsHosting: true,
+    //   });
+    // }
+    // router.push({
+    //   pathname: "/",
+    // });
   }
 
   return (
@@ -62,7 +66,7 @@ export default function IndexHostModeHost({}: {}) {
         className="btn"
         onClick={() => {
           changeMod();
-          setLoading(true);
+          // setLoading(true);
         }}
       >
         Change mod

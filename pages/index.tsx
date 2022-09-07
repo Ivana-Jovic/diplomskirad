@@ -18,33 +18,52 @@ import { verifyIdToken } from "../firebaseadmin";
 import {
   isAdmin,
   isFullyRegisteredUser,
-  isHostModeHost,
-  isHostModeTravel,
+  isHost,
   isLoggedUser,
   removedByAdmin,
 } from "../lib/hooks";
 import IndexHostModeHost from "../components/indexhostmodehost";
 import { useRouter } from "next/router";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../firebase-authProvider";
+import toast from "react-hot-toast";
 
 export default function Index({
-  isHostModeHost,
+  // isHostModeHost,
   propertiesJSON,
 }: {
-  isHostModeHost: boolean;
+  // isHostModeHost: boolean;
   propertiesJSON: string;
 }) {
   const router = useRouter();
-
-  if (isHostModeHost)
+  const { user, myUser, hostModeHostC, setHostModeHostC } =
+    useContext(AuthContext);
+  // useEffect(() => {
+  if (myUser && myUser.host && hostModeHostC) {
+    // //can access only if isHostModeTravel, else change mod
+    // setHostModeHostC(false);
     return (
       <div className="h-full">
         <Layout>
-          <div className="h-full">
+          <div className="!h-full">
             <IndexHostModeHost />
           </div>
         </Layout>
       </div>
     );
+  }
+  // }, []);
+
+  // if (isHostModeHost)
+  //   return (
+  //     <div className="h-full">
+  //       <Layout>
+  //         <div className="h-full">
+  //           <IndexHostModeHost />
+  //         </div>
+  //       </Layout>
+  //     </div>
+  //   );
   const arr: DocumentData[] = JSON.parse(propertiesJSON);
   return (
     <Layout>
@@ -52,7 +71,6 @@ export default function Index({
         <title>mybnb</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <div>
         <Banner />
       </div>
@@ -91,13 +109,25 @@ export async function getServerSideProps(context) {
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
+    // console.log("token", token[]);
     const { uid } = token;
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    const docSnap = await getDoc(doc(db, "users", uid));
+    // const userSnap = await getDoc(doc(db, "users", uid));
 
-    if (docSnap.exists()) {
-      myUser = docSnap.data();
+    const q = query(
+      collection(db, "property"),
+      orderBy("numberOfReviews", "desc"),
+      orderBy("totalStars", "desc"),
+      limit(8)
+    );
+    const [userSnap, querySnapshot] = await Promise.all([
+      getDoc(doc(db, "users", uid)),
+      getDocs(q),
+    ]);
+
+    if (userSnap.exists()) {
+      myUser = userSnap.data();
       if (!isFullyRegisteredUser(myUser)) {
         return {
           redirect: {
@@ -106,7 +136,7 @@ export async function getServerSideProps(context) {
           props: [],
         };
       }
-      if (isLoggedUser(myUser) || isHostModeTravel(myUser)) {
+      if (isLoggedUser(myUser) || isHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -131,18 +161,12 @@ export async function getServerSideProps(context) {
     if (!hasPermission) {
       return {
         props: {
-          isHostModeHost: isHostModeHost(myUser),
+          // isHostModeHost: isHostModeHost(myUser),
         },
       };
     }
+
     var properties: DocumentData[] = [];
-    const q = query(
-      collection(db, "property"),
-      orderBy("numberOfReviews", "desc"),
-      orderBy("totalStars", "desc"),
-      limit(8)
-    );
-    const querySnapshot = await getDocs(q);
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       properties.push(querySnapshot.docs[index].data());
     }

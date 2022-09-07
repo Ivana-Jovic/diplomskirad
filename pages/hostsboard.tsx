@@ -14,8 +14,10 @@ import dynamic from "next/dynamic";
 import Map2 from "../components/map2";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
-import { isHostModeHost, removedByAdmin } from "../lib/hooks";
-
+import { isHost, removedByAdmin } from "../lib/hooks";
+import toast from "react-hot-toast";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../firebase-authProvider";
 const Calendar = dynamic(() => import("../components/calendar"), {
   ssr: false,
 });
@@ -27,8 +29,15 @@ export default function HostsBoard({
   propertiesJSON: string;
   propertiesIds: string[];
 }) {
+  const { user, myUser, hostModeHostC, setHostModeHostC } =
+    useContext(AuthContext);
   const properties: DocumentData[] = JSON.parse(propertiesJSON);
-
+  useEffect(() => {
+    if (myUser && myUser.host && !hostModeHostC) {
+      //can access only if isHostModeHost, else change mod
+      setHostModeHostC(true);
+    }
+  }, [myUser]);
   return (
     <Layout>
       <>
@@ -148,7 +157,9 @@ export default function HostsBoard({
             Calendar
           </div>
           {propertiesIds && propertiesIds.length <= 10 && (
-            <Calendar propertyId={propertiesIds} />
+            <div className=" w-full max-w-xl">
+              <Calendar propertyId={propertiesIds} />
+            </div>
           )}
           {(!propertiesIds || propertiesIds.length === 0) && <div>NEMA</div>}
 
@@ -169,11 +180,17 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    const docSnap = await getDoc(doc(db, "users", uid));
+    const q = query(collection(db, "property"), where("ownerId", "==", uid));
+
+    // const docSnap = await getDoc(doc(db, "users", uid));
+    const [docSnap, querySnapshot] = await Promise.all([
+      getDoc(doc(db, "users", uid)),
+      getDocs(q),
+    ]);
 
     if (docSnap.exists()) {
       const myUser: DocumentData = docSnap.data();
-      if (isHostModeHost(myUser)) {
+      if (isHost(myUser)) {
         hasPermission = true;
         if (removedByAdmin(myUser)) {
           return {
@@ -195,9 +212,8 @@ export async function getServerSideProps(context) {
     }
     var properties: DocumentData[] = [];
     var propertiesIds: string[] = [];
-    const q = query(collection(db, "property"), where("ownerId", "==", uid));
 
-    const querySnapshot = await getDocs(q);
+    // const querySnapshot = await getDocs(q);
 
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       properties.push(querySnapshot.docs[index].data());

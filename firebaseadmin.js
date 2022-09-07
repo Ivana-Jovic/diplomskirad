@@ -1,4 +1,6 @@
 const admin = require("firebase-admin");
+// import admin from "firebase-admin";
+
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE);
 // const serviceAccount = require("./secrets.json");
 export const verifyIdToken = (token) => {
@@ -15,3 +17,5 @@ export const verifyIdToken = (token) => {
       throw error;
     });
 };
+
+// export default admin;/

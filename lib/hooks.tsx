@@ -93,16 +93,16 @@ export function isHost(myUser: DocumentData) {
   if (myUser && myUser.host && !myUser.isAdmin) return true;
   else return false;
 }
-export function isHostModeHost(myUser: DocumentData) {
-  if (myUser && myUser.host && myUser.modeIsHosting && !myUser.isAdmin)
-    return true;
-  else return false;
-}
-export function isHostModeTravel(myUser: DocumentData) {
-  if (myUser && myUser.host && !myUser.modeIsHosting && !myUser.isAdmin)
-    return true;
-  else return false;
-}
+// export function isHostModeHost(myUser: DocumentData) {
+//   if (myUser && myUser.host && myUser.modeIsHosting && !myUser.isAdmin)
+//     return true;
+//   else return false;
+// }
+// export function isHostModeTravel(myUser: DocumentData) {
+//   if (myUser && myUser.host && !myUser.modeIsHosting && !myUser.isAdmin)
+//     return true;
+//   else return false;
+// }
 export function removedByAdmin(myUser: DocumentData) {
   if (myUser && myUser.removedByAdmin) return true;
   else return false;
