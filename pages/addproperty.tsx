@@ -258,6 +258,10 @@ export default function AddProperty({
                   <TextField
                     {...register("title", {
                       required: "Please enter your last name",
+                      maxLength: {
+                        value: 50,
+                        message: "Title can have maximum 50 characters",
+                      },
                     })}
                     className="w-full "
                     id="outlined-required"
@@ -268,7 +272,10 @@ export default function AddProperty({
                   <TextField
                     {...register("desc", {
                       required: "Please enter  a description",
-                      // maxLength: 2,
+                      maxLength: {
+                        value: 100,
+                        message: "Description can have maximum 100 characters",
+                      },
                     })}
                     className="w-full "
                     id="outlined-required"

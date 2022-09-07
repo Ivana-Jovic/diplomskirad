@@ -238,6 +238,10 @@ export default function ProfileSettings({
               <TextField
                 {...register("firstName", {
                   required: "Please enter your first name",
+                  maxLength: {
+                    value: 10,
+                    message: "First name can have maximum 10 characters",
+                  },
                 })}
                 className=" "
                 id="outlined-required1"
@@ -249,6 +253,10 @@ export default function ProfileSettings({
               <TextField
                 {...register("lastName", {
                   required: "Please enter your last name",
+                  maxLength: {
+                    value: 10,
+                    message: "Last name can have maximum 10 characters",
+                  },
                 })}
                 className=" mb-2"
                 id="outlined-required2"

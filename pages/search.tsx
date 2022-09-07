@@ -395,6 +395,7 @@ export default function Search({
                     avgPricePerNight={
                       sumPricesPropertiesLocation / numPropertiesLocation
                     }
+                    inWishlist={false}
                   />
                 );
               })}
@@ -407,12 +408,16 @@ export default function Search({
               {filteredArr && filteredArr.length > 0 && (
                 <Map2 arrLoc={filteredArr} />
               )}
-              {filteredArr.length}
+              {filteredArr && filteredArr.length >= 0 && (
+                <div className=" badge text-center w-full mt-5">
+                  {filteredArr.length} search results
+                </div>
+              )}
             </div>
           </div>
         </section>
         {filteredArr && filteredArr.length === 0 && (
-          <div className=" badge text-center">**No search results**</div>
+          <div className=" badge text-center w-full">**No search results**</div>
         )}
       </div>
     </Layout>

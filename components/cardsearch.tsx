@@ -15,6 +15,7 @@ export default function CardSearch({
   numberOfReviews,
   numberOfNights,
   avgPricePerNight,
+  inWishlist,
 }: {
   propertyid: string;
   name: string;
@@ -25,6 +26,7 @@ export default function CardSearch({
   numberOfReviews: number;
   numberOfNights: number;
   avgPricePerNight: number;
+  inWishlist: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -54,7 +56,7 @@ export default function CardSearch({
       {loading && <SimpleBackdrop loading={loading} />}
       <div
         onClick={goToPropertyPage}
-        className="card rounded-md lg:card-side bg-base-100 shadow-md my-3   hover:opacity-90 hover:shadow-lg
+        className="lg:h-52 card rounded-md lg:card-side bg-base-100 shadow-md my-3   hover:opacity-90 hover:shadow-lg
 transition duration-200 ease-out
 cursor-pointer"
       >
@@ -67,22 +69,26 @@ cursor-pointer"
               ** Great deal **
             </div>
           )}
-          <figure className="relative h-48 lg:h-full  flex-shrink-0">
+          <figure className="relative h-48 lg:h-full  w-full flex-shrink-0">
             <Image src={image} alt={name} layout="fill" objectFit="cover" />
           </figure>
         </div>
 
-        <div className="card-body">
+        <div className="card-body lg:w-2/3">
           <div>
             <div className="flex justify-between items-center mb-2">
-              <div className="text-xl font-semibold">{name}</div>
+              <div className="text-xl font-semibold">
+                {name.length < 20
+                  ? name
+                  : name.slice(0, name.indexOf(" ", 20)) + "..."}
+              </div>
               <div className="flex">
                 {avgPricePerNight > parseFloat(price) && (
                   <div className="text-center hidden lg:badge lg:!p-3 mr-3 !bg-footer">
                     **Great deal**
                   </div>
                 )}
-                <Heart propertyid={propertyid} />
+                {!inWishlist && <Heart propertyid={propertyid} />}
               </div>
             </div>
             <div

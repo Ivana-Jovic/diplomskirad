@@ -38,7 +38,7 @@ import SimpleBackdrop from "./backdrop";
 //-toast svuda
 // -spiner svuda kartice, dugmici
 //- indexi da li su asc ili esc
-
+//-  faq rounded md
 export default function Banner({
   setOpenSearch,
 }: {

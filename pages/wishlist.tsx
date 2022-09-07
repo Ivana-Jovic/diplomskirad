@@ -1,5 +1,12 @@
 import Layout from "../components/layout";
-import { getDoc, doc, DocumentData } from "firebase/firestore";
+import {
+  getDoc,
+  doc,
+  DocumentData,
+  query,
+  collection,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../firebase-authProvider";
@@ -17,12 +24,13 @@ import {
 import RemovedByAdmin from "../components/removedbyadmin";
 
 export default function Wishlist({
+  uid,
   propertiesJSON,
 }: {
+  uid: string;
   propertiesJSON: string;
 }) {
   const faves: DocumentData[] = JSON.parse(propertiesJSON);
-
   return (
     <Layout>
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
@@ -45,6 +53,7 @@ export default function Wishlist({
                     numberOfReviews={property.numberOfReviews}
                     numberOfNights={0}
                     avgPricePerNight={0}
+                    inWishlist={true}
                   />
                 </div>
               );

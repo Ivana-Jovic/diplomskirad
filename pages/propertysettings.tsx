@@ -41,6 +41,7 @@ export default function PropertySettings({
     control,
     handleSubmit,
     register,
+    watch,
     formState: { errors },
   } = useForm<IFormInput>({
     defaultValues: {
@@ -162,7 +163,11 @@ export default function PropertySettings({
 
                 <TextField
                   {...register("title", {
-                    required: "Please enter your last name",
+                    required: "Please enter a title",
+                    maxLength: {
+                      value: 50,
+                      message: "Title can have maximum 50 characters",
+                    },
                   })}
                   className="w-full mb-2"
                   id="outlined-required"
@@ -173,6 +178,10 @@ export default function PropertySettings({
                 <TextField
                   {...register("desc", {
                     required: "Please enter  a description",
+                    maxLength: {
+                      value: 100,
+                      message: "Description can have maximum 100 characters",
+                    },
                   })}
                   className="w-full mb-2 "
                   id="outlined-required"

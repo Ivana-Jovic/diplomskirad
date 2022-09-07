@@ -15,10 +15,26 @@ const Map2 = (props: props) => {
   const { popup, arrLoc } = props;
   const mapElement = useRef();
   const [map, setMap] = useState<tt.Map>();
-
+  var lngArr = [];
+  var latArr = [];
+  var maxLng = null;
+  var minLng = null;
+  var minLat = null;
+  var maxLat = null;
+  function getMinLng() {
+    arrLoc.forEach((element, index) => {
+      lngArr.push(element.loc.split("-")[0]);
+      latArr.push(element.loc.split("-")[1]);
+    });
+    maxLng = Math.max(...lngArr);
+    minLng = Math.min(...lngArr);
+    minLat = Math.min(...latArr);
+    maxLat = Math.max(...latArr);
+  }
   // const [mm, setMm] = useState<QueryDocumentSnapshot<DocumentData>[]>(arrLoc);
   const router = useRouter();
   useEffect(() => {
+    getMinLng();
     const divs = arrLoc.map((elem) => {
       const popupDiv = document.createElement("div");
       //
@@ -64,7 +80,15 @@ const Map2 = (props: props) => {
 
     const initMap = async () => {
       const tt = await import("@tomtom-international/web-sdk-maps");
-      var center: tt.LngLatLike = [20.4609, 44.81647189463462];
+      // var center: tt.LngLatLike = [
+      //   arrLoc && arrLoc[0] && arrLoc[0].loc && arrLoc[0].loc !== ","
+      //     ? JSON.parse(arrLoc[0].loc.split("-")[0])
+      //     : 20.447,
+      //   arrLoc && arrLoc[0] && arrLoc[0].loc && arrLoc[0].loc !== ","
+      //     ? JSON.parse(arrLoc[0].loc.split("-")[1])
+      //     : 44.81,
+      // ];
+      // [20.4609, 44.81647189463462];
       var popup = new tt.Popup({
         offset: 35,
       });
@@ -73,7 +97,7 @@ const Map2 = (props: props) => {
       const ivaninaMapa = tt.map({
         key: process.env.NEXT_PUBLIC_TOMTOM,
         container: mapElement.current,
-        center: center,
+        // center: center,
         zoom: 12,
         // dragPan: !isMobileOrTablet(),
       });
@@ -92,26 +116,26 @@ const Map2 = (props: props) => {
       });
       ivaninaMapa.addControl(new tt.NavigationControl());
       ///////////
-      var marker = new tt.Marker({
-        draggable: true,
-      })
-        .setLngLat(center)
-        .addTo(ivaninaMapa);
-      function onDragEnd() {
-        var lngLat = marker.getLngLat();
-        lngLat = new tt.LngLat(
-          // roundLatLng(lngLat.lng),
-          // roundLatLng(lngLat.lat)
-          lngLat.lng,
-          lngLat.lat
-        );
-        popup.setHTML(lngLat.toString());
-        popup.setLngLat(lngLat);
-        marker.setPopup(popup);
-        marker.togglePopup();
-        // setLoc(lngLat.lng + "-" + lngLat.lat);
-      }
-      marker.on("dragend", onDragEnd);
+      // var marker = new tt.Marker({
+      //   draggable: true,
+      // })
+      //   .setLngLat(center)
+      //   .addTo(ivaninaMapa);
+      // function onDragEnd() {
+      //   var lngLat = marker.getLngLat();
+      //   lngLat = new tt.LngLat(
+      //     // roundLatLng(lngLat.lng),
+      //     // roundLatLng(lngLat.lat)
+      //     lngLat.lng,
+      //     lngLat.lat
+      //   );
+      //   popup.setHTML(lngLat.toString());
+      //   popup.setLngLat(lngLat);
+      //   marker.setPopup(popup);
+      //   marker.togglePopup();
+      //   // setLoc(lngLat.lng + "-" + lngLat.lat);
+      // }
+      // marker.on("dragend", onDragEnd);
       // /////
       function createMarker(
         icon,
@@ -178,6 +202,12 @@ const Map2 = (props: props) => {
       });
 
       //////
+      const bounds = new tt.LngLatBounds([minLng, minLat], [maxLng, maxLat]);
+      ivaninaMapa.fitBounds(bounds, {
+        padding: 35,
+        maxZoom: 13,
+        duration: 1000,
+      });
       setMap(ivaninaMapa);
     };
     initMap();

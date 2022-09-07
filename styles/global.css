@@ -218,6 +218,9 @@ h3{
   
   }
 } */
+.card{
+  @apply rounded-md ;
+}
 .badge{
   @apply bg-footer p-4 text-center ;
 }

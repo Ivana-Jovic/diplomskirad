@@ -99,7 +99,11 @@ export default function ReservationCard({
       setError("Please enter a comment.");
       return;
     }
-    console.log("OH NOOOOO");
+    if (!isHost && comment.length > 50) {
+      setError("Coment too long(max is 50 chars).");
+      return;
+    }
+
     const propertiesRef = collection(db, "property");
     const docRef = await addDoc(
       collection(propertiesRef, propertyId, "comments"),
@@ -408,6 +412,13 @@ export default function ReservationCard({
               ""
             ) : (
               <div className="badge !p-5  bg-footer w-full">** UPCOMING **</div>
+            )}
+          </div>
+          <div className="text-center  text-xl font-semibold mt-5 ">
+            {leftFB && (
+              <div className="badge !p-5  bg-footer w-full">
+                ** LEFT FEEDBACK **
+              </div>
             )}
           </div>
         </div>

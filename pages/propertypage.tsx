@@ -5,9 +5,11 @@ import {
   DocumentData,
   getDoc,
   getDocs,
+  limit,
   orderBy,
   query,
   QueryDocumentSnapshot,
+  startAfter,
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
@@ -39,6 +41,7 @@ type imgGalleryType = {
   original: string;
   thumbnail: string;
 };
+const LIMIT = 5;
 
 export default function PropertyPage({
   uid,
@@ -51,7 +54,7 @@ export default function PropertyPage({
 }) {
   const myUser: DocumentData | null = uid ? JSON.parse(myUserJSON) : null; //null ako je neulogovan
   const [more, setMore] = useState<boolean>(false);
-
+  const [makeARes, setMakeARes] = useState<boolean>(false);
   const router = useRouter();
   const { property: propertyid, from, to, numOfGuests } = router.query;
   const [property, setProperty] = useState<DocumentData>();
@@ -60,7 +63,8 @@ export default function PropertyPage({
   const pid: string = propertyid ? propertyid.toString() : "";
   const [arrLocation, setArrLocation] = useState<DocumentData[]>([]);
   const [galleryImages, setGalleryImages] = useState<imgGalleryType[]>([]);
-
+  const [loading, setLoading] = useState<boolean>(false);
+  const [postsEnd, setPostsEnd] = useState<boolean>(false);
   //bez server side props jer ima dosta slozenih objekata
   const getProperty = async () => {
     const comm: any[] = [];
@@ -84,19 +88,37 @@ export default function PropertyPage({
       const subColl = query(
         collectionGroup(db, "comments"),
         where("propertyId", "==", pid),
-        orderBy("createdAt", "desc")
+        orderBy("createdAt", "desc"),
+        limit(LIMIT)
       );
 
-      const subDocSnap = await getDocs(subColl);
-      subDocSnap.forEach((doc) => {
-        comm.push(doc);
-      });
-      setComments(comm);
+      const co = (await getDocs(subColl)).docs;
+      setComments(co);
     } else {
       console.log("No such document!");
     }
   };
+  const getMoreComments = async () => {
+    setLoading(true);
+    const last: DocumentData = comments[comments.length - 1].data();
+    const cursor = last.createdAt;
+    const q = query(
+      collectionGroup(db, "comments"),
+      where("propertyId", "==", pid),
+      orderBy("createdAt", "desc"),
+      startAfter(cursor),
+      limit(LIMIT)
+    );
 
+    const newComments = (await getDocs(q)).docs;
+
+    setComments(comments.concat(newComments));
+    setLoading(false);
+
+    if (newComments.length < LIMIT) {
+      setPostsEnd(true);
+    }
+  };
   useEffect(() => {
     if (propertyid) getProperty();
   }, [propertyid]); //probaj i property ako ne radi
@@ -107,7 +129,7 @@ export default function PropertyPage({
         <div className="pt-7 font-semibold  flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
           <div
             className="border shadow-md text-lg sm:text-2xl
-                font-semibold rounded-lg  p-6 mb-2 text-center"
+                font-semibold rounded-md  p-6 mb-2 text-center"
           >
             {property.title}
           </div>
@@ -205,33 +227,46 @@ export default function PropertyPage({
             </div>
           )}
 
-          <div className="mb-5">
-            {property.numOfPersons} guests · {property.numOfRooms} bedroom ·{" "}
-            {property.type}
-          </div>
           <div className="flex flex-col bg-grey-100 mb-10">
             <div
               className="border shadow-md text-lg sm:text-2xl
-                font-semibold rounded-lg  p-6"
+                font-semibold rounded-md  p-6"
             >
+              <div className="mb-5 font-normal text-sm">
+                {property.numOfPersons} guests · {property.numOfRooms} bedroom ·{" "}
+                {property.type}
+              </div>
               {property.description}
             </div>
           </div>
+
           <div className="flex flex-col items-center justify-center  mb-10 w-full h-96">
             {arrLocation.length > 0 && <Map2 arrLoc={arrLocation} />}
           </div>
 
-          {uid !== "" && !isHostModeHost && !myUser?.removedByAdmin && (
-            <div className=" w-full  grid place-content-center   ">
-              {property.adminApproved && (
-                <MakeAReservation property={property} />
-              )}
-              {!property.adminApproved && (
-                <div className="badge">
-                  **It is not posible to make a reservation yet. Waiting for
-                  admin approval.**
+          {uid !== "" &&
+            !isHostModeHost &&
+            !property.removedByAdmin &&
+            property.adminApproved && (
+              <div>
+                <button
+                  className="btn mb-10 w-full"
+                  onClick={() => {
+                    setMakeARes(!makeARes);
+                  }}
+                >
+                  {!makeARes && <div> Make a reservation </div>}
+                  {makeARes && <div> Close </div>}
+                </button>
+                <div className=" w-full  grid place-content-center   ">
+                  {makeARes && <MakeAReservation property={property} />}
                 </div>
-              )}
+              </div>
+            )}
+          {!property.adminApproved && (
+            <div className="badge">
+              **It is not posible to make a reservation yet. Waiting for admin
+              approval.**
             </div>
           )}
           {uid === "" && (
@@ -250,6 +285,7 @@ export default function PropertyPage({
               **You can&apos;t make a reservation - property removed by admin**
             </div>
           )}
+
           <div className="mb-10 mt-10">
             <div className="pt-7 pb-5 text-center text-3xl font-bold">
               Reviews
@@ -264,6 +300,13 @@ export default function PropertyPage({
                 </div>
               );
             })}
+            {!loading && !postsEnd && (
+              <button onClick={getMoreComments}>Load more</button>
+            )}
+
+            {postsEnd && (
+              <div className="badge  w-full">You have reached the end!</div>
+            )}
           </div>
         </div>
       )}
