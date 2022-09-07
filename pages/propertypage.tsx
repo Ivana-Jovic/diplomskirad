@@ -305,7 +305,7 @@ export default function PropertyPage({
             )}
 
             {postsEnd && (
-              <div className="badge  w-full">You have reached the end!</div>
+              <div className="badge w-full">You have reached the end!</div>
             )}
           </div>
         </div>

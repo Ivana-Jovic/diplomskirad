@@ -6,7 +6,7 @@ export default function SimpleBackdrop({ loading }: { loading: boolean }) {
     <div>
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={true}
+        open={loading}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
