@@ -22,14 +22,27 @@ export const AuthContext = createContext<ContextType>({
   myUser: null,
   // loading: false,
   setHostModeHostC: () => {},
-  hostModeHostC: true,
+  hostModeHostC: nookies.get().hostMode
+    ? nookies.get().hostMode === "true"
+      ? true
+      : false
+    : true,
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, loading] = useAuthState(auth);
   const [myUser, setMyUser] = useState<DocumentData | undefined>(undefined);
-  const [hostModeHostC, setHostModeHostC] = useState<boolean>(true);
+  const [hostModeHostC, setHostModeHostC] = useState<boolean>(
+    nookies.get().hostMode
+      ? nookies.get().hostMode === "true"
+        ? true
+        : false
+      : true
+  );
 
+  if (!nookies.get().hostMode) {
+    nookies.set(undefined, "hostMode", "true", {});
+  }
   useEffect(() => {
     let unsubscribe;
     async function helper() {
@@ -53,8 +66,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return unsubscribe;
   }, [user]);
   useEffect(() => {
-    if (myUser && myUser.host)
+    if (myUser && myUser.host) {
       toast.success(hostModeHostC ? "Mode: host" : "Mode: travel");
+      nookies.set(undefined, "hostMode", hostModeHostC ? "true" : "false", {});
+    }
   }, [hostModeHostC, myUser]);
   // const [user, setUser] = useState<User | null | undefined>(null);
   // const [myUser, setMyUser] = useState<any>(null);

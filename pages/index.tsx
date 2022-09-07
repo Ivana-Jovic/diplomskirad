@@ -43,13 +43,13 @@ export default function Index({
     // //can access only if isHostModeTravel, else change mod
     // setHostModeHostC(false);
     return (
-      <div className="h-full">
-        <Layout>
-          <div className="!h-full">
-            <IndexHostModeHost />
-          </div>
-        </Layout>
-      </div>
+      // <div className="!h-full">
+      <Layout>
+        <div className="!h-full">
+          <IndexHostModeHost />
+        </div>
+      </Layout>
+      // </div>
     );
   }
   // }, []);
