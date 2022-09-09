@@ -54,13 +54,13 @@ export default function IndexHostModeHost({}: {}) {
           Host board
         </a>
       </Link>
+      <Link href="/hostsreservations">
+        <a className="btn">Host reservations</a>
+      </Link>
       <Link href="/faq">
         <a className="btn" onClick={() => setLoading(true)}>
           FAQ
         </a>
-      </Link>
-      <Link href="/hostsreservations">
-        <a className="btn">Host reservations</a>
       </Link>
       <div
         className="btn"

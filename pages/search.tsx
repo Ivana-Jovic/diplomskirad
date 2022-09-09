@@ -268,7 +268,7 @@ export default function Search({
             from {fromStr} to {toStr} <br />
             {numOfGuests} guests - {rooms} rooms <br />
             Average price per night in {location} is{" "}
-            {(sumPricesPropertiesLocation / numPropertiesLocation).toFixed(1)}e
+            {(sumPricesPropertiesLocation / numPropertiesLocation).toFixed(1)}€
           </div>
           <div className="text-4xl mb-6">Stays in {location}</div>
           <div className="flex flex-col sm:flex-row mb-5 space-y-3 sm:space-y-0 sm:space-x-3 text-gray-800">

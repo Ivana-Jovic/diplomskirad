@@ -13,8 +13,10 @@ import {
   increment,
 } from "firebase/firestore";
 import { useRef, useState } from "react";
-import { db } from "../firebase";
+import { db, storage } from "../firebase";
 import toast from "react-hot-toast";
+import { deleteObject, ref } from "firebase/storage";
+import PropertySettings from "../pages/propertysettings";
 
 export default function ReportCard({ report }: { report: DocumentData }) {
   const [processed, setProcessed] = useState<boolean>(report.processed);
@@ -65,6 +67,14 @@ export default function ReportCard({ report }: { report: DocumentData }) {
   };
 
   const deleteProperty = async () => {
+    const property = await (
+      await getDoc(doc(db, "property", report.propertyId))
+    ).data();
+    console.log(property);
+    for (let index = 0; index < property.images.length; index++) {
+      console.log(property.images[index]);
+      await deleteObject(ref(storage, property.images[index]));
+    }
     await deleteDoc(doc(db, "property", report.propertyId));
     processReport();
   };
@@ -100,20 +110,21 @@ export default function ReportCard({ report }: { report: DocumentData }) {
                   " is reporting guest" +
                   report.guestId}
             </h2>
-            <div className="">
-              Created at {new Date(report.createdAt).toDateString()}
-            </div>
-            <div className="">reportId {report.id}</div>
             <div>
+              <div className="">
+                Created at {new Date(report.createdAt).toDateString()}
+              </div>
+              <div className="">Report id: {report.id}</div>
+
               {/* <div>{report.id}</div> */}
               <div className="">
-                Guest -{report.guestId}
+                Guest: {report.guestId}
                 {/* -{report.guestLastName}- */}
                 {/* {report.guestId} */}
               </div>
               <div className="">{report.reportText}</div>
               <div className="">
-                guest is Reporting:
+                Guest is Reporting:
                 {report.guestIsReporting ? "yes" : "no"}
               </div>
               <div className="">Host {report.hostId}</div>
@@ -152,13 +163,14 @@ export default function ReportCard({ report }: { report: DocumentData }) {
             <h2 className="card-title">
               {report.hostId} wants to add a property
             </h2>
-            <div className="">
-              Created at {new Date(report.createdAt).toDateString()}
-            </div>
-            <div className="">reportId {report.id}</div>
             <div>
+              {" "}
+              <div className="">
+                Created at {new Date(report.createdAt).toDateString()}
+              </div>
+              <div className="">Report id: {report.id}</div>
               <div className="">{report.reportText}</div>
-              <div className="">Host {report.hostId}</div>
+              {/* <div className="">Host: {report.hostId}</div> */}
               {!processed && (
                 <div>
                   <button className="btn mt-3 w-full" onClick={deleteProperty}>

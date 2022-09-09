@@ -99,15 +99,28 @@ cursor-pointer"
                 ? description
                 : description.slice(0, description.indexOf(" ", 100)) + "..."}
             </div>
-            <div className="text-lg flex items-center  mb-2">
-              {price}€/
-              <div className="text-md text-gray-500 ">night</div>
-            </div>
+            {!inWishlist && (
+              <div className="text-lg flex items-center  mb-2">
+                {price}€/
+                <div className="text-md text-gray-500 ">night</div>
+              </div>
+            )}
             <div className="flex justify-between items-center">
               <div className="text-sm flex items-center text-gray-500 ">
-                <div>{parseInt(price) * numberOfNights}€/</div>
-                <div className="text-sm text-gray-500 ">total</div>
+                {!inWishlist && (
+                  <>
+                    <div>{parseInt(price) * numberOfNights}€/</div>
+                    <div className="text-sm text-gray-500 ">total</div>
+                  </>
+                )}
+                {inWishlist && (
+                  <>
+                    <div className="text-lg flex items-center  ">{price}€/</div>
+                    <div className="text-md text-gray-500">night</div>
+                  </>
+                )}
               </div>
+
               <div className="flex items-center">
                 <div className="text-sm font-semibold">
                   {(totalStars / numberOfReviews

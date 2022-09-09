@@ -249,7 +249,7 @@ export default function PropertyPage({
             {arrLocation.length > 0 && <Map2 arrLoc={arrLocation} />}
           </div>
           {uid !== "" &&
-            !hostModeHostC &&
+            !(myUserContext && myUserContext.host && hostModeHostC) &&
             !property.removedByAdmin &&
             property.adminApproved && (
               <div>
@@ -268,24 +268,24 @@ export default function PropertyPage({
               </div>
             )}
           {!property.adminApproved && (
-            <div className="badge">
+            <div className="badge w-full grid place-content-center mb-10">
               **It is not posible to make a reservation yet. Waiting for admin
               approval.**
             </div>
           )}
 
           {uid === "" && (
-            <div className="badge w-full  grid place-content-center  mb-10 ">
+            <div className="badge w-full grid place-content-center mb-10 ">
               **You must be logged in to make a reservation**
             </div>
           )}
-          {hostModeHostC && (
-            <div className="badge w-full  grid place-content-center  mb-10 ">
+          {myUserContext && myUserContext.host && hostModeHostC && (
+            <div className="badge w-full grid place-content-center mb-10 ">
               **You can&apos;t make a reservation in host mode**
             </div>
           )}
           {property.removedByAdmin && (
-            <div className="badge w-full  grid place-content-center  mb-10 ">
+            <div className="badge w-full grid place-content-center mb-10 ">
               **You can&apos;t make a reservation - property removed by admin**
             </div>
           )}

@@ -378,7 +378,7 @@ export default function MakeAReservation({
               <div className="w-full mt-5 text-sm">
                 <div className="flex justify-between px-10 ">
                   <div>
-                    {property.pricePerNight}e x
+                    {property.pricePerNight}€ x
                     {dateTo && dateFrom
                       ? Math.round(
                           (dateTo?.getTime() - dateFrom?.getTime()) /

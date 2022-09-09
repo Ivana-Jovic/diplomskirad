@@ -272,7 +272,7 @@ export default function AddProperty({
             <Layout>
               {loading && <SimpleBackdrop loading={loading} />}
               <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="max-w-7xl px-5 mx-auto text-center gap-4">
+                <div className="max-w-7xl px-5 mx-auto  gap-4">
                   <div className="pt-7 pb-5 text-center text-3xl font-bold">
                     New property
                   </div>

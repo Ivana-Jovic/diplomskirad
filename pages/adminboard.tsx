@@ -11,6 +11,7 @@ import {
   startAfter,
   Timestamp,
   QueryDocumentSnapshot,
+  where,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import ReportCard from "../components/reportcard";
@@ -18,25 +19,28 @@ import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { isAdmin } from "../lib/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Divider } from "@mui/material";
 
 const LIMIT = 5;
 
 export default function AdminBoard({ reports }: { reports: string }) {
-  // const q = query(
-  //   collection(db, "reports"),
-  //   orderBy("processed"),
-  //   orderBy("createdAt"),
-  //   limit(LIMIT)
-  // );
-
   const repp: DocumentData[] = JSON.parse(reports);
 
   const [rep, setRep] = useState<DocumentData[]>(repp);
   const [loading, setLoading] = useState(false);
 
   const [postsEnd, setPostsEnd] = useState(repp.length === 0 ? true : false);
+  //////
+  const rt = query(
+    collection(db, "reports"),
+    orderBy("createdAt", "asc"),
+    startAfter(rep[0].createdAt)
+    // limit(1)
+  );
+  const [realtimeReports, loadingg] = useCollectionData(rt);
 
+  // ////////////
   //STARO: bez paginationa
   // const [realtimeReservations] = useCollectionData(q);
   // const rep: DocumentData[] = realtimeReservations || JSON.parse(reports);
@@ -60,6 +64,7 @@ export default function AdminBoard({ reports }: { reports: string }) {
       setPostsEnd(true);
     }
   };
+
   return (
     <Layout>
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
@@ -67,6 +72,18 @@ export default function AdminBoard({ reports }: { reports: string }) {
           <div className="pt-7 pb-5 text-center text-3xl font-bold">
             Reports
           </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 place-items-center">
+            {realtimeReports &&
+              realtimeReports.reverse().map((item) => {
+                console.log("RT id", item, item.id);
+                return (
+                  <div key={item.id} className="my-3 w-full">
+                    <ReportCard report={item} />
+                  </div>
+                );
+              })}
+          </div>
+          <Divider />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 place-items-center">
             {rep.map((item) => {
               return (
