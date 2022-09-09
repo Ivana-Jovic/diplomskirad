@@ -193,7 +193,7 @@ export default function PropertySettings({
                     },
                   })}
                   className="w-full mb-2"
-                  id="outlined-required"
+                  id="title"
                   label="Title"
                   helperText={errors.title ? errors.title.message : " "}
                 />
@@ -207,7 +207,7 @@ export default function PropertySettings({
                     },
                   })}
                   className="w-full mb-2 "
-                  id="outlined-required"
+                  id="desc"
                   label="Description"
                   multiline
                   maxRows={15}
@@ -223,7 +223,7 @@ export default function PropertySettings({
                       <>
                         <TextField
                           className="mr-3  mb-2"
-                          id="outlined-required"
+                          id="priceN"
                           label="Price per night"
                           value={value}
                           inputProps={{
@@ -256,7 +256,7 @@ export default function PropertySettings({
                       <>
                         <TextField
                           className="ml-3 mb-2"
-                          id="outlined-required"
+                          id="addCosts"
                           label="Additional costs"
                           value={value}
                           inputProps={{

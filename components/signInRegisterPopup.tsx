@@ -171,7 +171,7 @@ export default function SignInRegisterPopup() {
                       required: "Please enter your email",
                     })}
                     className="mb-2 w-full"
-                    id="outlined-required3"
+                    id="outlined-required2"
                     label="Email"
                     type="email"
                     // InputLabelProps={{ shrink: true }}

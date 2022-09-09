@@ -31,10 +31,12 @@ export default function AdminBoard({ reports }: { reports: string }) {
   // );
 
   const repp: DocumentData[] = JSON.parse(reports);
+
   const [rep, setRep] = useState<DocumentData[]>(repp);
   const [loading, setLoading] = useState(false);
 
-  const [postsEnd, setPostsEnd] = useState(false);
+  const [postsEnd, setPostsEnd] = useState(repp.length === 0 ? true : false);
+
   //STARO: bez paginationa
   // const [realtimeReservations] = useCollectionData(q);
   // const rep: DocumentData[] = realtimeReservations || JSON.parse(reports);

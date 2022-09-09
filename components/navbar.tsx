@@ -360,7 +360,11 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           <Link href="/">
             <a
               onClick={() => {
-                if (router.pathname !== "/") setLoading(true);
+                if (
+                  router.pathname !== "/" &&
+                  router.pathname !== "/indexadmin"
+                )
+                  setLoading(true);
               }}
               className=" text-2xl !text-darkGreen  font-logo
          font-semibold mr-2 cursor-pointer pl-3 "

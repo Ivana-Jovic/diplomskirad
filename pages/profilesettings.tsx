@@ -111,9 +111,11 @@ export default function ProfileSettings({
       data.profilePictureNEW &&
       file
     ) {
+      console.log("changeProfile1");
       if (myUser.photoURL) {
         await deleteObject(ref(storage, myUser.photoURL));
       }
+      console.log("changeProfile2");
       const extension = file.type.split("/")[1];
       const nnNEW: string = `uploads/${uid}/profile/${Date.now()}.${extension}`;
       const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
@@ -121,7 +123,7 @@ export default function ProfileSettings({
       if (file) {
         console.log("BBBBBBBBBBBBBB", file);
         const uploadTask = uploadBytesResumable(storageRef, file);
-
+        console.log("changeProfile3");
         uploadTask.on(
           "state_changed",
           (snapshot) => {
@@ -134,20 +136,35 @@ export default function ProfileSettings({
             console.log("ovo je greska");
             setError(err + "");
           },
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then(
-              async (downloadURL) => {
-                setUrl(downloadURL);
-                // update profile pic
-                if (myUser.photoURL !== downloadURL) {
-                  const docRef = await updateDoc(doc(db, "users", uid), {
-                    photoURL: downloadURL,
-                  }).catch((err) => {
-                    console.log("ERROR ", err.message);
-                  });
-                }
-              }
-            );
+          async () => {
+            console.log("changeProfile4");
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+            setUrl(downloadURL);
+            // update profile pic
+            if (myUser.photoURL !== downloadURL) {
+              console.log("changeProfile5");
+              const docRef = await updateDoc(doc(db, "users", uid), {
+                photoURL: downloadURL,
+              }).catch((err) => {
+                console.log("ERROR ", err.message);
+              });
+            }
+
+            // getDownloadURL(uploadTask.snapshot.ref).then(
+            //   async (downloadURL) => {
+            //     setUrl(downloadURL);
+            //     // update profile pic
+            //     if (myUser.photoURL !== downloadURL) {
+            //       console.log("changeProfile5");
+            //       const docRef = await updateDoc(doc(db, "users", uid), {
+            //         photoURL: downloadURL,
+            //       }).catch((err) => {
+            //         console.log("ERROR ", err.message);
+            //       });
+            //     }
+            //   }
+            // );
           }
         );
       }
@@ -257,7 +274,7 @@ export default function ProfileSettings({
                   },
                 })}
                 className=" "
-                id="outlined-required1"
+                id="firstName"
                 label="first name"
                 InputLabelProps={getValues("firstName") ? { shrink: true } : {}}
                 helperText={errors.firstName ? errors.firstName.message : " "}
@@ -272,7 +289,7 @@ export default function ProfileSettings({
                   },
                 })}
                 className=" mb-2"
-                id="outlined-required2"
+                id="lastName"
                 label="last name"
                 InputLabelProps={getValues("lastName") ? { shrink: true } : {}}
                 helperText={errors.lastName ? errors.lastName.message : " "}
@@ -298,7 +315,7 @@ export default function ProfileSettings({
                 <TextField
                   {...register("passwordOld")}
                   className="mb-2"
-                  id="outlined-required3"
+                  id="passwordOld"
                   label="enter old password"
                   type="password"
                   InputLabelProps={
@@ -311,7 +328,7 @@ export default function ProfileSettings({
                 <TextField
                   {...register("passwordNew")}
                   className="mb-2"
-                  id="outlined-required3"
+                  id="passwordNew"
                   label="enter new password"
                   type="password"
                   InputLabelProps={

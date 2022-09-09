@@ -89,10 +89,12 @@ export async function getServerSideProps(context) {
       getDoc(doc(db, "users", uid)),
       getDocs(q),
     ]);
-
+    console.log("Inside 1");
     if (docSnap.exists()) {
       const myUser: DocumentData = docSnap.data();
+      console.log("Inside");
       if (!isFullyRegisteredUser(myUser)) {
+        console.log("Inside3");
         return {
           redirect: {
             destination: "/profilesettings",

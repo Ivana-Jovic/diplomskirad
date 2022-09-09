@@ -279,7 +279,7 @@ export default function AddProperty({
                       },
                     })}
                     className="w-full "
-                    id="outlined-required"
+                    id="title"
                     label="Title"
                     helperText={errors.title ? errors.title.message : " "}
                   />
@@ -293,7 +293,7 @@ export default function AddProperty({
                       },
                     })}
                     className="w-full "
-                    id="outlined-required"
+                    id="desc"
                     label="Description"
                     multiline
                     maxRows={15}
@@ -314,7 +314,7 @@ export default function AddProperty({
                               //   required: "Please enter a value",
                               // })}
                               className="w-full"
-                              id="outlined-select-currency"
+                              id="type"
                               select
                               label="Select a type"
                               value={value}
@@ -347,7 +347,7 @@ export default function AddProperty({
                             //   required: "Please enter your last name",
                             // })}
                             className=""
-                            id="outlined-required"
+                            id="numRoooms"
                             label="Number of Rooms"
                             value={value}
                             // type="number"
@@ -378,7 +378,7 @@ export default function AddProperty({
                             //   required: "Please enter your last name",
                             // })}
                             className=""
-                            id="outlined-required"
+                            id="numPers"
                             label="Number of Persons"
                             value={value}
                             inputProps={{
@@ -411,7 +411,7 @@ export default function AddProperty({
                             // })}
 
                             className=""
-                            id="outlined-required"
+                            id="priceN"
                             label="Price per night"
                             value={value}
                             inputProps={{
@@ -449,7 +449,7 @@ export default function AddProperty({
                             //   required: "Please enter your last name",
                             // })}
                             className=""
-                            id="outlined-required"
+                            id="addCosts"
                             label="Additional costs"
                             value={value}
                             inputProps={{
@@ -487,7 +487,7 @@ export default function AddProperty({
                             // })}
                             // className="w-full"
                             className=""
-                            id="outlined-select-currency"
+                            id="garage"
                             select
                             label="Is there any parking spot"
                             value={value}
@@ -532,7 +532,7 @@ export default function AddProperty({
                       disabled
                       InputLabelProps={{ shrink: true }}
                       // className="mb-2"
-                      id="outlined-required"
+                      id="state"
                       label="State"
                       value={state}
                       // helperText={errors.state ? errors.state.message : " "}
@@ -545,7 +545,7 @@ export default function AddProperty({
                       disabled
                       InputLabelProps={{ shrink: true }}
                       // className="mb-2"
-                      id="outlined-required"
+                      id="city"
                       label="City"
                       value={city}
                       // helperText={errors.city ? errors.city.message : " "}
@@ -560,7 +560,7 @@ export default function AddProperty({
                       // })}
                       InputLabelProps={{ shrink: true }}
                       // className="mb-2"
-                      id="outlined-required"
+                      id="streetName"
                       label="Street"
                       value={streetName}
                       // helperText={errors.street ? errors.street.message : " "}
@@ -573,7 +573,7 @@ export default function AddProperty({
                       // })}
                       InputLabelProps={{ shrink: true }}
                       // className=" mb-2"
-                      id="outlined-required"
+                      id="streetNum"
                       label="StreetNum"
                       value={streetNum}
                       // onChange={(e) => {
