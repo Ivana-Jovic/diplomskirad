@@ -47,13 +47,6 @@ export default function PropertySettings({
     setHostModeHostC,
   } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (myUser && myUser.host && !hostModeHostC) {
-      //can access only if isHostModeHost, else change mod
-      setHostModeHostC(true);
-    }
-  }, [myUserContext]);
-
   const property: DocumentData = JSON.parse(propertyJSON);
   const [urlArr, setUrlArr] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
@@ -78,6 +71,14 @@ export default function PropertySettings({
   const [loading, setLoading] = useState<boolean>(false);
   const myUser: DocumentData = JSON.parse(myUserJSON);
   const imgNew: File[] = Array.from(watch("picturesNEW"));
+
+  useEffect(() => {
+    console.log("in prop sett");
+    if (myUserContext && myUserContext.host && !hostModeHostC) {
+      //can access only if isHostModeHost, else change mod
+      setHostModeHostC(true);
+    }
+  }, [myUserContext]);
 
   const onSubmit: SubmitHandler<IFormInput> = async (data: IFormInput) => {
     setError("");
@@ -203,15 +204,16 @@ export default function PropertySettings({
                   {...register("desc", {
                     required: "Please enter  a description",
                     maxLength: {
-                      value: 100,
-                      message: "Description can have maximum 100 characters",
+                      value: 400,
+                      message: "Description can have maximum 400 characters",
                     },
                   })}
                   className="w-full mb-2 "
                   id="desc"
                   label="Description"
                   multiline
-                  maxRows={15}
+                  rows={5}
+                  // maxRows={15}
                   helperText={errors.desc ? errors.desc.message : " "}
                 />
 

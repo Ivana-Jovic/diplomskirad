@@ -66,6 +66,11 @@ export default function Wishlist({
                 </div>
               );
             })}
+            {faves.length === 0 && (
+              <div className="badge w-full">
+                There are no properties in wishlist.
+              </div>
+            )}
           </div>
         </div>
       </div>

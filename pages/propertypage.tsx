@@ -62,13 +62,16 @@ export default function PropertyPage({
   const router = useRouter();
   const { property: propertyid, from, to, numOfGuests } = router.query;
   const [property, setProperty] = useState<DocumentData>();
-  const [comments, setComments] =
-    useState<QueryDocumentSnapshot<DocumentData>[]>();
+  const [comments, setComments] = useState<
+    QueryDocumentSnapshot<DocumentData>[]
+  >([]);
   const pid: string = propertyid ? propertyid.toString() : "";
   const [arrLocation, setArrLocation] = useState<DocumentData[]>([]);
   const [galleryImages, setGalleryImages] = useState<imgGalleryType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [postsEnd, setPostsEnd] = useState<boolean>(false);
+  const [postsEnd, setPostsEnd] = useState<boolean>(
+    comments.length === 0 ? true : false
+  );
   //bez server side props jer ima dosta slozenih objekata
   const getProperty = async () => {
     const comm: any[] = [];
@@ -230,7 +233,6 @@ export default function PropertyPage({
               />
             </div>
           )}
-
           <div className="flex flex-col bg-grey-100 mb-10">
             <div
               className="border shadow-md text-lg sm:text-2xl
@@ -243,11 +245,9 @@ export default function PropertyPage({
               {property.description}
             </div>
           </div>
-
           <div className="flex flex-col items-center justify-center  mb-10 w-full h-96">
             {arrLocation.length > 0 && <Map2 arrLoc={arrLocation} />}
           </div>
-
           {uid !== "" &&
             !hostModeHostC &&
             !property.removedByAdmin &&
@@ -273,6 +273,7 @@ export default function PropertyPage({
               approval.**
             </div>
           )}
+
           {uid === "" && (
             <div className="badge w-full  grid place-content-center  mb-10 ">
               **You must be logged in to make a reservation**
@@ -283,13 +284,11 @@ export default function PropertyPage({
               **You can&apos;t make a reservation in host mode**
             </div>
           )}
-
           {property.removedByAdmin && (
             <div className="badge w-full  grid place-content-center  mb-10 ">
               **You can&apos;t make a reservation - property removed by admin**
             </div>
           )}
-
           <div className="mb-10 mt-10">
             <div className="pt-7 pb-5 text-center text-3xl font-bold">
               Reviews
@@ -305,11 +304,16 @@ export default function PropertyPage({
               );
             })}
             {!loading && !postsEnd && (
-              <button onClick={getMoreComments}>Load more</button>
+              <button className="btn w-full" onClick={getMoreComments}>
+                Load more
+              </button>
             )}
 
-            {postsEnd && (
+            {comments.length !== 0 && postsEnd && (
               <div className="badge w-full">You have reached the end!</div>
+            )}
+            {comments.length === 0 && (
+              <div className="badge w-full">There are no reviews.</div>
             )}
           </div>
         </div>

@@ -110,7 +110,10 @@ cursor-pointer"
               </div>
               <div className="flex items-center">
                 <div className="text-sm font-semibold">
-                  {(totalStars / numberOfReviews).toFixed(1)}
+                  {(totalStars / numberOfReviews
+                    ? totalStars / numberOfReviews
+                    : 0
+                  ).toFixed(1)}
                 </div>
                 <Rating
                   name="read-only"

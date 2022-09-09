@@ -161,7 +161,7 @@ export default function HostsBoard({
               <Calendar propertyId={propertiesIds} />
             </div>
           )}
-          {(!propertiesIds || propertiesIds.length === 0) && <div>NEMA</div>}
+          {(!propertiesIds || propertiesIds.length === 0) && <div>None</div>}
 
           <div className="flex flex-col items-center justify-center mt-10 w-full h-96">
             {properties.length > 0 && <Map2 arrLoc={properties} />}

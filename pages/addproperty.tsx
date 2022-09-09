@@ -225,6 +225,8 @@ export default function AddProperty({
       // dateAddedProperty: new Date().toDateString(),
       createdAt: Timestamp.now().toMillis(),
       adminApproved: false,
+      totalEarnings: 0,
+      totalOccupancyDays: 0,
     });
     await updateDoc(doc(db, "property", docRef.id), {
       id: docRef.id,
@@ -293,15 +295,16 @@ export default function AddProperty({
                     {...register("desc", {
                       required: "Please enter  a description",
                       maxLength: {
-                        value: 100,
-                        message: "Description can have maximum 100 characters",
+                        value: 400,
+                        message: "Description can have maximum 400 characters",
                       },
                     })}
                     className="w-full "
                     id="desc"
                     label="Description"
                     multiline
-                    maxRows={15}
+                    // maxRows={15}
+                    rows={5}
                     helperText={errors.desc ? errors.desc.message : " "}
                   />
                   {/* </div> */}

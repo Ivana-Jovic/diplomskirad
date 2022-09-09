@@ -35,7 +35,7 @@ export default function CommentCard({
     "December",
   ];
 
-  const { user, myUser } = useContext(AuthContext);
+  const { user, myUser, hostModeHostC } = useContext(AuthContext);
   const [reported, setReported] = useState<boolean>(comment.data().reported);
   const report = async () => {
     const docRef = await addDoc(collection(db, "reports"), {
@@ -89,7 +89,8 @@ export default function CommentCard({
       <div className="font-normal">{comment.data().comment}</div>
       {myUser &&
         myUser.host &&
-        myUser.modeIsHosting &&
+        // myUser.modeIsHosting &&
+        hostModeHostC &&
         !reported &&
         user &&
         user.uid === propertyOwnerId && ( // it has to be hosts property

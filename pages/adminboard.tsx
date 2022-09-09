@@ -82,8 +82,11 @@ export default function AdminBoard({ reports }: { reports: string }) {
             </button>
           )}
 
-          {postsEnd && (
+          {rep.length !== 0 && postsEnd && (
             <div className="badge  w-full">You have reached the end!</div>
+          )}
+          {rep.length === 0 && (
+            <div className="badge w-full">There are no reports.</div>
           )}
         </div>
       </div>

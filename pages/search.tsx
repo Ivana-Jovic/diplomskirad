@@ -424,9 +424,9 @@ export default function Search({
             </div>
           </div>
         </section>
-        {filteredArr && filteredArr.length === 0 && (
+        {/* {filteredArr && filteredArr.length === 0 && (
           <div className=" badge text-center w-full">**No search results**</div>
-        )}
+        )}*/}
       </div>
     </Layout>
   );

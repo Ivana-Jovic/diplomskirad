@@ -67,6 +67,9 @@ export default function HostsReservations({
                 </div>
               );
             })}
+            {reserv.length === 0 && (
+              <div className="badge w-full">There are no reservations.</div>
+            )}
           </div>
         </div>
       </div>

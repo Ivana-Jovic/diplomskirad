@@ -22,7 +22,10 @@ export default function CardPopup({ property }: { property: DocumentData }) {
         <div className="flex justify-between items-center ">
           <div className="flex items-center">
             <div className="text-sm ">
-              {(property.totalStars / property.numberOfReviews).toFixed(1)}
+              {(property.totalStars / property.numberOfReviews
+                ? property.totalStars / property.numberOfReviews
+                : 0
+              ).toFixed(1)}
             </div>
             <Rating name="read-only" value={1} readOnly size="small" max={1} />
           </div>

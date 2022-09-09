@@ -71,7 +71,7 @@ export default function SignInRegisterPopup() {
         numberOfProperties: 0,
         faves: [],
         removedByAdmin: false,
-        modeIsHosting: false,
+        // modeIsHosting: false,
       });
       setLoading(true);
       router.push({

@@ -47,14 +47,14 @@ export default function CardHostsProperty({
           </figure>
           <div className="card-body">
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <div className="text-xl font-semibold">
-                  {name.length < 20
-                    ? name
-                    : name.slice(0, name.indexOf(" ", 20)) + "..."}
-                </div>
-                <Heart propertyid={propertyid} />
+              {/* <div className="flex justify-between items-center mb-2"> */}
+              <div className="text-xl font-semibold mb-2">
+                {name.length < 20
+                  ? name
+                  : name.slice(0, name.indexOf(" ", 20)) + "..."}
               </div>
+              {/* <Heart propertyid={propertyid} /> */}
+              {/* </div> */}
               <div className="text-sm text-gray-600 flex-grow mb-5">
                 {description.length < 100
                   ? description
@@ -64,8 +64,12 @@ export default function CardHostsProperty({
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
                   <div className="text-sm font-semibold">
-                    {(totalStars / numberOfReviews).toFixed(1)}
+                    {(totalStars / numberOfReviews
+                      ? totalStars / numberOfReviews
+                      : 0
+                    ).toFixed(1)}
                   </div>
+
                   <Rating
                     name="read-only"
                     value={totalStars / numberOfReviews}

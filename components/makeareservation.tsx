@@ -369,7 +369,8 @@ export default function MakeAReservation({
                   id="outlined-required"
                   label="Special requests"
                   multiline
-                  maxRows={15}
+                  // maxRows={15}
+                  rows={5}
                   InputLabelProps={{ shrink: true }}
                 />
               </div>
