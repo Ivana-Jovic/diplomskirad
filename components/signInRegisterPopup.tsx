@@ -52,39 +52,44 @@ export default function SignInRegisterPopup() {
     }
   };
 
-  const reg = (data: IFormInput) => {
+  const reg = async (data: IFormInput) => {
     setError("");
-    createUserWithEmailAndPassword(auth, data.email, data.password)
-      .then(async (cred) => {
-        console.log("User created:", cred.user);
-        // setIsLoggedIn(true);//sad
-        const docRef = await setDoc(doc(db, "users", cred.user.uid), {
-          userId: cred.user.uid,
-          host: false,
-          isAdmin: false,
-          isSuperhost: false,
-          numberOfProperties: 0,
-          faves: [],
-          removedByAdmin: false,
-          modeIsHosting: false,
-        });
-        setLoading(true);
-        router.push({
-          pathname: "/profilesettings",
-        });
-      })
-      .catch((err) => {
-        if (err.code === "auth/email-already-in-use") {
-          setError("Can't register - email already in use");
-        } else if (err.code === "auth/weak-password") {
-          setError("Can't register - weak password");
-        } else if (err.code === "auth/too-many-requests") {
-          setError("Too many requests - try again later");
-        } else {
-          setError("Can't register - wrong data");
-        }
-        console.log(err.message, err.code);
+    try {
+      const cred = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      // .then(async (cred) => {
+      console.log("User created:", cred.user);
+      // setIsLoggedIn(true);//sad
+      const docRef = await setDoc(doc(db, "users", cred.user.uid), {
+        userId: cred.user.uid,
+        host: false,
+        isAdmin: false,
+        isSuperhost: false,
+        numberOfProperties: 0,
+        faves: [],
+        removedByAdmin: false,
+        modeIsHosting: false,
       });
+      setLoading(true);
+      router.push({
+        pathname: "/profilesettings",
+      });
+      // })
+    } catch (err) {
+      if (err.code === "auth/email-already-in-use") {
+        setError("Can't register - email already in use");
+      } else if (err.code === "auth/weak-password") {
+        setError("Can't register - weak password");
+      } else if (err.code === "auth/too-many-requests") {
+        setError("Too many requests - try again later");
+      } else {
+        setError("Can't register - wrong data");
+      }
+      console.log(err.message, err.code);
+    }
   };
   const sig = async (data: IFormInput) => {
     setError("");

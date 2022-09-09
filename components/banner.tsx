@@ -26,7 +26,7 @@ import SimpleBackdrop from "./backdrop";
 //   },
 // });
 //TODOppp na firebasu uslovi
-//ako nine registrovan do kraja yabrani kucicu i omogici samo logout
+
 //TODO provere i loc i vercel
 //- za dugacke titlove i descriptione svuda da li izgleda ok
 //- na raznim velicinama ekrana

@@ -13,7 +13,12 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
 import Link from "next/link";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { isAdmin, isHost, isLoggedUser } from "../lib/hooks";
+import {
+  isAdmin,
+  isFullyRegisteredUser,
+  isHost,
+  isLoggedUser,
+} from "../lib/hooks";
 import SimpleBackdrop from "./backdrop";
 import toast from "react-hot-toast";
 
@@ -336,14 +341,43 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
       />
     </>
   );
+  const menuNotFullyReg = (
+    <>
+      <Menu
+        items={[
+          {
+            key: "1",
+            label: (
+              <>
+                <div
+                  className=" menuItem "
+                  // onClick={() => setLoading(true)}
+                >
+                  menuNotFullyReg
+                  <LogoutNEW />
+                </div>
+              </>
+            ),
+          },
+        ]}
+      />
+    </>
+  );
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   const menu = (
     <>
-      {isLoggedUser(myUser) && menuLoggedUser}
-      {isAdmin(myUser) && menuAdmin}
-      {isHost(myUser) && hostModeHostC && menuHostModeHost}
-      {isHost(myUser) && !hostModeHostC && menuHostModeTravel}
+      {isLoggedUser(myUser) && isFullyRegisteredUser(myUser) && menuLoggedUser}
+      {isAdmin(myUser) && isFullyRegisteredUser(myUser) && menuAdmin}
+      {isHost(myUser) &&
+        hostModeHostC &&
+        isFullyRegisteredUser(myUser) &&
+        menuHostModeHost}
+      {isHost(myUser) &&
+        !hostModeHostC &&
+        isFullyRegisteredUser(myUser) &&
+        menuHostModeTravel}
+      {!isFullyRegisteredUser(myUser) && menuNotFullyReg}
       {/* {isHostModeHost(myUser) && menuHostModeHost}
       {isHostModeTravel(myUser) && menuHostModeTravel} */}
     </>
@@ -362,7 +396,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
               onClick={() => {
                 if (
                   router.pathname !== "/" &&
-                  router.pathname !== "/indexadmin"
+                  router.pathname !== "/indexadmin" &&
+                  isFullyRegisteredUser(myUser)
                 )
                   setLoading(true);
               }}
