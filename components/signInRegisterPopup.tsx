@@ -67,10 +67,11 @@ export default function SignInRegisterPopup() {
           removedByAdmin: false,
           modeIsHosting: false,
         });
-        setLoading(true);
+
         router.push({
           pathname: "/profilesettings",
         });
+        setLoading(true);
       })
       .catch((err) => {
         if (err.code === "auth/email-already-in-use") {
@@ -107,10 +108,10 @@ export default function SignInRegisterPopup() {
 
       if (docSnap.exists()) {
         if (docSnap.data().isAdmin) {
-          setLoading(true);
           router.push({
             pathname: "/indexadmin",
           });
+          setLoading(true);
           return;
         }
       }

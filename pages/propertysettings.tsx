@@ -6,7 +6,12 @@ import ErrorPage from "./errorpage";
 import { InputAdornment, TextField } from "@mui/material";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import ImageForm from "../components/imageform";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { useRouter } from "next/router";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
@@ -96,10 +101,11 @@ export default function PropertySettings({
       console.log(ret);
       if (ret) {
         toast.success("Update successful");
-        setLoading(true);
+
         router.push({
           pathname: "/hostsboard",
         });
+        setLoading(true);
       } else {
         console.log("RETURNED FALSE subm");
         toast.error("Update not successful");
@@ -138,6 +144,9 @@ export default function PropertySettings({
         setError("Image must be png, jpeg or jpg");
         return null;
       }
+    }
+    for (let index = 0; index < property.images.length; index++) {
+      await deleteObject(ref(storage, property.images[index]));
     }
     return urlArr;
   };

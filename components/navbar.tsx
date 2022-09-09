@@ -50,7 +50,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "1",
             label: (
               <>
-                <div className=" menuItem" onClick={() => setLoading(true)}>
+                <div
+                  className=" menuItem"
+                  //  onClick={() => setLoading(true)}
+                >
                   menuLoggedUser
                   <LogoutNEW />
                 </div>
@@ -120,7 +123,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "1",
             label: (
               <>
-                <div className="menuItem" onClick={() => setLoading(true)}>
+                <div
+                  className="menuItem"
+                  //  onClick={() => setLoading(true)}
+                >
                   menuAdmin
                   <LogoutNEW />
                 </div>
@@ -172,7 +178,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           {
             key: "1",
             label: (
-              <div className=" menuItem " onClick={() => setLoading(true)}>
+              <div
+                className=" menuItem "
+                // onClick={() => setLoading(true)}
+              >
                 menuHostModeHost
                 <LogoutNEW />
               </div>
@@ -256,7 +265,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "1",
             label: (
               <>
-                <div className=" menuItem " onClick={() => setLoading(true)}>
+                <div
+                  className=" menuItem "
+                  // onClick={() => setLoading(true)}
+                >
                   menuHostModeTravel
                   <LogoutNEW />
                 </div>

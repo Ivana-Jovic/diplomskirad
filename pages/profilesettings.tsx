@@ -1,5 +1,10 @@
 import { doc, DocumentData, getDoc, updateDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { useContext, useEffect, useState } from "react";
 import ImageForm from "../components/imageform";
 import Layout from "../components/layout";
@@ -36,7 +41,7 @@ type IFormInput = {
   passwordOld: string;
   firstName: string;
   lastName: string;
-  profilePicture: string;
+  // profilePicture: string;
   profilePictureNEW: File[];
 };
 
@@ -106,6 +111,9 @@ export default function ProfileSettings({
       data.profilePictureNEW &&
       file
     ) {
+      if (myUser.photoURL) {
+        await deleteObject(ref(storage, myUser.photoURL));
+      }
       const extension = file.type.split("/")[1];
       const nnNEW: string = `uploads/${uid}/profile/${Date.now()}.${extension}`;
       const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
@@ -211,11 +219,11 @@ export default function ProfileSettings({
       if (res) {
         console.log("res is true");
         toast.success("Update successful");
-        setLoading(true);
+
         router.push({
           pathname: "/",
         });
-
+        setLoading(true);
         return;
       } else {
         console.log("res is false");
