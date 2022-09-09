@@ -101,11 +101,10 @@ export default function PropertySettings({
       console.log(ret);
       if (ret) {
         toast.success("Update successful");
-
+        setLoading(true);
         router.push({
           pathname: "/hostsboard",
         });
-        setLoading(true);
       } else {
         console.log("RETURNED FALSE subm");
         toast.error("Update not successful");

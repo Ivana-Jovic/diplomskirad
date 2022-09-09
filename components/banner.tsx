@@ -75,6 +75,7 @@ export default function Banner({
       setError("Check out date must be after check in date");
     } else {
       setOpenSearch?.(false);
+      setLoading(true);
       router.push({
         pathname: "/search",
         query: {
@@ -85,7 +86,6 @@ export default function Banner({
           rooms: rooms,
         },
       });
-      setLoading(true);
     }
   };
 

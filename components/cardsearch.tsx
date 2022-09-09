@@ -31,6 +31,7 @@ export default function CardSearch({
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const goToPropertyPage = () => {
+    setLoading(true);
     if (router.pathname === "/search") {
       router.push({
         pathname: "/propertypage",
@@ -49,7 +50,6 @@ export default function CardSearch({
         },
       });
     }
-    setLoading(true);
   };
   return (
     <>

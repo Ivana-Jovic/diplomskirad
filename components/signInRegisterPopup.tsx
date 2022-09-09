@@ -61,17 +61,17 @@ export default function SignInRegisterPopup() {
         const docRef = await setDoc(doc(db, "users", cred.user.uid), {
           userId: cred.user.uid,
           host: false,
+          isAdmin: false,
           isSuperhost: false,
           numberOfProperties: 0,
           faves: [],
           removedByAdmin: false,
           modeIsHosting: false,
         });
-
+        setLoading(true);
         router.push({
           pathname: "/profilesettings",
         });
-        setLoading(true);
       })
       .catch((err) => {
         if (err.code === "auth/email-already-in-use") {
@@ -108,10 +108,11 @@ export default function SignInRegisterPopup() {
 
       if (docSnap.exists()) {
         if (docSnap.data().isAdmin) {
+          setLoading(true);
           router.push({
             pathname: "/indexadmin",
           });
-          setLoading(true);
+
           return;
         }
       }

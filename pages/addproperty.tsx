@@ -138,11 +138,10 @@ export default function AddProperty({
       console.log(ret);
       if (ret) {
         toast.success("Property added successfully");
-
+        setLoading(true);
         router.push({
           pathname: "/",
         });
-        setLoading(true);
       } else {
         console.log("RETURNED FALSE subm");
         toast.error("Property not added successfully");

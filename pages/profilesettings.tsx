@@ -219,11 +219,11 @@ export default function ProfileSettings({
       if (res) {
         console.log("res is true");
         toast.success("Update successful");
-
+        setLoading(true);
         router.push({
           pathname: "/",
         });
-        setLoading(true);
+
         return;
       } else {
         console.log("res is false");
