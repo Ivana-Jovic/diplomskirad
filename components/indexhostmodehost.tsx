@@ -33,7 +33,7 @@ export default function IndexHostModeHost({}: {}) {
 
   return (
     //relative h-full
-    <div className="mt-20  flex  flex-col   mx-auto max-w-md  px-8 sm:px-16    text-center gap-4">
+    <div className="mt-20 flex  flex-col  mx-auto max-w-md  px-8 sm:px-16    text-center gap-4">
       {loading && <SimpleBackdrop loading={loading} />}
       {/* items-center content-start self-center justify-items-center justify-center justify-self-center
     place-items-center place-self-center place-content-center */}

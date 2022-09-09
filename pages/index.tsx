@@ -45,9 +45,9 @@ export default function Index({
     return (
       // <div className="!h-full">
       <Layout>
-        <div className="!h-full">
-          <IndexHostModeHost />
-        </div>
+        {/* <div className="!h-full"> */}
+        <IndexHostModeHost />
+        {/* </div> */}
       </Layout>
       // </div>
     );
@@ -119,7 +119,7 @@ export async function getServerSideProps(context) {
       collection(db, "property"),
       orderBy("numberOfReviews", "desc"),
       orderBy("totalStars", "desc"),
-      limit(8)
+      limit(6)
     );
     const [userSnap, querySnapshot] = await Promise.all([
       getDoc(doc(db, "users", uid)),
@@ -182,7 +182,7 @@ export async function getServerSideProps(context) {
       collection(db, "property"),
       orderBy("numberOfReviews", "desc"),
       orderBy("totalStars", "desc"),
-      limit(8)
+      limit(6)
     );
     const querySnapshot = await getDocs(q);
     for (let index = 0; index < querySnapshot.docs.length; index++) {

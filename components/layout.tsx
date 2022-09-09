@@ -35,7 +35,7 @@ export default function Layout({
       </Head>
       <Navbar placeholder={placeholder} />
       <Toaster />
-      <main className="bg-background pb-7 w-full h-full">{children}</main>
+      <main className="bg-background pb-7 w-full grow">{children}</main>
       <Footer />
     </div>
     // </>
