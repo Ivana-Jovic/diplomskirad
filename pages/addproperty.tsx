@@ -16,7 +16,12 @@ import { InputAdornment, MenuItem, TextField } from "@mui/material";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import Map from "../components/map";
 import ImageForm from "../components/imageform";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  getDownloadURL,
+  ref,
+  uploadBytes,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { useRouter } from "next/router";
 import {
   isFullyRegisteredUser,
@@ -175,7 +180,7 @@ export default function AddProperty({
         }/properties/${Date.now()}.${extension}`;
         const storageRef = ref(storage, nnNEW); //ref to file. file dosnt exist yet
         //when we upload using this ref this file should have that name
-        const uploadTask = await uploadBytesResumable(storageRef, selected);
+        const uploadTask = await uploadBytes(storageRef, selected);
         const url: string = await getDownloadURL(uploadTask.ref);
         console.log("WWWWWWWWWWWWWWWWWWW");
         urlArr.push(url);

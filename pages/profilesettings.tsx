@@ -3,6 +3,7 @@ import {
   deleteObject,
   getDownloadURL,
   ref,
+  uploadBytes,
   uploadBytesResumable,
 } from "firebase/storage";
 import { useContext, useEffect, useState } from "react";
@@ -122,51 +123,51 @@ export default function ProfileSettings({
       //when we upload using this ref this file should have that name
       if (file) {
         console.log("BBBBBBBBBBBBBB", file);
-        const uploadTask = uploadBytesResumable(storageRef, file);
+        const uploadTask = await uploadBytes(storageRef, file);
         console.log("changeProfile3");
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            console.log(
-              "zdravo"
-              // +(snapshot.bytesTransferred / snapshot.totalBytes) * 100 +"%"
-            );
-          },
-          (err) => {
-            console.log("ovo je greska");
-            setError(err + "");
-          },
-          async () => {
-            console.log("changeProfile4");
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        // uploadTask.on(
+        //   "state_changed",
+        //   (snapshot) => {
+        //     console.log(
+        //       "zdravo"
+        //       // +(snapshot.bytesTransferred / snapshot.totalBytes) * 100 +"%"
+        //     );
+        //   },
+        //   (err) => {
+        //     console.log("ovo je greska");
+        //     setError(err + "");
+        //   },
+        //   async () => {
+        console.log("changeProfile4");
+        const downloadURL = await getDownloadURL(uploadTask.ref);
 
-            setUrl(downloadURL);
-            // update profile pic
-            if (myUser.photoURL !== downloadURL) {
-              console.log("changeProfile5");
-              const docRef = await updateDoc(doc(db, "users", uid), {
-                photoURL: downloadURL,
-              }).catch((err) => {
-                console.log("ERROR ", err.message);
-              });
-            }
+        setUrl(downloadURL);
+        // update profile pic
+        if (myUser.photoURL !== downloadURL) {
+          console.log("changeProfile5");
+          const docRef = await updateDoc(doc(db, "users", uid), {
+            photoURL: downloadURL,
+          }).catch((err) => {
+            console.log("ERROR ", err.message);
+          });
+        }
 
-            // getDownloadURL(uploadTask.snapshot.ref).then(
-            //   async (downloadURL) => {
-            //     setUrl(downloadURL);
-            //     // update profile pic
-            //     if (myUser.photoURL !== downloadURL) {
-            //       console.log("changeProfile5");
-            //       const docRef = await updateDoc(doc(db, "users", uid), {
-            //         photoURL: downloadURL,
-            //       }).catch((err) => {
-            //         console.log("ERROR ", err.message);
-            //       });
-            //     }
-            //   }
-            // );
-          }
-        );
+        // getDownloadURL(uploadTask.snapshot.ref).then(
+        //   async (downloadURL) => {
+        //     setUrl(downloadURL);
+        //     // update profile pic
+        //     if (myUser.photoURL !== downloadURL) {
+        //       console.log("changeProfile5");
+        //       const docRef = await updateDoc(doc(db, "users", uid), {
+        //         photoURL: downloadURL,
+        //       }).catch((err) => {
+        //         console.log("ERROR ", err.message);
+        //       });
+        //     }
+        //   }
+        // );
+        //   }
+        // );
       }
     }
 
