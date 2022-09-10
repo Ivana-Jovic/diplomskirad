@@ -304,7 +304,7 @@ export default function PropertyPage({
                 </div>
               );
             })}
-            {!loading && !postsEnd && (
+            {!loading && !postsEnd && comments.length !== 0 && (
               <button className="btn w-full" onClick={getMoreComments}>
                 Load more
               </button>

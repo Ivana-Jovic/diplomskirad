@@ -121,9 +121,9 @@ export default function SignInRegisterPopup() {
           return;
         }
       }
-      // router.push({
-      //   pathname: "/",
-      // });
+      router.push({
+        pathname: "/",
+      });
     } catch (err) {
       if (err.code === "auth/user-not-found") {
         setError("Can't sign in  - user not found");
