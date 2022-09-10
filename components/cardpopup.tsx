@@ -9,7 +9,7 @@ import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 export default function CardPopup({ property }: { property: DocumentData }) {
   const router = useRouter();
   return (
-    <div className="card card-side  p-2 rounded-md  cursor-pointer bg-base-100 shadow-md hover:opacity-90 hover:shadow-lg">
+    <div className="card card-side  p-2 rounded-md  cursor-pointer bg-base-100 hover:opacity-90 hover:shadow-lg">
       <figure className="relative h-auto w-1/3  flex-shrink-0">
         <Image
           src={property.images[0]}
@@ -36,7 +36,7 @@ export default function CardPopup({ property }: { property: DocumentData }) {
             : property.title.slice(0, property.title.indexOf(" ", 20)) + "..."}
         </div>
         <div className=" flex items-center ">
-          {property.price}€/
+          {property.pricePerNight}€/
           <div className="text-md text-gray-500 ">night</div>
         </div>
       </div>

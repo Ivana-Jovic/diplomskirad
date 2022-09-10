@@ -275,10 +275,6 @@ export default function ReservationCard({
                   <td>{total}€</td>
                 </tr>
                 <tr>
-                  <td className="text-md font-semibold">Total:</td>
-                  <td>{total}€</td>
-                </tr>
-                <tr>
                   <td className="text-md font-semibold">Guests:</td>
                   <td> {guests}</td>
                 </tr>

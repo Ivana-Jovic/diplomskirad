@@ -165,7 +165,7 @@ export default function HostsBoard({
           <div className="pt-7 pb-5 text-center text-3xl font-bold mt-10">
             Map
           </div>
-          <div className="flex flex-col items-center justify-center mt-10 w-full h-96">
+          <div className="flex flex-col items-center justify-center mt-10 mb-10 w-full h-96">
             {properties.length > 0 && <Map2 arrLoc={properties} />}
           </div>
         </div>

@@ -70,7 +70,8 @@ export default function PropertyPage({
   const [galleryImages, setGalleryImages] = useState<imgGalleryType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [postsEnd, setPostsEnd] = useState<boolean>(
-    comments.length === 0 ? true : false
+    false
+    // comments.length === 0 ? true : false
   );
   //bez server side props jer ima dosta slozenih objekata
   const getProperty = async () => {
