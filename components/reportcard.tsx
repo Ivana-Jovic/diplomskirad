@@ -103,33 +103,30 @@ export default function ReportCard({ report }: { report: DocumentData }) {
           <div className="card-body">
             <h2 className="card-title">
               {report.guestIsReporting
-                ? "Guest " + report.guestId + " is reporting a host"
+                ? "Guest " + " is reporting: " + report.reportText
                 : //+ item.data().hostId
                   "Host " +
                   // item.data().hostId +
-                  " is reporting guest" +
-                  report.guestId}
+                  " is reporting:  " +
+                  report.reportText}
             </h2>
             <div>
               <div className="">
                 Created at {new Date(report.createdAt).toDateString()}
               </div>
               <div className="">Report id: {report.id}</div>
-
+              {/* Guest is Reporting:
+              {report.guestIsReporting ? "yes" : "no"} */}
               {/* <div>{report.id}</div> */}
               <div className="">
                 Guest: {report.guestId}
                 {/* -{report.guestLastName}- */}
                 {/* {report.guestId} */}
               </div>
-              <div className="">{report.reportText}</div>
-              <div className="">
-                Guest is Reporting:
-                {report.guestIsReporting ? "yes" : "no"}
-              </div>
-              <div className="">Host {report.hostId}</div>
+              <div className="">Host: {report.hostId}</div>
+              {/* <div className="">{report.reportText}</div> */}
               {/* <div className="">Reservation Id {report.reservationId}</div> */}
-              <div className="">Reservation Id {report.reservationId}</div>
+              <div className="">Reservation id: {report.reservationId}</div>
               {!processed && (
                 <div>
                   {report.reportText !== "comment" && (
@@ -160,17 +157,14 @@ export default function ReportCard({ report }: { report: DocumentData }) {
       {report.reportText === "wantsToAddProperty" && (
         <div className="card w-full bg-base-100 shadow-xl">
           <div className="card-body">
-            <h2 className="card-title">
-              {report.hostId} wants to add a property
-            </h2>
+            <h2 className="card-title">Host wants to add a property</h2>
             <div>
-              {" "}
               <div className="">
                 Created at {new Date(report.createdAt).toDateString()}
               </div>
               <div className="">Report id: {report.id}</div>
-              <div className="">{report.reportText}</div>
-              {/* <div className="">Host: {report.hostId}</div> */}
+              {/* <div className="">{report.reportText}</div> */}
+              <div className="">Host: {report.hostId}</div>
               {!processed && (
                 <div>
                   <button className="btn mt-3 w-full" onClick={deleteProperty}>
