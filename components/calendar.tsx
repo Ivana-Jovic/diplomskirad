@@ -4,8 +4,30 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { useEffect, useRef, useState, useCallback } from "react";
 import ReservationCard from "./reservationcard";
-const arrColour = ["#f7cbc8", "#c9eef0", "#d0e8c8", "#e8dcc1"];
-const arrColour3 = ["bg-[#f7cbc8]", "bg-[#c9eef0]"];
+const arrColour = [
+  "#FFB6A3",
+  "#F5D1C3",
+  "#C4D7D1",
+  "#5F9595",
+  "#F0BC68",
+  "#8990B3",
+  "#FFD3C4",
+  "#DEE3FF",
+  "#DEFFC4",
+  "#d0e8c8",
+];
+const arrColour3 = [
+  `bg-[#FFB6A3]`,
+  `bg-[#F5D1C3]`,
+  `bg-[#C4D7D1]`,
+  `bg-[#5F9595]`,
+  `bg-[#F0BC68]`,
+  `bg-[#8990B3]`,
+  `bg-[#FFD3C4]`,
+  `bg-[#DEE3FF]`,
+  `bg-[#DEFFC4]`,
+  `bg-[#A0B392]`,
+];
 const arrColour2 = ["logo", "logo"];
 //TDOD: add colours
 
@@ -31,7 +53,7 @@ export default function Calendar({
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
-      console.log("AAAAAAAAAAAAAA", propertyId.length);
+      console.log("AAAAAAAAAAAAAA", doc.data().leftFeedback, propertyId.length);
       calendarRef.current
         ?.getApi()
         .getEventById(
@@ -60,15 +82,16 @@ export default function Calendar({
             timeCheckOut: doc.data().timeCheckOut,
             propertyId: doc.data().propertyId,
             hostId: doc.data().hostId,
-            garage: doc.data().garage,
+            garage: doc.data().garage as boolean,
             guests: doc.data().guests,
             specialReq: doc.data().specialReq,
             userId: doc.data().userId,
             firstName: doc.data().firstName,
             lastName: doc.data().lastName,
             user: doc.data().user,
-            leftFeedback: doc.data().leftFeedback,
-            reservationId: doc.data().reservationId,
+            leftFeedback: doc.data().leftFeedback as boolean,
+            hostLeftReport: doc.data().hostLeftReport as boolean,
+            reservationId: doc.data().id,
             createdAt: doc.data().createdAt,
           },
           color: arrColour[propertyId.indexOf(doc.data().propertyId)],
@@ -108,70 +131,85 @@ export default function Calendar({
   // [JSON.stringify(propertyId)] https://stackoverflow.com/questions/59467758/passing-array-to-useeffect-dependency-list
 
   return (
-    <>
-      <FullCalendar
-        // key={propertyId}
+    <div className="flex lg:flex-row flex-col mt-7">
+      <div className="lg:w-2/3 ">
+        <FullCalendar
+          // key={propertyId}
 
-        ref={calendarRef}
-        plugins={[dayGridPlugin]}
-        showNonCurrentDates={false}
-        fixedWeekCount={false}
-        // events={[
-        //   { title: "event 1", start: "2022-08-01", end: "2022-08-03" },
-        //   { title: "event 2", date: "2022-08-02" },
-        // ]}
-        displayEventEnd={true}
-        eventColor={"#cfd2d4"}
-        eventTextColor={"#0f172a"}
-        eventTimeFormat={{ hour: "2-digit", minute: "2-digit", hour12: false }}
-        // eventDisplay={"background"}
-        // editable
-        // selectable
-        eventClick={function (info: any) {
-          // alert("Event: " + info.event.title);
-          //   info.el.style.borderColor = "red";
-          //   setIsPopupOpen(true);
-          info.el.style.borderColor = "red";
-          setEventInfo(info);
-          if (eventInfo) eventInfo.el.style.borderColor = "white";
-          //   info.el.style.borderColor = "red";
-        }}
-      />
-      {eventInfo && (
-        <div className="mt-10 ">
+          ref={calendarRef}
+          plugins={[dayGridPlugin]}
+          showNonCurrentDates={false}
+          fixedWeekCount={false}
+          // events={[
+          //   { title: "event 1", start: "2022-08-01", end: "2022-08-03" },
+          //   { title: "event 2", date: "2022-08-02" },
+          // ]}
+          displayEventEnd={true}
+          eventColor={"#cfd2d4"}
+          eventTextColor={"#0f172a"}
+          eventTimeFormat={{
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }}
+          // eventDisplay={"background"}
+          // editable
+          // selectable
+          eventClick={function (info: any) {
+            // alert("Event: " + info.event.title);
+            //   info.el.style.borderColor = "red";
+            //   setIsPopupOpen(true);
+            info.el.style.borderColor = "red";
+            setEventInfo(info);
+            if (eventInfo) eventInfo.el.style.borderColor = "white";
+            //   info.el.style.borderColor = "red";
+          }}
+        />
+      </div>
+
+      <div className="lg:w-1/3 mt-5 lg:mt-0 self-center ">
+        {eventInfo && (
           <div className="grid place-items-center ">
             <div
               className={
                 arrColour3[
                   propertyId.indexOf(eventInfo?.event.extendedProps.propertyId)
-                ]
+                ] + ` rounded-full `
               }
             >
-              <ReservationCard
-                userId={eventInfo?.event.extendedProps.userId}
-                firstName={eventInfo?.event.extendedProps.firstName}
-                lastName={eventInfo?.event.extendedProps.lastName}
-                to={eventInfo?.event.end.toDateString()}
-                from={eventInfo?.event.start.toDateString()}
-                propertyId={eventInfo?.event.extendedProps.propertyId}
-                hostId={eventInfo?.event.extendedProps.hostId}
-                garage={eventInfo?.event.extendedProps.garage}
-                guests={eventInfo?.event.extendedProps.guests}
-                specialReq={eventInfo?.event.extendedProps.specialReq}
-                timeCheckIn={eventInfo?.event.extendedProps.timeCheckIn}
-                timeCheckOut={eventInfo?.event.extendedProps.timeCheckOut}
-                title={eventInfo?.event.title}
-                total={eventInfo?.event.extendedProps.total}
-                user={eventInfo?.event.extendedProps.user}
-                leftFeedback={eventInfo?.event.extendedProps.leftFeedback}
-                reservationId={eventInfo?.event.extendedProps.reservationId}
-                isHost={true}
-                createdAt={eventInfo?.event.extendedProps.createdAt}
-              />
+              <div className="p-5"></div>
             </div>
+            {/* aa{eventInfo?.event.extendedProps.leftFeedback + ""} */}
+            <ReservationCard
+              userId={eventInfo?.event.extendedProps.userId}
+              firstName={eventInfo?.event.extendedProps.firstName}
+              lastName={eventInfo?.event.extendedProps.lastName}
+              to={eventInfo?.event.end.toDateString()}
+              from={eventInfo?.event.start.toDateString()}
+              propertyId={eventInfo?.event.extendedProps.propertyId}
+              hostId={eventInfo?.event.extendedProps.hostId}
+              garage={eventInfo?.event.extendedProps.garage as boolean}
+              guests={eventInfo?.event.extendedProps.guests}
+              specialReq={eventInfo?.event.extendedProps.specialReq}
+              timeCheckIn={eventInfo?.event.extendedProps.timeCheckIn}
+              timeCheckOut={eventInfo?.event.extendedProps.timeCheckOut}
+              title={eventInfo?.event.title}
+              total={eventInfo?.event.extendedProps.total}
+              user={eventInfo?.event.extendedProps.user}
+              leftFeedback={
+                eventInfo?.event.extendedProps.leftFeedback as boolean
+              }
+              hostLeftReport={
+                eventInfo?.event.extendedProps.hostLeftReport as boolean
+              }
+              reservationId={eventInfo?.event.extendedProps.reservationId}
+              isHost={true}
+              createdAt={eventInfo?.event.extendedProps.createdAt}
+              // isOwnerOfThisProperty={true}
+            />
           </div>
-        </div>
-      )}
-    </>
+        )}{" "}
+      </div>
+    </div>
   );
 }

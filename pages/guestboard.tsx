@@ -61,6 +61,7 @@ export default function GuestBoard({
                     // bez obzira na mod, cak i da jeste inace host, ovde je u ulozi guesta
                     //  Kad napravis modove u oba resrvation carda obrati paznju na isHost
                     isHost={false}
+                    // isOwnerOfThisProperty={user.uid === item.hostId}
                   />
                 </div>
               );

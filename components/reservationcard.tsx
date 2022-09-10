@@ -11,7 +11,7 @@ import {
   Timestamp,
   setDoc,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { db } from "../firebase";
 import Rating from "@mui/material/Rating";
 import {
@@ -62,10 +62,12 @@ export default function ReservationCard({
   total,
   user,
   leftFeedback,
+  hostLeftReport,
   reservationId,
   isHost,
   createdAt,
-}: {
+}: // isOwnerOfThisProperty,
+{
   userId: string;
   firstName: string;
   lastName: string;
@@ -82,12 +84,15 @@ export default function ReservationCard({
   total: number;
   user: string;
   leftFeedback: boolean;
+  hostLeftReport: boolean;
   reservationId: string;
-  isHost: boolean;
+  isHost: boolean; // IS OWNER
   createdAt: number;
+  // isOwnerOfThisProperty: boolean;
 }) {
   const len: number = 15;
   const [leftFB, setLeftFB] = useState<boolean>(leftFeedback);
+  const [hostLeftRep, setHostLeftRep] = useState<boolean>(hostLeftReport);
   const [comment, setComment] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [stars, setStars] = useState<number | null>(1);
@@ -183,14 +188,26 @@ export default function ReservationCard({
     await updateDoc(doc(db, "reports", docRef.id), {
       id: docRef.id,
     });
+    if (isHost) {
+      await updateDoc(doc(db, "reservations", reservationId), {
+        hostLeftReport: true,
+      });
+      setHostLeftRep(true);
+    }
     toast.success("Reported successfully");
   };
-
+  const hostWontReport = async () => {
+    await updateDoc(doc(db, "reservations", reservationId), {
+      hostLeftReport: true,
+    });
+    setHostLeftRep(true);
+    toast.success("Didn't report");
+  };
   return (
     <div
       className={
         `card rounded-md shadow-lg my-3  max-w-5xl h-[400px] ` +
-        `${new Date(to) <= new Date() ? " bg-[#f1efef]" : " bg-[#eff5ef]"}`
+        `${new Date(to) <= new Date() ? " bg-[#F4EAE4]" : " bg-[#e8f8ef]"}`
       }
     >
       <div className="card-body">
@@ -218,7 +235,7 @@ export default function ReservationCard({
             <table className="w-full">
               <tbody>
                 <tr>
-                  <td className="text-md font-semibold">Reservation number:</td>
+                  <td className="text-md font-semibold">Reservation no:</td>
                   <td>
                     {reservationId?.length < len
                       ? reservationId
@@ -279,7 +296,13 @@ export default function ReservationCard({
                 </tr>
                 <tr>
                   <td className="text-md font-semibold">Special request:</td>
-                  <td>{specialReq ? specialReq : "none"}</td>
+                  <td>
+                    {specialReq
+                      ? specialReq?.length <= 20
+                        ? specialReq
+                        : specialReq?.slice(0, 20) + "..."
+                      : "none"}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -287,7 +310,7 @@ export default function ReservationCard({
           <div>
             {new Date(to) <= new Date() && (
               <div className="text-center mt-5">
-                {!leftFB && (
+                {((!leftFB && !isHost) || (!hostLeftReport && isHost)) && (
                   <>
                     <label
                       htmlFor="my-modal-3"
@@ -295,7 +318,7 @@ export default function ReservationCard({
                     shadow-md  w-full
                       hover:shadow-lg active:scale-90 transition duration-150"
                     >
-                      {isHost ? "Report" : "Leave feedback"}
+                      {isHost ? "Report or cancel report" : "Leave feedback"}
                     </label>
                     <input
                       type="checkbox"
@@ -391,12 +414,51 @@ export default function ReservationCard({
                                 </FormControl>
                               </div>
                             )}
-                            <button
-                              className="btn mt-3"
-                              onClick={leaveFeedback}
-                            >
-                              {isHost ? "Report" : "Leave feedback"}
-                            </button>
+                            {!isHost && (
+                              <button
+                                className="btn mt-3"
+                                onClick={leaveFeedback}
+                              >
+                                Leave feedback
+                              </button>
+                            )}
+                            {isHost && (
+                              <div className="flex flex-col ">
+                                <button className="btn mt-3" onClick={report}>
+                                  Report
+                                </button>
+                                <button
+                                  className="btn mt-3"
+                                  onClick={hostWontReport}
+                                >
+                                  Dont report
+                                </button>
+                              </div>
+                            )}
+                            {/* {!isHost && (
+                              <button
+                                className="btn mt-3"
+                                onClick={leaveFeedback}
+                              >
+                                Leave feedback
+                              </button>
+                            )}
+                            {isHost && (
+                              <div className="flex ">
+                                <button
+                                  className=" mt-3 !w-1/2"
+                                  onClick={report}
+                                >
+                                  Report
+                                </button>
+                                <button
+                                  className=" mt-3 !w-1/2"
+                                  onClick={hostWontReport}
+                                >
+                                  Dont repoert
+                                </button>
+                              </div>
+                            )} */}
                             <div className="text-center mt-2">{error}</div>
                           </div>
                         </div>
@@ -415,7 +477,7 @@ export default function ReservationCard({
             )}
           </div>
           <div className="text-center  text-xl font-semibold mt-5 ">
-            {leftFB && (
+            {((leftFB && !isHost) || (hostLeftReport && isHost)) && (
               <div className="badge !p-5  bg-footer w-full">
                 ** LEFT FEEDBACK **
               </div>

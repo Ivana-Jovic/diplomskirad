@@ -152,6 +152,7 @@ export default function MakeAReservation({
           data.timeTo.getMinutes(),
         specialReq: data.specialReq,
         leftFeedback: false,
+        hostLeftReport: false,
         createdAt: Timestamp.now().toMillis(),
       });
 
@@ -364,7 +365,12 @@ export default function MakeAReservation({
               </div>
               <div className="w-full  my-3">
                 <TextField
-                  {...register("specialReq")}
+                  {...register("specialReq", {
+                    maxLength: {
+                      value: 20,
+                      message: "Request can have maximum 20 characters",
+                    },
+                  })}
                   className="w-full"
                   id="outlined-required"
                   label="Special requests"

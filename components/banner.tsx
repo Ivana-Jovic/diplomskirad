@@ -40,7 +40,6 @@ import SimpleBackdrop from "./backdrop";
 //- indexi da li su asc ili esc
 //- obrisati sliku iz stoaraga u profile i u nekretninama
 //- testirati kad admin ne odobrava property da li se brise i da li brise storage
-// TODO !!!!!!!!!!!!AKO SAM NA ISTOJ STRANI I ODABEREM U MENIJU ISTU SKLONI SPINER
 
 export default function Banner({
   setOpenSearch,

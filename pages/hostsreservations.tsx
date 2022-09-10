@@ -62,6 +62,7 @@ export default function HostsReservations({
                       reservationId={item.id}
                       // bez obzira na mod, cak i da jeste inace host, ovde je u ulozi guesta
                       isHost={true}
+                      // isOwnerOfThisProperty={true}
                     />
                   </div>
                 </div>
