@@ -66,10 +66,10 @@ export default function GuestBoard({
                 </div>
               );
             })}
-            {reserv.length === 0 && (
-              <div className="badge w-full">There are no reservations.</div>
-            )}
-          </div>
+          </div>{" "}
+          {reserv.length === 0 && (
+            <div className="badge w-full">There are no reservations.</div>
+          )}
         </div>
       </div>
     </Layout>

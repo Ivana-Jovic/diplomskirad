@@ -251,7 +251,7 @@ export default function ProfileSettings({
   };
   return (
     <Layout>
-      <div className="max-w-3xl px-8 sm:px-16 text-center  mx-auto  mt-5 ">
+      <div className="max-w-3xl px-8 sm:px-16 text-center  mx-auto  mt-10 ">
         {loading && <SimpleBackdrop loading={loading} />}
         <form onSubmit={handleSubmit(onSubmit)} className="">
           <div className="flex flex-col">

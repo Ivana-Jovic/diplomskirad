@@ -78,9 +78,12 @@ cursor-pointer"
           <div>
             <div className="flex justify-between items-center mb-2">
               <div className="text-xl font-semibold">
-                {name.length < 20
+                {name.length <= 20
                   ? name
-                  : name.slice(0, name.indexOf(" ", 20)) + "..."}
+                  : name.slice(
+                      0,
+                      name.indexOf(" ", 20) > 24 ? name.indexOf(" ", 20) : 24
+                    ) + "..."}
               </div>
               <div className="flex">
                 {avgPricePerNight > parseFloat(price) && (

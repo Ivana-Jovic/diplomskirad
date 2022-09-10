@@ -153,7 +153,7 @@ export default function SignInRegisterPopup() {
           console.log("register clicked");
           togglePopup("R");
         }}
-        className="hidden md:inline mr-3"
+        className="btn scale-75 hidden md:inline "
       >
         Register
       </button>
@@ -162,6 +162,7 @@ export default function SignInRegisterPopup() {
           console.log("sign in clicked");
           togglePopup("S");
         }}
+        className="btn scale-75"
       >
         Sign in
       </button>

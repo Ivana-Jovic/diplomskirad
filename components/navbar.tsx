@@ -477,7 +477,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         className="py-5 shadow-xl bg-header flex flex-col
        w-full sticky top-0 z-[100]"
       >
-        <div className="sm:px-5  md:px-10 grid grid-cols-3">
+        <div
+          className="sm:px-5  md:px-10 grid grid-cols-3
+         items-center"
+        >
           <Link href="/">
             <a
               onClick={() => {
@@ -496,7 +499,10 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           </Link>
 
           {
-            <div className="flex items-center space-x-4 justify-self-end col-span-2 pr-3">
+            <div
+              className="flex items-center space-x-4 justify-self-end col-span-2 pr-3
+"
+            >
               {((user && myUser) || user === null) &&
                 router &&
                 router.pathname !== "/" &&

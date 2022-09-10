@@ -42,38 +42,36 @@ export default function Wishlist({
   return (
     <Layout>
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
-        <div>
-          <div className="flex flex-col mt-10 ">
-            <div className="pt-7 pb-5 text-center text-3xl font-bold">
-              Wishlist
+        {/* <div> */}
+        {/* <div className="flex flex-col mt-10 "> */}
+        <div className="pt-7 pb-5 text-center text-3xl font-bold">Wishlist</div>
+        {faves.map((property: DocumentData) => {
+          return (
+            <div key={property.id}>
+              <CardSearch
+                key={property.id}
+                propertyid={property.id}
+                name={property.title}
+                description={property.description}
+                image={property.images[0]}
+                price={property.pricePerNight}
+                totalStars={property.totalStars}
+                numberOfReviews={property.numberOfReviews}
+                numberOfNights={0}
+                avgPricePerNight={0}
+                inWishlist={true}
+              />
             </div>
-            {faves.map((property: DocumentData) => {
-              return (
-                <div key={property.id}>
-                  <CardSearch
-                    key={property.id}
-                    propertyid={property.id}
-                    name={property.title}
-                    description={property.description}
-                    image={property.images[0]}
-                    price={property.pricePerNight}
-                    totalStars={property.totalStars}
-                    numberOfReviews={property.numberOfReviews}
-                    numberOfNights={0}
-                    avgPricePerNight={0}
-                    inWishlist={true}
-                  />
-                </div>
-              );
-            })}
-            {faves.length === 0 && (
-              <div className="badge w-full">
-                There are no properties in wishlist.
-              </div>
-            )}
+          );
+        })}
+        {faves.length === 0 && (
+          <div className="badge w-full">
+            There are no properties in wishlist.
           </div>
-        </div>
+        )}
       </div>
+      {/* </div> */}
+      {/* </div> */}
       <div></div>
     </Layout>
   );
