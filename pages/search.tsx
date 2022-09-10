@@ -500,7 +500,11 @@ type ReturnType = {
   sumPricesPropertiesLocation: number;
   arr: DocumentData[];
 };
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export async function getServerSideProps(context) {
+  context.res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=10, stale-while-revalidate=100"
+  );
   try {
     const queryUrl = context.query;
     const cookies = nookies.get(context);
@@ -574,4 +578,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
-};
+}

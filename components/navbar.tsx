@@ -69,7 +69,13 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "2",
             label: (
               <Link href="/profilesettings">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/profilesettings")
+                      setLoading(true);
+                  }}
+                >
                   Profile
                 </a>
               </Link>
@@ -79,7 +85,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "3",
             label: (
               <Link href="/guestboard">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/guestboard") setLoading(true);
+                  }}
+                >
                   Guest board
                 </a>
               </Link>
@@ -89,7 +100,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "4",
             label: (
               <Link href="/wishlist">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/wishlist") setLoading(true);
+                  }}
+                >
                   Wishlist
                 </a>
               </Link>
@@ -99,7 +115,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "5",
             label: (
               <Link href="/addproperty">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/addproperty") setLoading(true);
+                  }}
+                >
                   Become a host
                 </a>
               </Link>
@@ -110,7 +131,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "6",
             label: (
               <Link href="/faq">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/faq") setLoading(true);
+                  }}
+                >
                   FAQ
                 </a>
               </Link>
@@ -142,7 +168,13 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "2",
             label: (
               <Link href="/profilesettings">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/profilesettings")
+                      setLoading(true);
+                  }}
+                >
                   Profile
                 </a>
               </Link>
@@ -153,7 +185,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "3",
             label: (
               <Link href="/adminboard">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/adminboard") setLoading(true);
+                  }}
+                >
                   Admin board
                 </a>
               </Link>
@@ -165,7 +202,9 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
               <Link href="/faq">
                 <a
                   className="hover:opacity-80  transition duration-200 ease-out  py-1 pl-1"
-                  onClick={() => setLoading(true)}
+                  onClick={() => {
+                    if (router.pathname !== "/faq") setLoading(true);
+                  }}
                 >
                   FAQ
                 </a>
@@ -196,7 +235,13 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "2",
             label: (
               <Link href="/profilesettings">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/profilesettings")
+                      setLoading(true);
+                  }}
+                >
                   Profile
                 </a>
               </Link>
@@ -207,7 +252,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "3",
             label: (
               <Link href="/addproperty">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/addproperty") setLoading(true);
+                  }}
+                >
                   Add property
                 </a>
               </Link>
@@ -217,7 +267,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "4",
             label: (
               <Link href="/hostsboard">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/hostsboard") setLoading(true);
+                  }}
+                >
                   Host board
                 </a>
               </Link>
@@ -227,7 +282,13 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "5",
             label: (
               <Link href="/hostsreservations">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/hostsreservations")
+                      setLoading(true);
+                  }}
+                >
                   Host reservations
                 </a>
               </Link>
@@ -251,7 +312,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "7",
             label: (
               <Link href="/faq">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/faq") setLoading(true);
+                  }}
+                >
                   FAQ
                 </a>
               </Link>
@@ -284,7 +350,13 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "2",
             label: (
               <Link href="/profilesettings">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/profilesettings")
+                      setLoading(true);
+                  }}
+                >
                   Profile
                 </a>
               </Link>
@@ -295,7 +367,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "3",
             label: (
               <Link href="/guestboard">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/guestboard") setLoading(true);
+                  }}
+                >
                   Guest board
                 </a>
               </Link>
@@ -306,7 +383,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "4",
             label: (
               <Link href="/wishlist">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/wishlist") setLoading(true);
+                  }}
+                >
                   Wishlist
                 </a>
               </Link>
@@ -331,7 +413,12 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "6",
             label: (
               <Link href="/faq">
-                <a className="menuItem" onClick={() => setLoading(true)}>
+                <a
+                  className="menuItem"
+                  onClick={() => {
+                    if (router.pathname !== "/faq") setLoading(true);
+                  }}
+                >
                   FAQ
                 </a>
               </Link>

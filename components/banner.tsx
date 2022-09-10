@@ -41,7 +41,6 @@ import SimpleBackdrop from "./backdrop";
 //- obrisati sliku iz stoaraga u profile i u nekretninama
 //- testirati kad admin ne odobrava property da li se brise i da li brise storage
 // TODO !!!!!!!!!!!!AKO SAM NA ISTOJ STRANI I ODABEREM U MENIJU ISTU SKLONI SPINER
-//TODO cache
 
 export default function Banner({
   setOpenSearch,
