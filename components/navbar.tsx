@@ -435,15 +435,9 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           {
             key: "1",
             label: (
-              <>
-                <div
-                  className=" menuItem "
-                  // onClick={() => setLoading(true)}
-                >
-                  menuNotFullyReg
-                  <LogoutNEW />
-                </div>
-              </>
+              <Link href="/profilesettings">
+                <a className="menuItem">Profile</a>
+              </Link>
             ),
           },
         ]}
