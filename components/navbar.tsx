@@ -506,6 +506,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
               {((user && myUser) || user === null) &&
                 router &&
                 router.pathname !== "/" &&
+                router.pathname !== "/profilesettings" &&
                 (isLoggedUser(myUser) ||
                   (isHost(myUser) && !hostModeHostC)) && (
                   <button

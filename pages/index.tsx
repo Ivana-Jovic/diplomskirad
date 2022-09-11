@@ -39,6 +39,16 @@ export default function Index({
   const { user, myUser, hostModeHostC, setHostModeHostC } =
     useContext(AuthContext);
   // useEffect(() => {
+
+  if (myUser && !isFullyRegisteredUser(myUser)) {
+    console.log(
+      "is not FullyRegisteredUser and this should be caught in SSR!!"
+    );
+    router.push({
+      pathname: "/profilesettings",
+    });
+    return;
+  }
   if (myUser && myUser.host && hostModeHostC) {
     // //can access only if isHostModeTravel, else change mod
     // setHostModeHostC(false);

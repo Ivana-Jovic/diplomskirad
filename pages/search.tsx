@@ -377,7 +377,7 @@ export default function Search({
               />
             </div>
           </div>
-          <div className="flex flex-col lg:flex-row  justify-between gap-10 ">
+          <div className="flex flex-col-reverse lg:flex-row  justify-between gap-10 ">
             <div className="flex flex-col w-full">
               {filteredArr.map((item) => {
                 const property = item;
