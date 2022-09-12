@@ -9,7 +9,7 @@ import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 export default function CardPopup({ property }: { property: DocumentData }) {
   const router = useRouter();
   return (
-    <div className="card card-side  p-2 rounded-md  cursor-pointer bg-base-100 hover:opacity-90 hover:shadow-lg">
+    <div className="card card-side  p-2 rounded-md  cursor-pointer bg-bgBase hover:opacity-90 hover:shadow-lg">
       <figure className="relative h-auto w-1/3  flex-shrink-0 !mb-0">
         <Image
           src={property.images[0]}

@@ -37,7 +37,7 @@ export default function CardHostsProperty({
       >
         <a
           onClick={() => setLoading(true)}
-          className="card rounded-md bg-base-100 shadow-lg mt-3  max-w-5xl hover:opacity-90 hover:shadow-lg
+          className="card rounded-md bg-bgBase shadow-lg mt-3  max-w-5xl hover:opacity-90 hover:shadow-lg
   transition duration-200 ease-out rounded-b-none"
         >
           <figure className="relative h-48 flex-shrink-0">

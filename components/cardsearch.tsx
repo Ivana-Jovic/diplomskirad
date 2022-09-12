@@ -56,7 +56,7 @@ export default function CardSearch({
       {loading && <SimpleBackdrop loading={loading} />}
       <div
         onClick={goToPropertyPage}
-        className="lg:h-52 card rounded-md lg:card-side bg-base-100 shadow-md my-3   hover:opacity-90 hover:shadow-lg
+        className="lg:h-52 card rounded-md lg:card-side bg-bgBase shadow-md my-3   hover:opacity-90 hover:shadow-lg
 transition duration-200 ease-out
 cursor-pointer"
       >

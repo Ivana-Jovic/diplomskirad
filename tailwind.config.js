@@ -20,6 +20,7 @@ module.exports = {
         textHover: "#a1a1aa",
         logo: "#FF5A5F",
         darkGreen: "#134e4a",
+        bgBase: "#fefeff",
       },
       height: {
         "50vh": "50vh",

@@ -286,7 +286,7 @@ export default function Search({
                 <ul
                   tabIndex={0}
                   className="border dropdown-content menu p-2 shadow
-                  bg-base-100 rounded-box w-64 sm:w-96
+                  bg-bgBase rounded-box w-64 sm:w-96
                  flex items-center
                   "
                 >

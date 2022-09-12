@@ -4,7 +4,7 @@ export default function Faq() {
     <Layout>
       <div className="max-w-7xl mx-auto px-8 sm:px-16  ">
         <div className="pt-7 pb-5 text-center text-3xl font-bold">FAQ</div>
-        <div className="card  bg-base-100 shadow-md mb-10">
+        <div className="card  bg-bgBase shadow-md mb-10">
           <div className="card-body">
             <h2 className="card-title">
               Can I get extra beds/cots for child(ren)?
@@ -16,7 +16,7 @@ export default function Faq() {
             </div>
           </div>
         </div>
-        <div className="card bg-base-100 shadow-md  mb-10">
+        <div className="card bg-bgBase shadow-md  mb-10">
           <div className="card-body">
             <h2 className="card-title">
               Can I change the guest name for this booking?
@@ -27,13 +27,13 @@ export default function Faq() {
             </div>
           </div>
         </div>
-        <div className="card  bg-base-100 shadow-md  mb-10">
+        <div className="card  bg-bgBase shadow-md  mb-10">
           <div className="card-body">
             <h2 className="card-title">Can I cancel my booking?</h2>
             <div>All bookings are non-refundable so you cannot cancel. </div>
           </div>
         </div>
-        <div className="card  bg-base-100 shadow-md  mb-10">
+        <div className="card  bg-bgBase shadow-md  mb-10">
           <div className="card-body">
             <h2 className="card-title">Are meals included in my booking?</h2>
             <div>
@@ -44,7 +44,7 @@ export default function Faq() {
           </div>
         </div>
 
-        <div className="card  bg-base-100 shadow-md mb-10">
+        <div className="card  bg-bgBase shadow-md mb-10">
           <div className="card-body">
             <h2 className="card-title">
               What kinds of photos should I upload?
@@ -60,7 +60,7 @@ export default function Faq() {
             </div>
           </div>
         </div>
-        <div className="card bg-base-100 shadow-md  mb-10">
+        <div className="card bg-bgBase shadow-md  mb-10">
           <div className="card-body">
             <h2 className="card-title">
               What happens if my property is damaged by a guest?

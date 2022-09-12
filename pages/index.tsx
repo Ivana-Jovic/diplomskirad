@@ -78,7 +78,7 @@ export default function Index({
   return (
     <Layout>
       <Head>
-        <title>mybnb</title>
+        <title>diplomski</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>

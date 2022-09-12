@@ -18,6 +18,7 @@ import {
   isFullyRegisteredUser,
   isHost,
   isLoggedUser,
+  removedByAdmin,
 } from "../lib/hooks";
 import SimpleBackdrop from "./backdrop";
 import toast from "react-hot-toast";
@@ -444,21 +445,49 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
       />
     </>
   );
-
+  const menuRemovedByAdmin = (
+    <>
+      <Menu
+        items={[
+          {
+            key: "1",
+            label: (
+              <div
+                className=" menuItem "
+                // onClick={() => setLoading(true)}
+              >
+                menuRemovedByAdmin
+                <LogoutNEW />
+              </div>
+            ),
+          },
+        ]}
+      />
+    </>
+  );
   ////////////////////////////////////////////////////////////////////////////////////////////
   const menu = (
     <>
-      {isLoggedUser(myUser) && isFullyRegisteredUser(myUser) && menuLoggedUser}
+      {!removedByAdmin(myUser) &&
+        isLoggedUser(myUser) &&
+        isFullyRegisteredUser(myUser) &&
+        menuLoggedUser}
       {isAdmin(myUser) && isFullyRegisteredUser(myUser) && menuAdmin}
-      {isHost(myUser) &&
+      {!removedByAdmin(myUser) &&
+        isHost(myUser) &&
         hostModeHostC &&
         isFullyRegisteredUser(myUser) &&
         menuHostModeHost}
-      {isHost(myUser) &&
+      {!removedByAdmin(myUser) &&
+        isHost(myUser) &&
         !hostModeHostC &&
         isFullyRegisteredUser(myUser) &&
         menuHostModeTravel}
-      {!isFullyRegisteredUser(myUser) && menuNotFullyReg}
+      {!removedByAdmin(myUser) &&
+        !isFullyRegisteredUser(myUser) &&
+        menuNotFullyReg}
+
+      {removedByAdmin(myUser) && menuRemovedByAdmin}
       {/* {isHostModeHost(myUser) && menuHostModeHost}
       {isHostModeTravel(myUser) && menuHostModeTravel} */}
     </>

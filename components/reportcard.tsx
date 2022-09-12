@@ -99,7 +99,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
   return (
     <>
       {report.reportText !== "wantsToAddProperty" && (
-        <div className="card w-full bg-base-100 shadow-xl">
+        <div className="card w-full bg-bgBase shadow-xl">
           <div className="card-body">
             <h2 className="card-title">
               {report.guestIsReporting
@@ -155,7 +155,7 @@ export default function ReportCard({ report }: { report: DocumentData }) {
         </div>
       )}
       {report.reportText === "wantsToAddProperty" && (
-        <div className="card w-full bg-base-100 shadow-xl">
+        <div className="card w-full bg-bgBase shadow-xl">
           <div className="card-body">
             <h2 className="card-title">Host wants to add a property</h2>
             <div>

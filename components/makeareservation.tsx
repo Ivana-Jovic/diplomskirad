@@ -217,8 +217,8 @@ export default function MakeAReservation({
     <>
       {/*  */}
       <div
-        className="relative w-80 xs:w-96  h-[700px] sm:h-[700px] lg:h-[700px] 
-    xl:h-[700px] 2xl:h-[700px] "
+        className="relative w-80 xs:w-96  h-[750px] sm:h-[750px] lg:h-[750px] 
+    xl:h-[750px] 2xl:h-[750px] "
       >
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <form onSubmit={handleSubmit(onSubmit)}>
