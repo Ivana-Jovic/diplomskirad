@@ -324,10 +324,10 @@ export default function PropertyPage({
 }
 
 export async function getServerSideProps(context) {
-  context.res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=10, stale-while-revalidate=100"
-  );
+  // context.res.setHeader(
+  //   "Cache-Control",
+  //   "public, s-maxage=10, stale-while-revalidate=100"
+  // );
   try {
     var myUser: DocumentData = null;
     const cookies = nookies.get(context);
