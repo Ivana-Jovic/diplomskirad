@@ -227,6 +227,7 @@ export default function AddProperty({
       adminApproved: false,
       totalEarnings: 0,
       totalOccupancyDays: 0,
+      removedByAdmin: false,
     });
     await updateDoc(doc(db, "property", docRef.id), {
       id: docRef.id,
