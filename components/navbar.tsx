@@ -31,22 +31,23 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
     useContext(AuthContext);
   function changeMod() {
     setHostModeHostC(!hostModeHostC);
-    // toast.success(hostModeHostC ? "Mode: host" : "Mode: travel");
-    // console.log
-    // if (myUser && myUser.modeIsHosting) {
-    //   await updateDoc(doc(db, "users", user?.uid), {
-    //     modeIsHosting: false,
-    //   });
-    // }
-    // if (myUser && !myUser.modeIsHosting) {
-    //   await updateDoc(doc(db, "users", user?.uid), {
-    //     modeIsHosting: true,
-    //   });
-    // }
-    // router.push({
-    //   pathname: "/",
-    // });
   }
+  // toast.success(hostModeHostC ? "Mode: host" : "Mode: travel");
+  // console.log
+  // if (myUser && myUser.modeIsHosting) {
+  //   await updateDoc(doc(db, "users", user?.uid), {
+  //     modeIsHosting: false,
+  //   });
+  // }
+  // if (myUser && !myUser.modeIsHosting) {
+  //   await updateDoc(doc(db, "users", user?.uid), {
+  //     modeIsHosting: true,
+  //   });
+  // }
+  // router.push({
+  //   pathname: "/",
+  // });
+
   ////////////////////////////////////////////////////////////////////////////////////////////
   const menuLoggedUser = (
     <>

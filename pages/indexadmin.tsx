@@ -35,11 +35,12 @@ export default function IndexAdmin() {
     </Layout>
   );
 }
+// context.res.setHeader(
+//   "Cache-Control",
+//   "public, s-maxage=10, stale-while-revalidate=100"
+// );
+
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
@@ -62,7 +63,6 @@ export async function getServerSideProps(context) {
         props: [],
       };
     }
-
     return {
       props: {},
     };

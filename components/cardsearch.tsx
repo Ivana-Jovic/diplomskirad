@@ -124,21 +124,25 @@ cursor-pointer"
                 )}
               </div>
 
-              <div className="flex items-center">
-                <div className="text-sm font-semibold">
-                  {(totalStars / numberOfReviews
-                    ? totalStars / numberOfReviews
-                    : 0
-                  ).toFixed(1)}
+              {numberOfReviews !== 0 ? (
+                <div className="flex items-center">
+                  <div className="text-sm font-semibold">
+                    {(totalStars / numberOfReviews
+                      ? totalStars / numberOfReviews
+                      : 0
+                    ).toFixed(1)}
+                  </div>
+                  <Rating
+                    name="read-only"
+                    value={totalStars / numberOfReviews}
+                    readOnly
+                    size="small"
+                    precision={0.1}
+                  />
                 </div>
-                <Rating
-                  name="read-only"
-                  value={totalStars / numberOfReviews}
-                  readOnly
-                  size="small"
-                  precision={0.1}
-                />
-              </div>
+              ) : (
+                <div className="flex items-center badge">NEW</div>
+              )}
             </div>
           </div>
         </div>

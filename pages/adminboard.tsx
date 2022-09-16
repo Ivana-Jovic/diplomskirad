@@ -38,19 +38,20 @@ export default function AdminBoard({ reports }: { reports: string }) {
     startAfter(rep[0].createdAt)
     // limit(1)
   );
-  const [realtimeReports, loadingg] = useCollectionData(rt);
+  const [realtimeReports] = useCollectionData(rt);
 
   // ////////////
   //STARO: bez paginationa
   // const [realtimeReservations] = useCollectionData(q);
   // const rep: DocumentData[] = realtimeReservations || JSON.parse(reports);
+  // orderBy("processed"),//NE radi i sa ovim
   const getMorePosts = async () => {
     setLoading(true);
     const last = rep[rep.length - 1];
     const cursor = last.createdAt;
     const q = query(
       collection(db, "reports"),
-      // orderBy("processed"),//NE radi i sa ovim
+
       orderBy("createdAt", "desc"),
       startAfter(cursor),
       limit(LIMIT)
