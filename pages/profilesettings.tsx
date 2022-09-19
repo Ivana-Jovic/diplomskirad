@@ -4,7 +4,6 @@ import {
   getDownloadURL,
   ref,
   uploadBytes,
-  uploadBytesResumable,
 } from "firebase/storage";
 import { useContext, useEffect, useState } from "react";
 import ImageForm from "../components/imageform";
@@ -15,17 +14,9 @@ import { useRouter } from "next/router";
 import { TextField } from "@mui/material";
 import { auth } from "../firebase";
 import { useForm, SubmitHandler } from "react-hook-form";
-import ErrorPage from "./errorpage";
-import {
-  isAdmin,
-  isFullyRegisteredUser,
-  isHost,
-  isLoggedUser,
-  removedByAdmin,
-} from "../lib/hooks";
+import { isAdmin, isHost, isLoggedUser, removedByAdmin } from "../lib/hooks";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
-import RemovedByAdmin from "../components/removedbyadmin";
 import {
   EmailAuthProvider,
   reauthenticateWithCredential,
@@ -42,7 +33,6 @@ type IFormInput = {
   passwordOld: string;
   firstName: string;
   lastName: string;
-  // profilePicture: string;
   profilePictureNEW: File[];
 };
 
@@ -65,7 +55,7 @@ export default function ProfileSettings({
   } = useContext(AuthContext);
   const router = useRouter();
 
-  const [error, setError] = useState<string>(""); //any
+  const [error, setError] = useState<string>("");
   const [errorPassword, setErrorPassword] = useState<string>("");
   const [url, setUrl] = useState<string>("");
   const [wantToChangePass, setWantToChangePass] = useState<boolean>(false);
@@ -91,18 +81,6 @@ export default function ProfileSettings({
 
   const imgNew = watch("profilePictureNEW");
 
-  // ------------------NE BRISI-----------------!!!!!!!!!!!!!!
-  // useEffect(() => {
-  //   reset({
-  //     email: user?.email ?? "",
-  //     passwordNew: "",
-  //     passwordOld: myUser?.passwordState,
-  //     firstName: myUser?.firstName,
-  //     lastName: myUser?.lastName,
-  //   });
-  // }, [user, myUser, reset]);
-  // ------------------NE BRISI-----------------!!!!!!!!!!!!!!
-
   const changeProfile = async (data: IFormInput) => {
     const fileArr = data.profilePictureNEW ?? null;
     const file = fileArr.length > 0 ? fileArr[0] : null;
@@ -125,19 +103,7 @@ export default function ProfileSettings({
         console.log("BBBBBBBBBBBBBB", file);
         const uploadTask = await uploadBytes(storageRef, file);
         console.log("changeProfile3");
-        // uploadTask.on(
-        //   "state_changed",
-        //   (snapshot) => {
-        //     console.log(
-        //       "zdravo"
-        //       // +(snapshot.bytesTransferred / snapshot.totalBytes) * 100 +"%"
-        //     );
-        //   },
-        //   (err) => {
-        //     console.log("ovo je greska");
-        //     setError(err + "");
-        //   },
-        //   async () => {
+
         console.log("changeProfile4");
         const downloadURL = await getDownloadURL(uploadTask.ref);
 
@@ -151,23 +117,6 @@ export default function ProfileSettings({
             console.log("ERROR ", err.message);
           });
         }
-
-        // getDownloadURL(uploadTask.snapshot.ref).then(
-        //   async (downloadURL) => {
-        //     setUrl(downloadURL);
-        //     // update profile pic
-        //     if (myUser.photoURL !== downloadURL) {
-        //       console.log("changeProfile5");
-        //       const docRef = await updateDoc(doc(db, "users", uid), {
-        //         photoURL: downloadURL,
-        //       }).catch((err) => {
-        //         console.log("ERROR ", err.message);
-        //       });
-        //     }
-        //   }
-        // );
-        //   }
-        // );
       }
     }
 
@@ -188,11 +137,11 @@ export default function ProfileSettings({
         });
       } catch (err) {
         if (err.code === "auth/weak-password") {
-          setErrorPassword("Can't update password - weak password"); //
+          setErrorPassword("Can't update password - weak password");
         } else if (err.code === "auth/too-many-requests") {
           setErrorPassword("Too many requests - try again later");
         } else if (err.code === "auth/wrong-password") {
-          setErrorPassword("Can't update password - wrong password"); //
+          setErrorPassword("Can't update password - wrong password");
         } else {
           setErrorPassword("Can't update password - wrong data ");
         }
@@ -381,10 +330,6 @@ export default function ProfileSettings({
 }
 
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
@@ -404,7 +349,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -414,7 +359,7 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
     return {
@@ -430,7 +375,7 @@ export async function getServerSideProps(context) {
       redirect: {
         destination: "/",
       },
-      props: [],
+      props: {},
     };
   }
 }

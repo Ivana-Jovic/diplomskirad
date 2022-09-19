@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import { TextField } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import SimpleBackdrop from "./backdrop";
-// import admin from "../firebaseadmin";
 
 type IFormInput = {
   email: string;
@@ -60,9 +59,7 @@ export default function SignInRegisterPopup() {
         data.email,
         data.password
       );
-      // .then(async (cred) => {
       console.log("User created:", cred.user);
-      // setIsLoggedIn(true);//sad
       const docRef = await setDoc(doc(db, "users", cred.user.uid), {
         userId: cred.user.uid,
         host: false,
@@ -71,13 +68,11 @@ export default function SignInRegisterPopup() {
         numberOfProperties: 0,
         faves: [],
         removedByAdmin: false,
-        // modeIsHosting: false,
       });
       setLoading(true);
       router.push({
         pathname: "/profilesettings",
       });
-      // })
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setError("Can't register - email already in use");
@@ -100,13 +95,6 @@ export default function SignInRegisterPopup() {
         data.password
       );
 
-      // const authh = admin.auth();
-      // await authh.setCustomUserClaims(user.uid, {
-      //   isHost: false,
-      //   isAdmin: false,
-      // });
-
-      // .then(async (cred) => {
       console.log("User signedin:", cred.user);
 
       const docSnap = await getDoc(doc(db, "users", cred.user.uid));
@@ -153,7 +141,7 @@ export default function SignInRegisterPopup() {
           console.log("register clicked");
           togglePopup("R");
         }}
-        className="btn scale-75 hidden md:inline "
+        className="btn hidden md:inline md:mr-4 "
       >
         Register
       </button>
@@ -162,7 +150,7 @@ export default function SignInRegisterPopup() {
           console.log("sign in clicked");
           togglePopup("S");
         }}
-        className="btn scale-75"
+        className="btn "
       >
         Sign in
       </button>
@@ -180,7 +168,6 @@ export default function SignInRegisterPopup() {
                     id="outlined-required2"
                     label="Email"
                     type="email"
-                    // InputLabelProps={{ shrink: true }}
                     helperText={errors.email ? errors.email.message : " "}
                   />
                   <TextField
@@ -189,7 +176,6 @@ export default function SignInRegisterPopup() {
                       pattern: {
                         value:
                           /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[#$@!%&*?]).{8,15}$/,
-                        // /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,15}$/,
                         message:
                           "Password must be 8 to 15 characters long, contain at least one number, both lower and uppercase letters and special characters",
                       },

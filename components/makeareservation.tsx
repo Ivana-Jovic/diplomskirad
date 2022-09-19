@@ -93,15 +93,6 @@ export default function MakeAReservation({
       }
     }
     toast.error("Reservation NOT successful");
-    // isAvailable(dateFrom, dateTo, prId).then(async (isAv) => {
-    //   if (!isAv) {
-    //     console.log(" POKLAPAJU SE");
-    //     setError("NOT AVAILABLE, please select other dates");
-    //   } else {
-    //     console.log("NE POKLAPAJU SE");
-    //     await reserve(data);
-    //   }
-    // });
   };
   const reserve = async (data: IFormInput) => {
     if (dateFrom && dateTo && dateFrom >= dateTo) {
@@ -226,7 +217,7 @@ export default function MakeAReservation({
               className={`absolute flex  flex-col  items-center rounded-3xl border-2 border-solid py-5  text-xl justify-around bg-background opacity-95 pr-7 pl-7 `}
             >
               <div className="w-full flex justify-between px-10 py-2 mb-5 text-sm">
-                <div>{property.pricePerNight}e night</div>
+                <div>{property.pricePerNight}€ night</div>
                 <div className="flex  items-center">
                   {(property.totalStars / property.numberOfReviews).toFixed(1)}
                   <Rating
@@ -295,13 +286,9 @@ export default function MakeAReservation({
                   <Controller
                     name="garage"
                     control={control}
-                    // rules={{ required: "Please enter a value" }}
                     render={({ field: { onChange, value } }) => (
                       <>
                         <TextField
-                          // {...register("garage", {
-                          //   required: "Please enter if you need a garage",
-                          // })}
                           className="w-full"
                           id="outlined-select-currency"
                           select
@@ -311,9 +298,6 @@ export default function MakeAReservation({
                             onChange(e.target.value === "true" ? true : false);
                           }}
                           InputLabelProps={{ shrink: true }}
-                          // helperText={
-                          //   errors.garage ? errors.garage.message : " "
-                          // }
                         >
                           {["true", "false"].map((option) => (
                             <MenuItem key={option} value={option}>
@@ -375,7 +359,6 @@ export default function MakeAReservation({
                   id="outlined-required"
                   label="Special requests"
                   multiline
-                  // maxRows={15}
                   rows={5}
                   InputLabelProps={{ shrink: true }}
                 />

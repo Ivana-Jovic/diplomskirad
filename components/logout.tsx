@@ -7,15 +7,11 @@ export default function Logout({}: {}) {
   const router = useRouter();
 
   const logout = async () => {
-    //event: React.MouseEvent<HTMLButtonElement>
     console.log("nnn");
-    // event.preventDefault(); // Preventing the page from reloading
     try {
       await signOut(auth);
-      // .then(() => {
       console.log("the user signed out");
       nookies.set(undefined, "token", "", {});
-      // setIsLoggedIn(false);sad
       router.push({
         pathname: "/",
       });

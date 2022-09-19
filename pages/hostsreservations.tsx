@@ -15,7 +15,6 @@ import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { isHost, removedByAdmin } from "../lib/hooks";
-import toast from "react-hot-toast";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../firebase-authProvider";
 export default function HostsReservations({
@@ -62,7 +61,6 @@ export default function HostsReservations({
                       reservationId={item.id}
                       // bez obzira na mod, cak i da jeste inace host, ovde je u ulozi guesta
                       isHost={true}
-                      // isOwnerOfThisProperty={true}
                     />
                   </div>
                 </div>
@@ -79,10 +77,6 @@ export default function HostsReservations({
 }
 
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
@@ -94,7 +88,6 @@ export async function getServerSideProps(context) {
       where("hostId", "==", uid),
       orderBy("createdAt", "desc")
     );
-    // const docSnap = await getDoc(doc(db, "users", uid));
     const [docSnap, querySnapshot] = await Promise.all([
       getDoc(doc(db, "users", uid)),
       getDocs(q),
@@ -109,7 +102,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -120,12 +113,10 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
     const arrData: DocumentData[] = [];
-
-    // const querySnapshot = await getDocs(q);
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       arrData.push(querySnapshot.docs[index].data());
     }
@@ -142,7 +133,7 @@ export async function getServerSideProps(context) {
       redirect: {
         destination: "/",
       },
-      props: [],
+      props: {},
     };
   }
 }

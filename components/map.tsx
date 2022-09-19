@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import * as ReactDOM from "react-dom/client";
 
 interface props {
-  //ovde je svuda bio any
   setLoc: Dispatch<SetStateAction<string>>;
   popup?: React.ReactNode;
   setState: Dispatch<SetStateAction<string>>;
@@ -41,7 +40,6 @@ const Map = (props: props) => {
         container: mapElement.current,
         center: center,
         zoom: 12,
-        // dragPan: !isMobileOrTablet(),
       });
       ivaninaMapa.addControl(
         new tt.GeolocateControl({
@@ -63,7 +61,6 @@ const Map = (props: props) => {
         searchOptions: {
           key: process.env.NEXT_PUBLIC_TOMTOM,
           language: "en-GB",
-          // idxSet: "PAD,Addr",
         },
         autocompleteOptions: {
           key: process.env.NEXT_PUBLIC_TOMTOM,
@@ -72,13 +69,7 @@ const Map = (props: props) => {
 
         noResultsMessage: "No results found.",
       });
-      // ttSearchBox.setFilter({
-      //   type: "category",
-      //   value: {
-      //     name: "Point Address",
-      //     id: "9361",
-      //   },
-      // });
+
       ivaninaMapa.addControl(ttSearchBox, "top-left");
 
       ttSearchBox.on("tomtom.searchbox.resultselected", function (event: any) {
@@ -89,7 +80,6 @@ const Map = (props: props) => {
           marker.setLngLat(bl).addTo(ivaninaMapa);
           ivaninaMapa.easeTo({ center: bl });
           var lngLat = marker.getLngLat();
-          // setLoc(lngLat.lng + "-" + lngLat.lat);
           setLoc(
             event.data.result.position.lng +
               "-" +
@@ -97,7 +87,6 @@ const Map = (props: props) => {
           );
           setState(event.data.result.address.country);
           setCity(event.data.result.address.localName);
-          // countrySecondarySubdivision);
           setStreetName(event.data.result.address.streetName);
           setStreetNum(event.data.result.address.streetNumber);
           setSelectedStreet(true);
@@ -114,23 +103,3 @@ const Map = (props: props) => {
 };
 
 export default Map;
-
-// This option specifies indexes to use for the search. The predefined indexes are:
-// Addr: Address range interpolation (when there is no PAD)
-// Geo: Geographies
-// PAD: Point Addresses
-// POI: Points of interest
-// Str: Streets
-// Xstr: Cross Streets (intersections)
-// Example
-// // search Points Of Interest only
-// tt.services.geometrySearch({
-//   query: 'pizza',
-//   idxSet: 'POI'
-// }).then(handleResults);
-// // search addresses only
-// tt.services.geometrySearch()
-// tt.services.geometrySearch({
-//   query: 'pizza',
-//   idxSet: 'PAD,Addr'
-// }).then(handleResults);

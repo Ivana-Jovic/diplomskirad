@@ -7,17 +7,12 @@ import { Toaster } from "react-hot-toast";
 export default function Layout({
   children,
   placeholder,
-}: // home,
-{
+}: {
   children: React.ReactNode;
   placeholder?: string;
-  // home?: boolean;
 }) {
   return (
     <div className="w-full min-h-screen flex flex-col">
-      {/* <> */}
-      {/* //displ flex flex dir col
-      //mt auto footer */}
       <Head>
         {/* <link rel="icon" href="/favicon.ico" />
         <meta
@@ -38,6 +33,5 @@ export default function Layout({
       <main className="bg-background pb-7 w-full grow">{children}</main>
       <Footer />
     </div>
-    // </>
   );
 }

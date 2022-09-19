@@ -2,21 +2,18 @@ import {
   collection,
   doc,
   DocumentData,
-  DocumentSnapshot,
   getDoc,
   getDocs,
   query,
   where,
-  QueryDocumentSnapshot,
   updateDoc,
   deleteDoc,
   increment,
 } from "firebase/firestore";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { db, storage } from "../firebase";
 import toast from "react-hot-toast";
 import { deleteObject, ref } from "firebase/storage";
-import PropertySettings from "../pages/propertysettings";
 
 export default function ReportCard({ report }: { report: DocumentData }) {
   const [processed, setProcessed] = useState<boolean>(report.processed);
@@ -104,28 +101,15 @@ export default function ReportCard({ report }: { report: DocumentData }) {
             <h2 className="card-title">
               {report.guestIsReporting
                 ? "Guest " + " is reporting: " + report.reportText
-                : //+ item.data().hostId
-                  "Host " +
-                  // item.data().hostId +
-                  " is reporting:  " +
-                  report.reportText}
+                : "Host " + " is reporting:  " + report.reportText}
             </h2>
             <div>
               <div className="">
                 Created at {new Date(report.createdAt).toDateString()}
               </div>
               <div className="">Report id: {report.id}</div>
-              {/* Guest is Reporting:
-              {report.guestIsReporting ? "yes" : "no"} */}
-              {/* <div>{report.id}</div> */}
-              <div className="">
-                Guest: {report.guestId}
-                {/* -{report.guestLastName}- */}
-                {/* {report.guestId} */}
-              </div>
+              <div className="">Guest: {report.guestId}</div>
               <div className="">Host: {report.hostId}</div>
-              {/* <div className="">{report.reportText}</div> */}
-              {/* <div className="">Reservation Id {report.reservationId}</div> */}
               <div className="">Reservation id: {report.reservationId}</div>
               {!processed && (
                 <div>
@@ -136,7 +120,6 @@ export default function ReportCard({ report }: { report: DocumentData }) {
                   )}
                   <div className="flex flex-col">
                     {report.reportText === "comment" && (
-                      // <Button action={deleteComment} text="Delete comment" type="" />
                       <button className="btn mt-3" onClick={deleteComment}>
                         Delete comment
                       </button>
@@ -163,7 +146,6 @@ export default function ReportCard({ report }: { report: DocumentData }) {
                 Created at {new Date(report.createdAt).toDateString()}
               </div>
               <div className="">Report id: {report.id}</div>
-              {/* <div className="">{report.reportText}</div> */}
               <div className="">Host: {report.hostId}</div>
               {!processed && (
                 <div>

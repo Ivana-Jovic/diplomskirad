@@ -9,9 +9,6 @@ import {
   orderBy,
   limit,
   startAfter,
-  Timestamp,
-  QueryDocumentSnapshot,
-  where,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import ReportCard from "../components/reportcard";
@@ -19,32 +16,24 @@ import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { isAdmin } from "../lib/hooks";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Divider } from "@mui/material";
 
 const LIMIT = 5;
 
 export default function AdminBoard({ reports }: { reports: string }) {
   const repp: DocumentData[] = JSON.parse(reports);
-
   const [rep, setRep] = useState<DocumentData[]>(repp);
   const [loading, setLoading] = useState(false);
-
   const [postsEnd, setPostsEnd] = useState(repp.length === 0 ? true : false);
-  //////
+
   const rt = query(
     collection(db, "reports"),
     orderBy("createdAt", "asc"),
     startAfter(rep[0].createdAt)
-    // limit(1)
   );
   const [realtimeReports] = useCollectionData(rt);
 
-  // ////////////
-  //STARO: bez paginationa
-  // const [realtimeReservations] = useCollectionData(q);
-  // const rep: DocumentData[] = realtimeReservations || JSON.parse(reports);
-  // orderBy("processed"),//NE radi i sa ovim
   const getMorePosts = async () => {
     setLoading(true);
     const last = rep[rep.length - 1];
@@ -113,10 +102,6 @@ export default function AdminBoard({ reports }: { reports: string }) {
 }
 
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
@@ -137,14 +122,13 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
     const arrData: DocumentData[] = [];
     const querySnapshot = await getDocs(
       query(
         collection(db, "reports"),
-        // orderBy("processed"),
         orderBy("createdAt", "desc"),
         limit(LIMIT)
       )
@@ -163,7 +147,7 @@ export async function getServerSideProps(context) {
       redirect: {
         destination: "/",
       },
-      props: [],
+      props: {},
     };
   }
 }

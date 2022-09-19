@@ -1,27 +1,17 @@
 import Layout from "../components/layout";
-import {
-  getDoc,
-  doc,
-  DocumentData,
-  query,
-  collection,
-  where,
-} from "firebase/firestore";
+import { getDoc, doc, DocumentData } from "firebase/firestore";
 import { db } from "../firebase";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../firebase-authProvider";
 import CardSearch from "../components/cardsearch";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import ErrorPage from "./errorpage";
 import {
   isFullyRegisteredUser,
   isHost,
   isLoggedUser,
   removedByAdmin,
 } from "../lib/hooks";
-import RemovedByAdmin from "../components/removedbyadmin";
 
 export default function Wishlist({
   uid,
@@ -42,8 +32,6 @@ export default function Wishlist({
   return (
     <Layout>
       <div className=" flex flex-col max-w-7xl mx-auto px-8 sm:px-16">
-        {/* <div> */}
-        {/* <div className="flex flex-col mt-10 "> */}
         <div className="pt-7 pb-5 text-center text-3xl font-bold">Wishlist</div>
         {faves.map((property: DocumentData) => {
           return (
@@ -70,17 +58,11 @@ export default function Wishlist({
           </div>
         )}
       </div>
-      {/* </div> */}
-      {/* </div> */}
       <div></div>
     </Layout>
   );
 }
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
@@ -96,7 +78,7 @@ export async function getServerSideProps(context) {
           redirect: {
             destination: "/profilesettings",
           },
-          props: [],
+          props: {},
         };
       }
       if (isLoggedUser(myUser) || isHost(myUser)) {
@@ -106,7 +88,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -116,11 +98,10 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
     var properties: DocumentData[] = [];
-    // const docSnap1 = await getDoc(doc(db, "users", uid));
 
     if (docSnap.exists()) {
       for (let index = 0; index < docSnap.data().faves.length; index++) {
@@ -145,7 +126,7 @@ export async function getServerSideProps(context) {
       redirect: {
         destination: "/",
       },
-      props: [],
+      props: {},
     };
   }
 }

@@ -29,21 +29,11 @@ const arrColour3 = [
   `bg-[#A0B392]`,
 ];
 const arrColour2 = ["logo", "logo"];
-//TDOD: add colours
 
-export default function Calendar({
-  propertyId,
-}: // reff,
-{
-  propertyId: string[];
-  // reff: RefObject<FullCalendar>;
-}) {
+export default function Calendar({ propertyId }: { propertyId: string[] }) {
   const calendarRef = useRef<FullCalendar>(null);
-  //   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-  //   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [eventInfo, setEventInfo] = useState<any>(null);
 
-  //   const niz = useRef<Date[]>([]);
   const getRes = useCallback(async () => {
     console.log("]]]]]");
     const q = query(
@@ -70,7 +60,6 @@ export default function Calendar({
             doc.data().lastName +
             " " +
             doc.data().from,
-          // allDay: false,
           title: doc.data().firstName + " " + doc.data().lastName,
           start: new Date(doc.data().from).setHours(14),
           end: new Date(
@@ -105,45 +94,30 @@ export default function Calendar({
       ?.getApi()
       .getEvents()
       .forEach((item: EventApi) => {
-        //   EventInput
         item.remove();
         console.log("Dva");
       });
-    //   calendarRef.current.getApi().fullCalendar(‘removeEventSources’)
+
     calendarRef.current?.getApi().removeAllEvents();
     calendarRef.current?.getApi().removeAllEventSources();
     calendarRef.current
       ?.getApi()
       .getEventSources()
       .forEach((item: EventSourceApi) => {
-        //   EventInput
         item.remove();
         console.log("Tri");
       });
-    // // setEventInfo(null);
-    // const proba = async () => {
-    //   if (propertyId) await getRes();
-    // };
-    // proba();
     if (propertyId && propertyId.length > 0) getRes();
   }, [getRes, propertyId, propertyId.length]);
-  // ,propertyId[0], propertyId[1]
-  // [JSON.stringify(propertyId)] https://stackoverflow.com/questions/59467758/passing-array-to-useeffect-dependency-list
 
   return (
     <div className="flex lg:flex-row flex-col mt-7">
       <div className="lg:w-2/3 ">
         <FullCalendar
-          // key={propertyId}
-
           ref={calendarRef}
           plugins={[dayGridPlugin]}
           showNonCurrentDates={false}
           fixedWeekCount={false}
-          // events={[
-          //   { title: "event 1", start: "2022-08-01", end: "2022-08-03" },
-          //   { title: "event 2", date: "2022-08-02" },
-          // ]}
           displayEventEnd={true}
           eventColor={"#cfd2d4"}
           eventTextColor={"#0f172a"}
@@ -152,17 +126,10 @@ export default function Calendar({
             minute: "2-digit",
             hour12: false,
           }}
-          // eventDisplay={"background"}
-          // editable
-          // selectable
           eventClick={function (info: any) {
-            // alert("Event: " + info.event.title);
-            //   info.el.style.borderColor = "red";
-            //   setIsPopupOpen(true);
             info.el.style.borderColor = "red";
             setEventInfo(info);
             if (eventInfo) eventInfo.el.style.borderColor = "white";
-            //   info.el.style.borderColor = "red";
           }}
         />
       </div>
@@ -179,7 +146,6 @@ export default function Calendar({
             >
               <div className="p-5"></div>
             </div>
-            {/* aa{eventInfo?.event.extendedProps.leftFeedback + ""} */}
             <ReservationCard
               userId={eventInfo?.event.extendedProps.userId}
               firstName={eventInfo?.event.extendedProps.firstName}
@@ -205,10 +171,9 @@ export default function Calendar({
               reservationId={eventInfo?.event.extendedProps.reservationId}
               isHost={true}
               createdAt={eventInfo?.event.extendedProps.createdAt}
-              // isOwnerOfThisProperty={true}
             />
           </div>
-        )}{" "}
+        )}
       </div>
     </div>
   );

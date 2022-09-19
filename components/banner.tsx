@@ -10,24 +10,11 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { alertTitleClasses, Autocomplete } from "@mui/material";
+import { Autocomplete } from "@mui/material";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import SimpleBackdrop from "./backdrop";
-// const theme = createTheme({
-//   components: {
-//     MuiDatePicker: {
-//       styleOverrides: {
-//         root: {
-//           backgroundColor: "red",
-//         },
-//       },
-//     },
-//   },
-// });
-//TODOppp na firebasu uslovi
 
-//TODO provere i loc i vercel
 //- za dugacke titlove i descriptione svuda da li izgleda ok
 //- na raznim velicinama ekrana
 //- provere za sve pristupe plus pri promeni moda

@@ -9,9 +9,8 @@ import {
   updateDoc,
   where,
   Timestamp,
-  setDoc,
 } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { db } from "../firebase";
 import Rating from "@mui/material/Rating";
 import {
@@ -22,28 +21,6 @@ import {
   RadioGroup,
 } from "@mui/material";
 import toast from "react-hot-toast";
-// const theme = createTheme({
-//   components: {
-//     MuiDatePicker: {
-//       styleOverrides: {
-//         root: {
-//           backgroundColor: "red",
-//         },
-//       },
-//     },
-//   },
-// });
-
-// const theme = createTheme({
-//   components: {
-//     Radio: {
-//       '&$checked': {
-//         color: '#4B8DF8'
-//       }
-//     },
-//     checked: {}
-//   },
-// });
 
 export default function ReservationCard({
   userId,
@@ -66,8 +43,7 @@ export default function ReservationCard({
   reservationId,
   isHost,
   createdAt,
-}: // isOwnerOfThisProperty,
-{
+}: {
   userId: string;
   firstName: string;
   lastName: string;
@@ -88,7 +64,6 @@ export default function ReservationCard({
   reservationId: string;
   isHost: boolean; // IS OWNER
   createdAt: number;
-  // isOwnerOfThisProperty: boolean;
 }) {
   const len: number = 15;
   const [leftFB, setLeftFB] = useState<boolean>(leftFeedback);
@@ -168,7 +143,6 @@ export default function ReservationCard({
       report();
     }
     setLeftFB(true);
-    // setIsPopupOpen(false);
     setComment("");
     setStars(1);
     setReportReason("");
@@ -212,25 +186,6 @@ export default function ReservationCard({
     >
       <div className="card-body">
         <div>
-          {/* <div className="text-lg font-semibold text-center mb-5">
-            {from} -{to}
-          </div>
-          <div className="flex text-center text-xs">
-            <div className="text-md font-semibold"> Reservation number:</div>
-            {reservationId}
-          </div>
-          <div className="flex text-center text-xs">
-            <div className="text-md font-semibold">Created at:</div>
-            {new Date(createdAt).toDateString()}
-          </div>
-          <div className="flex ">
-            <div className="text-md font-semibold">{user}</div>
-            {userId}
-          </div>
-          <div className="flex text-center text-xs">
-            <div className="text-md font-semibold">Propertyid:</div>
-            {propertyId}
-          </div> */}
           <div className="w-full overflow-x-auto">
             <table className="w-full">
               <tbody>
@@ -306,7 +261,7 @@ export default function ReservationCard({
           <div>
             {new Date(to) <= new Date() && (
               <div className="text-center mt-5">
-                {((!leftFB && !isHost) || (!hostLeftReport && isHost)) && (
+                {((!leftFB && !isHost) || (!hostLeftRep && isHost)) && ( //bilo hostLeftReport
                   <>
                     <label
                       htmlFor="my-modal-3"
@@ -431,30 +386,6 @@ export default function ReservationCard({
                                 </button>
                               </div>
                             )}
-                            {/* {!isHost && (
-                              <button
-                                className="btn mt-3"
-                                onClick={leaveFeedback}
-                              >
-                                Leave feedback
-                              </button>
-                            )}
-                            {isHost && (
-                              <div className="flex ">
-                                <button
-                                  className=" mt-3 !w-1/2"
-                                  onClick={report}
-                                >
-                                  Report
-                                </button>
-                                <button
-                                  className=" mt-3 !w-1/2"
-                                  onClick={hostWontReport}
-                                >
-                                  Dont repoert
-                                </button>
-                              </div>
-                            )} */}
                             <div className="text-center mt-2">{error}</div>
                           </div>
                         </div>
@@ -473,7 +404,7 @@ export default function ReservationCard({
             )}
           </div>
           <div className="text-center  text-xl font-semibold mt-5 ">
-            {((leftFB && !isHost) || (hostLeftReport && isHost)) && (
+            {((leftFB && !isHost) || (hostLeftRep && isHost)) && ( //BilohostLeftReport
               <div className="badge !p-5  bg-footer w-full">
                 ** LEFT FEEDBACK **
               </div>

@@ -1,8 +1,6 @@
-import { doc, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/dist/client/router";
 import Image from "next/image";
 import { useContext, useState } from "react";
-import { db } from "../firebase";
 import LogoutNEW from "./logout";
 import { Dropdown, Menu, Space } from "antd";
 import SignInRegisterPopup from "./signInRegisterPopup";
@@ -21,7 +19,6 @@ import {
   removedByAdmin,
 } from "../lib/hooks";
 import SimpleBackdrop from "./backdrop";
-import toast from "react-hot-toast";
 
 export default function Navbar({ placeholder }: { placeholder?: string }) {
   const [openSearch, setOpenSearch] = useState<boolean>(false);
@@ -32,21 +29,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
   function changeMod() {
     setHostModeHostC(!hostModeHostC);
   }
-  // toast.success(hostModeHostC ? "Mode: host" : "Mode: travel");
-  // console.log
-  // if (myUser && myUser.modeIsHosting) {
-  //   await updateDoc(doc(db, "users", user?.uid), {
-  //     modeIsHosting: false,
-  //   });
-  // }
-  // if (myUser && !myUser.modeIsHosting) {
-  //   await updateDoc(doc(db, "users", user?.uid), {
-  //     modeIsHosting: true,
-  //   });
-  // }
-  // router.push({
-  //   pathname: "/",
-  // });
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   const menuLoggedUser = (
@@ -57,11 +39,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "1",
             label: (
               <>
-                <div
-                  className=" menuItem"
-                  //  onClick={() => setLoading(true)}
-                >
-                  menuLoggedUser
+                <div className=" menuItem">
+                  menu logged user
                   <LogoutNEW />
                 </div>
               </>
@@ -156,11 +135,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "1",
             label: (
               <>
-                <div
-                  className="menuItem"
-                  //  onClick={() => setLoading(true)}
-                >
-                  menuAdmin
+                <div className="menuItem">
+                  menu admin
                   <LogoutNEW />
                 </div>
               </>
@@ -224,11 +200,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           {
             key: "1",
             label: (
-              <div
-                className=" menuItem "
-                // onClick={() => setLoading(true)}
-              >
-                menuHostModeHost
+              <div className=" menuItem ">
+                menu host mode host
                 <LogoutNEW />
               </div>
             ),
@@ -303,7 +276,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
                 className="menuItem"
                 onClick={() => {
                   changeMod();
-                  // setLoading(true);
                 }}
               >
                 Change mod
@@ -338,11 +310,8 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
             key: "1",
             label: (
               <>
-                <div
-                  className=" menuItem "
-                  // onClick={() => setLoading(true)}
-                >
-                  menuHostModeTravel
+                <div className=" menuItem ">
+                  menu host mode travel
                   <LogoutNEW />
                 </div>
               </>
@@ -404,7 +373,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
                 className="menuItem"
                 onClick={() => {
                   changeMod();
-                  // setLoading(true);
                 }}
               >
                 Change mod
@@ -453,10 +421,7 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
           {
             key: "1",
             label: (
-              <div
-                className=" menuItem "
-                // onClick={() => setLoading(true)}
-              >
+              <div className=" menuItem ">
                 menuRemovedByAdmin
                 <LogoutNEW />
               </div>
@@ -489,8 +454,6 @@ export default function Navbar({ placeholder }: { placeholder?: string }) {
         menuNotFullyReg}
 
       {removedByAdmin(myUser) && menuRemovedByAdmin}
-      {/* {isHostModeHost(myUser) && menuHostModeHost}
-      {isHostModeTravel(myUser) && menuHostModeTravel} */}
     </>
   );
 

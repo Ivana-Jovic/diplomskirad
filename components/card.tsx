@@ -1,9 +1,5 @@
 import Image from "next/image";
-import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
-import { yellow, red } from "@mui/material/colors";
-// import Heart from "./heart";
 import { Rating } from "@mui/material";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import SimpleBackdrop from "./backdrop";
 import { useState } from "react";
@@ -23,7 +19,6 @@ export default function Card({
   totalStars: number;
   numberOfReviews: number;
 }) {
-  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   return (
     <>
@@ -53,7 +48,6 @@ export default function Card({
                 <div className="text-xl font-semibold">
                   {name.length < 23 ? name : name.slice(0, 23) + "..."}
                 </div>
-                {/* <Heart propertyid={propertyid} /> */}
               </div>
 
               <div className="flex justify-between items-center ">

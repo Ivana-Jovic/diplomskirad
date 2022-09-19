@@ -31,46 +31,35 @@ const Map2 = (props: props) => {
     minLat = Math.min(...latArr);
     maxLat = Math.max(...latArr);
   }
-  // const [mm, setMm] = useState<QueryDocumentSnapshot<DocumentData>[]>(arrLoc);
   const router = useRouter();
   useEffect(() => {
     getMinLng();
     const divs = arrLoc.map((elem) => {
       const popupDiv = document.createElement("div");
-      //
       const root = ReactDOM.createRoot(popupDiv);
-      // root.render(popup);
       root.render(
         <div
           className="bg-red-100 w-44"
-          onClick={() =>
-            // router.push({
-            //   pathname: "/propertypage",
-            //   query: {
-            //     property: elem.id,
-            //   },
-            // })
-            {
-              if (router && router.pathname === "/search") {
-                router.push({
-                  pathname: "/propertypage",
-                  query: {
-                    property: elem.id,
-                    from: router.query.from,
-                    numOfGuests: router.query.numOfGuests,
-                    to: router.query.to,
-                  },
-                });
-              } else {
-                router.push({
-                  pathname: "/propertypage",
-                  query: {
-                    property: elem.id,
-                  },
-                });
-              }
+          onClick={() => {
+            if (router && router.pathname === "/search") {
+              router.push({
+                pathname: "/propertypage",
+                query: {
+                  property: elem.id,
+                  from: router.query.from,
+                  numOfGuests: router.query.numOfGuests,
+                  to: router.query.to,
+                },
+              });
+            } else {
+              router.push({
+                pathname: "/propertypage",
+                query: {
+                  property: elem.id,
+                },
+              });
             }
-          }
+          }}
         >
           <CardPopup property={elem} />
         </div>
@@ -80,26 +69,14 @@ const Map2 = (props: props) => {
 
     const initMap = async () => {
       const tt = await import("@tomtom-international/web-sdk-maps");
-      // var center: tt.LngLatLike = [
-      //   arrLoc && arrLoc[0] && arrLoc[0].loc && arrLoc[0].loc !== ","
-      //     ? JSON.parse(arrLoc[0].loc.split("-")[0])
-      //     : 20.447,
-      //   arrLoc && arrLoc[0] && arrLoc[0].loc && arrLoc[0].loc !== ","
-      //     ? JSON.parse(arrLoc[0].loc.split("-")[1])
-      //     : 44.81,
-      // ];
-      // [20.4609, 44.81647189463462];
       var popup = new tt.Popup({
         offset: 35,
       });
-      // .setDOMContent(popupDiv);
 
       const ivaninaMapa = tt.map({
         key: process.env.NEXT_PUBLIC_TOMTOM,
         container: mapElement.current,
-        // center: center,
         zoom: 12,
-        // dragPan: !isMobileOrTablet(),
       });
       ivaninaMapa.addControl(
         new tt.GeolocateControl({
@@ -115,28 +92,7 @@ const Map2 = (props: props) => {
           .addTo(ivaninaMapa);
       });
       ivaninaMapa.addControl(new tt.NavigationControl());
-      ///////////
-      // var marker = new tt.Marker({
-      //   draggable: true,
-      // })
-      //   .setLngLat(center)
-      //   .addTo(ivaninaMapa);
-      // function onDragEnd() {
-      //   var lngLat = marker.getLngLat();
-      //   lngLat = new tt.LngLat(
-      //     // roundLatLng(lngLat.lng),
-      //     // roundLatLng(lngLat.lat)
-      //     lngLat.lng,
-      //     lngLat.lat
-      //   );
-      //   popup.setHTML(lngLat.toString());
-      //   popup.setLngLat(lngLat);
-      //   marker.setPopup(popup);
-      //   marker.togglePopup();
-      //   // setLoc(lngLat.lng + "-" + lngLat.lat);
-      // }
-      // marker.on("dragend", onDragEnd);
-      // /////
+
       function createMarker(
         icon,
         position: tt.LngLatLike,
@@ -145,38 +101,11 @@ const Map2 = (props: props) => {
         element,
         popupMarker
       ) {
-        // const markerElement: HTMLDivElement = document.createElement("div");
-        // markerElement.className = "marker";
-        // const markerContentElement: HTMLDivElement =
-        //   document.createElement("div");
-        // markerContentElement.className = "marker-content";
-        // markerContentElement.style.backgroundColor = color;
-        // markerElement.appendChild(markerContentElement);
-        // const iconElement: HTMLDivElement = document.createElement("div");
-        // iconElement.className = "marker-icon";
-        // iconElement.style.backgroundImage = "url('/images/banner.jpg')";
+        const popup = new tt.Popup({
+          offset: { bottom: [0, -30] },
+        }).setDOMContent(popupMarker);
 
-        // markerContentElement.appendChild(iconElement);
-        const popup = new tt.Popup({ offset: { bottom: [0, -30] } })
-          // .setText(popupText)
-          // .setHTML("<p>title:</p><p>" + popupText + "</p>");
-          .setDOMContent(popupMarker);
-        //   .on("click", (param) => {
-        //     console.log("...............");
-        //     router.push({
-        //       pathname: "/propertypage",
-        //       query: {
-        //         property: element.id,
-        //       },
-        //     });
-        //   });
-        // add marker to map
-        new tt.Marker()
-          // { anchor: "bottom" }!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          // new tt.Marker({ element: markerElement, anchor: "bottom" })
-          .setLngLat(position)
-          .setPopup(popup)
-          .addTo(ivaninaMapa);
+        new tt.Marker().setLngLat(position).setPopup(popup).addTo(ivaninaMapa);
       }
       console.log("PPPPP", arrLoc.length);
       ivaninaMapa.on("load", (param) => {
@@ -201,7 +130,6 @@ const Map2 = (props: props) => {
         });
       });
 
-      //////
       const bounds = new tt.LngLatBounds([minLng, minLat], [maxLng, maxLat]);
       ivaninaMapa.fitBounds(bounds, {
         padding: 35,
@@ -213,7 +141,7 @@ const Map2 = (props: props) => {
     initMap();
     return () => map?.remove();
   }, [arrLoc]);
-  return <div ref={mapElement} className="w-full h-full"></div>; //w-full h-96
+  return <div ref={mapElement} className="w-full h-full"></div>;
 };
 
 export default Map2;

@@ -68,10 +68,8 @@ export default function CommentCard({
   return (
     <div className="my-5 p-2 border">
       <div>
-        {comment.data().firstName}-{comment.data().lastName}
+        {comment.data().firstName} {comment.data().lastName}
       </div>
-      <div>{new Date(comment.data().createdAt).toDateString()}</div>
-
       <div className="text-xs">
         {months[new Date(comment.data().date).getMonth()]}
         &nbsp;
@@ -89,7 +87,6 @@ export default function CommentCard({
       <div className="font-normal">{comment.data().comment}</div>
       {myUser &&
         myUser.host &&
-        // myUser.modeIsHosting &&
         hostModeHostC &&
         !reported &&
         user &&

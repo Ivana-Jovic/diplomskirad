@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { useRouter } from "next/router";
-import Heart from "./heart";
 import { Rating } from "@mui/material";
 import Link from "next/link";
 import SimpleBackdrop from "./backdrop";
@@ -22,7 +20,6 @@ export default function CardHostsProperty({
   totalStars: number;
   numberOfReviews: number;
 }) {
-  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   return (
     <div>
@@ -47,14 +44,11 @@ export default function CardHostsProperty({
           </figure>
           <div className="card-body">
             <div>
-              {/* <div className="flex justify-between items-center mb-2"> */}
               <div className="text-xl font-semibold mb-2">
                 {name.length < 20
                   ? name
                   : name.slice(0, name.indexOf(" ", 20)) + "..."}
               </div>
-              {/* <Heart propertyid={propertyid} /> */}
-              {/* </div> */}
               <div className="text-sm text-gray-600 flex-grow mb-5">
                 {description.length < 100
                   ? description

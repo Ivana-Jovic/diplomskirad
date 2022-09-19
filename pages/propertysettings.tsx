@@ -11,7 +11,6 @@ import {
   getDownloadURL,
   ref,
   uploadBytes,
-  uploadBytesResumable,
 } from "firebase/storage";
 import { useRouter } from "next/router";
 import nookies from "nookies";
@@ -93,7 +92,6 @@ export default function PropertySettings({
     } else if (
       data.picturesNEW &&
       data.picturesNEW.length > 0 &&
-      // !data.picturesNEW ||
       ((data.picturesNEW && data.picturesNEW.length < 3) ||
         (data.picturesNEW && data.picturesNEW.length > 20))
     ) {
@@ -111,16 +109,6 @@ export default function PropertySettings({
         console.log("RETURNED FALSE subm");
         toast.error("Update not successful");
       }
-
-      // update(data).then((ret) => {
-      //   console.log(ret);
-      //   if (ret) {
-      //     router.push({
-      //       pathname: "/hostsboard",
-      //     });
-      //     setLoading(true)
-      //   } else console.log("RETURNED FALSE subm");
-      // });
     }
   };
 
@@ -213,7 +201,6 @@ export default function PropertySettings({
                   label="Description"
                   multiline
                   rows={5}
-                  // maxRows={15}
                   helperText={errors.desc ? errors.desc.message : " "}
                 />
 
@@ -341,19 +328,14 @@ export default function PropertySettings({
   );
 }
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
     const { uid, email } = token;
-
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
     const queryUrl = context.query;
-    // const docSnap2 = await getDoc(doc(db, "users", uid));
+
     const [docSnap2, docSnap] = await Promise.all([
       getDoc(doc(db, "users", uid)),
       getDoc(doc(db, "property", queryUrl.property)),
@@ -367,7 +349,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -377,12 +359,12 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
 
     var property: DocumentData = null;
-    // const docSnap = await getDoc(doc(db, "property", queryUrl.property));
+
     if (docSnap.exists()) {
       property = docSnap.data();
     }
@@ -399,7 +381,7 @@ export async function getServerSideProps(context) {
       redirect: {
         destination: "/",
       },
-      props: [],
+      props: {},
     };
   }
 }

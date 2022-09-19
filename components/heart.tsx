@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { db } from "../firebase";
 import { AuthContext } from "../firebase-authProvider";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
-import { yellow, red } from "@mui/material/colors";
+import { red } from "@mui/material/colors";
 import toast from "react-hot-toast";
 
 export default function Heart({ propertyid }: { propertyid: string }) {
@@ -42,8 +42,7 @@ export default function Heart({ propertyid }: { propertyid: string }) {
   };
 
   useEffect(() => {
-    if (user && myUser) checkIfInFaves(); //PAZI OVO JE BILO NAJSKORIJE 3.9.2022
-    //ako ne radi vrati myUser!= undefined
+    if (user && myUser) checkIfInFaves();
   }, [user, myUser, checkIfInFaves]);
 
   return (

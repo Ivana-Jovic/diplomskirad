@@ -157,9 +157,7 @@ export default function HostsBoard({
             Calendar
           </div>
           {propertiesIds && propertiesIds.length <= 10 && (
-            // <div className=" w-full max-w-xl flex-grow">
             <Calendar propertyId={propertiesIds} />
-            // {/* </div> */}
           )}
           {(!propertiesIds || propertiesIds.length === 0) && <div>None</div>}
           <div className="pt-7 pb-5 text-center text-3xl font-bold mt-10">
@@ -170,16 +168,11 @@ export default function HostsBoard({
           </div>
         </div>
       </>
-      {/* )} */}
     </Layout>
   );
 }
 
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
@@ -187,8 +180,6 @@ export async function getServerSideProps(context) {
 
     var hasPermission: boolean = false;
     const q = query(collection(db, "property"), where("ownerId", "==", uid));
-
-    // const docSnap = await getDoc(doc(db, "users", uid));
     const [docSnap, querySnapshot] = await Promise.all([
       getDoc(doc(db, "users", uid)),
       getDocs(q),
@@ -203,7 +194,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -213,13 +204,11 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
     var properties: DocumentData[] = [];
     var propertiesIds: string[] = [];
-
-    // const querySnapshot = await getDocs(q);
 
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       properties.push(querySnapshot.docs[index].data());
@@ -233,14 +222,11 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (err) {
-    // context.res.writeHead(302, { location: "/" });
-    // context.res.end();
-    // return { props: [] };
     return {
       redirect: {
         destination: "/",
       },
-      props: [],
+      props: {},
     };
   }
 }

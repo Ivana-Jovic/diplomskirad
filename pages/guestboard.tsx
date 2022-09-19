@@ -59,14 +59,12 @@ export default function GuestBoard({
                     {...(item as any)} //ovde mora any
                     reservationId={item.id}
                     // bez obzira na mod, cak i da jeste inace host, ovde je u ulozi guesta
-                    //  Kad napravis modove u oba resrvation carda obrati paznju na isHost
                     isHost={false}
-                    // isOwnerOfThisProperty={user.uid === item.hostId}
                   />
                 </div>
               );
             })}
-          </div>{" "}
+          </div>
           {reserv.length === 0 && (
             <div className="badge w-full">There are no reservations.</div>
           )}
@@ -76,23 +74,18 @@ export default function GuestBoard({
   );
 }
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
     const { uid } = token;
-
     var hasPermission: boolean = false;
+
     const q = query(
       collection(db, "reservations"),
       where("userId", "==", uid),
       orderBy("createdAt", "desc")
     );
 
-    // const docSnap = await getDoc(doc(db, "users", uid));
     const [docSnap, querySnapshot] = await Promise.all([
       getDoc(doc(db, "users", uid)),
       getDocs(q),
@@ -107,7 +100,7 @@ export async function getServerSideProps(context) {
           redirect: {
             destination: "/profilesettings",
           },
-          props: [],
+          props: {},
         };
       }
       if (isLoggedUser(myUser) || isHost(myUser)) {
@@ -117,7 +110,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -127,12 +120,10 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
     const arrData: DocumentData[] = [];
-
-    // const querySnapshot = await getDocs(q);
 
     for (let index = 0; index < querySnapshot.docs.length; index++) {
       arrData.push(querySnapshot.docs[index].data());
@@ -148,7 +139,7 @@ export async function getServerSideProps(context) {
       redirect: {
         destination: "/",
       },
-      props: [],
+      props: {},
     };
   }
 }

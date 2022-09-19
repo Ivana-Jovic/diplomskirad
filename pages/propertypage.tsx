@@ -23,7 +23,6 @@ import { Rating } from "@mui/material";
 import Map2 from "../components/map2";
 import ImageGallery from "react-image-gallery";
 import CommentCard from "../components/commentcard";
-import ErrorPage from "./errorpage";
 import {
   isFullyRegisteredUser,
   isHost,
@@ -32,8 +31,6 @@ import {
 } from "../lib/hooks";
 import nookies from "nookies";
 import { verifyIdToken } from "../firebaseadmin";
-import RemovedByAdmin from "../components/removedbyadmin";
-import toast from "react-hot-toast";
 import { AuthContext } from "../firebase-authProvider";
 
 type imgGalleryType = {
@@ -69,10 +66,7 @@ export default function PropertyPage({
   const [arrLocation, setArrLocation] = useState<DocumentData[]>([]);
   const [galleryImages, setGalleryImages] = useState<imgGalleryType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [postsEnd, setPostsEnd] = useState<boolean>(
-    false
-    // comments.length === 0 ? true : false
-  );
+  const [postsEnd, setPostsEnd] = useState<boolean>(false);
   //bez server side props jer ima dosta slozenih objekata
   const getProperty = async () => {
     const comm: any[] = [];
@@ -129,7 +123,7 @@ export default function PropertyPage({
   };
   useEffect(() => {
     if (propertyid) getProperty();
-  }, [propertyid]); //probaj i property ako ne radi
+  }, [propertyid]);
 
   return (
     <Layout>
@@ -240,8 +234,8 @@ export default function PropertyPage({
                 font-semibold rounded-md  p-6"
             >
               <div className="mb-5 font-normal text-sm">
-                {property.numOfPersons} guests · {property.numOfRooms} bedroom ·{" "}
-                {property.type}
+                {property.numOfPersons} guests · {property.numOfRooms} bedrooms
+                · {property.type}
               </div>
               {property.description}
             </div>
@@ -324,10 +318,6 @@ export default function PropertyPage({
 }
 
 export async function getServerSideProps(context) {
-  // context.res.setHeader(
-  //   "Cache-Control",
-  //   "public, s-maxage=10, stale-while-revalidate=100"
-  // );
   try {
     var myUser: DocumentData = null;
     const cookies = nookies.get(context);
@@ -344,7 +334,7 @@ export async function getServerSideProps(context) {
           redirect: {
             destination: "/profilesettings",
           },
-          props: [],
+          props: {},
         };
       }
       if (isLoggedUser(myUser) || isHost(myUser)) {
@@ -354,7 +344,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -365,7 +355,7 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
 

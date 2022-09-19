@@ -20,8 +20,6 @@ text-lg sm:text-2xl font-semibold;
   .roundButtonDisabled{
     @apply flex rounded-full w-10 h-10 border
     p-3 place-content-center place-items-center items-center justify-items-center
-    
-   /* shadow-md  */
 text-lg sm:text-2xl font-semibold;
   }
 }
@@ -30,34 +28,17 @@ text-lg sm:text-2xl font-semibold;
 @tailwind components;
 @tailwind utilities;
 
-  
-/* //http://cssstars.com/remove-spinners-number-input-field/ */
-/* Webkit browsers like Safari and Chrome */
-/* input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
--webkit-appearance: none;
-margin: 0;
-}
-/* For Firefox */
-/* input[type='number'] {
-  -moz-appearance:textfield;
-} */ 
-
 html,
 body {
   padding: 0;
   margin: 0;
-  /* font-family: 'Montserrat', sans-serif; */
-  /* background-color:; */
   width: 100%;
   height: 100%;
   color:#0f172a;
   background-color: #f8fafc
-  /* #f8fafc; */
 }
 
 a {
-  /* color: #0f172a; */
   color:#0f172a !important;
   text-decoration: none ;
 }
@@ -71,9 +52,7 @@ a:hover {
 }
 
 #__next {
-  /* width: 100vw; */
   min-height: 100vh;
-  /* height: 100%; */
   display: flex;
   flex-direction: column;
 }
@@ -90,47 +69,15 @@ a:hover {
   background: #161616 !important;
   border-color:#f8fafc !important;
  }
-/* ."MuiSvgIcon-root */
  .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline ,
-  /* .MuiOutlinedInput-input .MuiInputBase-input{
-     */
-     /* .MuiFormControl-root-focused .MuiTextField-root { */
       .MuiInputLabel-root  
         ,.MuiOutlinedInput-input{
-          /* .label.Mui-focused{ */
-     /* m-3 .css-1u3bzj6-MuiFormControl-root-MuiTextField-root{ */
   color: #161616!important;
   border-color: #161616 !important;
 }
-/* img {
-  max-width: 100%;
-  display: block;
-
-} */
-/* .imageContainer{
-  /* width: 100%; */
-  /* display: inline-block;  */
-   /* height: 30px; */
-   /*  */
-/* }
-.imageContainer
-  > span{
-    position: unset !important;
-  }
-.imageContainer .image{
-  object-fit: fill;
-  width:100% !important;
-  position: relative !important;
-  height: unset !important;
 
 
 
-min-width: 300px;
- min-height: 200px; 
- border-top-left-radius: 8px;
- border-top-right-radius: 8px;
-} */
-/* kartice */
 h4{
   font-size:  18px;
   font-weight: 600;
@@ -141,7 +88,6 @@ h6{
   margin-top: 8px;
   margin-bottom: 8px;
 }
-/*  */
  h1{
   font-size:  32px;
   font-weight: 700;
@@ -157,14 +103,7 @@ h3{
 
 .mapboxgl-popup-content {
   border-radius:0.375rem !important;
-  /* padding: 1rem; */
   padding: 0rem !important;
-  /* position: relative;
-  background: #fff;
-  border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(0,0,0,.1);
-  padding: 10px 10px 15px;
-  pointer-events: auto; */
 }
 .mapboxgl-popup-close-button {
   font-size: 1rem !important;
@@ -176,7 +115,7 @@ h3{
   cursor: pointer!important;
   background-color: transparent!important;
 }
-/* //loader */
+
 .loader {
   border: 10px solid var(--color-bg); 
   border-top: 10px solid var(--color-blue); 
@@ -192,7 +131,6 @@ h3{
 }
 
 .image-gallery {
-  /* width: 40%; */
   width: 100%;
   height: 220px;
 }
@@ -213,12 +151,6 @@ h3{
   color: #161616;
 }
 
-/* @media (hover: hover) and (pointer: fine) {
-  &:hover {
-    color: $ig-blue;
-  
-  }
-} */
 .card{
   @apply rounded-md ;
 }

@@ -26,19 +26,11 @@ import IndexHostModeHost from "../components/indexhostmodehost";
 import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../firebase-authProvider";
-import toast from "react-hot-toast";
 
-export default function Index({
-  // isHostModeHost,
-  propertiesJSON,
-}: {
-  // isHostModeHost: boolean;
-  propertiesJSON: string;
-}) {
+export default function Index({ propertiesJSON }: { propertiesJSON: string }) {
   const router = useRouter();
   const { user, myUser, hostModeHostC, setHostModeHostC } =
     useContext(AuthContext);
-  // useEffect(() => {
 
   if (myUser && !isFullyRegisteredUser(myUser)) {
     console.log(
@@ -51,29 +43,14 @@ export default function Index({
   }
   if (myUser && myUser.host && hostModeHostC) {
     // //can access only if isHostModeTravel, else change mod
-    // setHostModeHostC(false);
+
     return (
-      // <div className="!h-full">
       <Layout>
-        {/* <div className="!h-full"> */}
         <IndexHostModeHost />
-        {/* </div> */}
       </Layout>
-      // </div>
     );
   }
-  // }, []);
 
-  // if (isHostModeHost)
-  //   return (
-  //     <div className="h-full">
-  //       <Layout>
-  //         <div className="h-full">
-  //           <IndexHostModeHost />
-  //         </div>
-  //       </Layout>
-  //     </div>
-  //   );
   const arr: DocumentData[] = JSON.parse(propertiesJSON);
   return (
     <Layout>
@@ -123,11 +100,9 @@ export async function getServerSideProps(context) {
   try {
     const cookies = nookies.get(context);
     const token = await verifyIdToken(cookies.token);
-    // console.log("token", token[]);
     const { uid } = token;
     var myUser: DocumentData = null;
     var hasPermission: boolean = false;
-    // const userSnap = await getDoc(doc(db, "users", uid));
 
     const q = query(
       collection(db, "property"),
@@ -147,7 +122,7 @@ export async function getServerSideProps(context) {
           redirect: {
             destination: "/profilesettings",
           },
-          props: [],
+          props: {},
         };
       }
       if (isLoggedUser(myUser) || isHost(myUser)) {
@@ -157,7 +132,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -167,16 +142,14 @@ export async function getServerSideProps(context) {
           redirect: {
             destination: "/indexadmin",
           },
-          props: [],
+          props: {},
         };
       }
     }
 
     if (!hasPermission) {
       return {
-        props: {
-          // isHostModeHost: isHostModeHost(myUser),
-        },
+        props: {},
       };
     }
 

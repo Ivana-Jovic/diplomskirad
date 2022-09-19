@@ -298,7 +298,6 @@ export default function Search({
                           value={priceRange}
                           onChange={(e: Event, newValue: number | number[]) => {
                             if (rangeRef !== null) {
-                              //PAZI OVDE JE BILO OBICNO != AKO NE RADI VRATI OVO
                               clearTimeout(rangeRef.current);
                             }
                             rangeRef.current = setTimeout(() => {
@@ -424,9 +423,6 @@ export default function Search({
             </div>
           </div>
         </section>
-        {/* {filteredArr && filteredArr.length === 0 && (
-          <div className=" badge text-center w-full">**No search results**</div>
-        )}*/}
       </div>
     </Layout>
   );
@@ -512,7 +508,7 @@ export async function getServerSideProps(context) {
     const { uid } = token;
 
     var hasPermission: boolean = false;
-    // const docSnap = await getDoc(doc(db, "users", uid));
+
     const [docSnap, returns] = await Promise.all([
       getDoc(doc(db, "users", uid)),
       getEverything(context),
@@ -524,7 +520,7 @@ export async function getServerSideProps(context) {
           redirect: {
             destination: "/profilesettings",
           },
-          props: [],
+          props: {},
         };
       }
       if (isLoggedUser(myUser) || isHost(myUser)) {
@@ -534,7 +530,7 @@ export async function getServerSideProps(context) {
             redirect: {
               destination: "/removedbyadmin",
             },
-            props: [],
+            props: {},
           };
         }
       }
@@ -545,10 +541,9 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
-    // const returns: ReturnType = await getEverything(context);
 
     return {
       props: {

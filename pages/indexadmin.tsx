@@ -35,10 +35,6 @@ export default function IndexAdmin() {
     </Layout>
   );
 }
-// context.res.setHeader(
-//   "Cache-Control",
-//   "public, s-maxage=10, stale-while-revalidate=100"
-// );
 
 export async function getServerSideProps(context) {
   try {
@@ -60,7 +56,7 @@ export async function getServerSideProps(context) {
         redirect: {
           destination: "/",
         },
-        props: [],
+        props: {},
       };
     }
     return {
@@ -71,7 +67,7 @@ export async function getServerSideProps(context) {
       redirect: {
         destination: "/",
       },
-      props: [],
+      props: {},
     };
   }
 }
